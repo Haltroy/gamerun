@@ -8,10 +8,16 @@ One simple easy-to-use script that wraps around these for gaming:
  
 Currently only intended for Nvidia users with Nvidia's drivers (both propriety and open-sourced) with just switcherooctl as a backup solution. However, any request to add support for AMD and Intel or Nouveau is welcomed. 
 
+# IMPORTANT
+
+I decided to make this script into an actual full-fledged application where you can even edit stuff (enabling/disabling components or changing their configuration) per app via GUI. The development of that version will continue on [GitLab](https://gitlab.com/Haltroy) (currently I haven't started it so here's my profile instead). App will be Linux only (just like this script).
+
+This script should still work, except there won't be any updates on it starting now (not like there are people use this shit and actually reading this anyways).
+
 # INSTALLATION
 
 1. Clone the repository with `git clone https://github.com/haltroy/gamerun.git` or [Download ZIP](https://github.com/Haltroy/gamerun/archive/refs/heads/main.zip)
-2. On Arch Linux (and Arch-based distributions), use `makepkg -si` to install it directly or
+2. On Arch Linux (and Arch-based distributions), use `makepkg -si` to install it directly or (for all distributions)
    copy the `gamerun` script to either:
     - `/bin`: `# cp gamerun /bin` (Requires privileges)
     - `/usr/bin`: `# cp gamerun /bin` (Requires privileges)
@@ -25,7 +31,7 @@ Currently only intended for Nvidia users with Nvidia's drivers (both propriety a
    
 ## UNINSTALL
 
-Just either remove the script or use `# pacman -R gamerun` on Arch & Arch-based systems.
+Just either remove the script or use `pacman -R gamerun` on Arch & Arch-based systems.
 
 # CONFIGURE
 
@@ -45,6 +51,8 @@ Here's a list of each file and what they configure:
 
 # DEVELOPMENT
 
-Any requests and PRs are welcomed. Just don't forget to update the SHA512 checksum on PKGBUILD file if you changed anything on the main script.
+~Any requests and PRs are welcomed. Just don't forget to update the SHA512 checksum on PKGBUILD file if you changed anything on the main script.~
+
+Future development of this script halted in favor of an upcoming project.
 
 I originally intended this for my own personal use (hence why there's not enough stuff here in the first place) but I thought maybe others can use it as well.
