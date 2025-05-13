@@ -53,9 +53,9 @@ Here's a list of each file and what they configure:
 
 # DEVELOPMENT
 
-~Any requests and PRs are welcomed. Just don't forget to update the SHA512 checksum on PKGBUILD file if you changed anything on the main script.~
+Any requests and PRs are welcomed. Just don't forget to update the SHA512 checksum on PKGBUILD file if you changed anything on the main script.
 
-Future development of this script halted in favor of an upcoming project.
+Future big development of this script halted in favor of an upcoming project.
 
 I originally intended this for my own personal use (hence why there's not enough stuff here in the first place) but I thought maybe others can use it as well.
 
