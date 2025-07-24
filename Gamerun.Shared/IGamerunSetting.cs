@@ -1,0 +1,51 @@
+using System.Collections.Generic;
+using System.IO;
+
+namespace Gamerun.Shared
+{
+    /// <summary>
+    ///     Abstract class for different settings classes for Gamerun.
+    /// </summary>
+    public abstract class GamerunSettingsAbstract
+    {
+        /// <summary>
+        ///     Delegate for the save event.
+        /// </summary>
+        public delegate void GamerunSettingSaveDelegate();
+
+        /// <summary>
+        ///     Reads data from <paramref name="stream" /> and sets the settings accordingly.
+        /// </summary>
+        /// <param name="stream">Stream to read the data from.</param>
+        public abstract void ReadSettings(Stream stream);
+
+        /// <summary>
+        ///     Writes data to <paramref name="stream" />.
+        /// </summary>
+        /// <param name="stream"></param>
+        public abstract void WriteSettings(Stream stream);
+
+        /// <summary>
+        ///     Generates the command, environment variables and start/end script(s).
+        /// </summary>
+        /// <param name="args">Arguments from previous module(s).</param>
+        /// <returns>Command to run.</returns>
+        public abstract GamerunStartArguments GenerateArgs(GamerunStartArguments args);
+
+        /// <summary>
+        ///     This event will be fired when a setting changes to dynamically save it.
+        /// </summary>
+        public abstract event GamerunSettingSaveDelegate? OnSave;
+    }
+}
+
+public class GamerunStartArguments
+{
+    public string Prefix { get; set; }
+    public string Postfix { get; set; }
+    public Dictionary<string, string> Environment { get; set; }
+    public string StartScript { get; set; }
+    public string EndScript { get; set; }
+    public int StartScriptTimeout { get; set; }
+    public int EndScriptTimeout { get; set; }
+}
