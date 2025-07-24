@@ -1,14 +1,15 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace Gamerun.Shared
 {
-    public class AppSettings : GamerunSettingsAbstract
+    public class AppSettings : GamerunSettingsAbstract, ICloneable
     {
         private bool _amdPerfLevel = true;
         private bool _blockScreenSaver = true;
         private bool _cpuGovernor = true;
-        private bool _disableSplitLOckMitigation = true;
+        private bool _disableSplitLockMitigation = true;
         private uint _gpuID;
         private bool _igpuGovernor = true;
         private float _igpuTreshold = 0.3F; // iGPU Watts / CPU Watts
@@ -18,15 +19,29 @@ namespace Gamerun.Shared
         private bool _optimizeGPU = true;
 
         private bool _parkCores = true;
+
+        private bool _parkCoresAuto = true;
+
+        private Dictionary<uint, bool>
+            _parkedCores; // TODO: Handle these init on constructor by adding the cores themselves.
+
         private bool _pinCores = true;
+        private bool _pinCoresAuto = true;
+
+        private Dictionary<uint, bool>
+            _pinnedCores; // TODO: also figure out how to make this auto-save aka invoke OnSave()?
+
         private bool _powerGovernor = true;
         private bool _prioritize = true;
         private bool _prioritizeIO = true;
 
-        private bool _softrealtime = true;
-        // TODO: Park & Pin cores list
-        // TODO: Start and Stop script & script timeouts
+        private App? _shadowApp;
 
+        private bool _softrealtime = true;
+        private string? _startupScriptPath;
+        private uint _startupScriptTimeout = 10;
+        private string? _stopScriptPath;
+        private uint _stopScriptTimeout = 10;
 
         // ReSharper disable once InconsistentNaming
         private bool _useGPU = true;
@@ -69,6 +84,259 @@ namespace Gamerun.Shared
             }
         }
 
+        public float iGPUTreshold
+        {
+            get => iGPUTreshold;
+            set
+            {
+                _igpuTreshold = value;
+                OnSave?.Invoke();
+            }
+        }
+
+        public Dictionary<uint, bool> ParkedCores
+        {
+            get => _parkedCores;
+            set
+            {
+                _parkedCores = value;
+                OnSave?.Invoke();
+            }
+        }
+
+        public Dictionary<uint, bool> PinnedCores
+        {
+            get => _pinnedCores;
+            set
+            {
+                _pinnedCores = value;
+                OnSave?.Invoke();
+            }
+        }
+
+        public string StartupScriptPath
+        {
+            get => _startupScriptPath;
+            set
+            {
+                _startupScriptPath = value;
+                OnSave?.Invoke();
+            }
+        }
+
+        public string StopScriptPath
+        {
+            get => _stopScriptPath;
+            set
+            {
+                _stopScriptPath = value;
+                OnSave?.Invoke();
+            }
+        }
+
+        public bool AMDPerfLevel
+        {
+            get => _amdPerfLevel;
+            set
+            {
+                _amdPerfLevel = value;
+                OnSave?.Invoke();
+            }
+        }
+
+        public bool BlockScreenSaver
+        {
+            get => _blockScreenSaver;
+            set
+            {
+                _blockScreenSaver = value;
+                OnSave?.Invoke();
+            }
+        }
+
+        public bool CPUGovernor
+        {
+            get => _cpuGovernor;
+            set
+            {
+                _cpuGovernor = value;
+                OnSave?.Invoke();
+            }
+        }
+
+        public bool DisableSplitLockMitigation
+        {
+            get => _disableSplitLockMitigation;
+            set
+            {
+                _disableSplitLockMitigation = value;
+                OnSave?.Invoke();
+            }
+        }
+
+        public bool iGPUGovernor
+        {
+            get => _igpuGovernor;
+            set
+            {
+                _igpuGovernor = value;
+                OnSave?.Invoke();
+            }
+        }
+
+        public bool NvPowerMizer
+        {
+            get => _nvPowerMizer;
+            set
+            {
+                _nvPowerMizer = value;
+                OnSave?.Invoke();
+            }
+        }
+
+        public bool OptimizeGPU
+        {
+            get => _optimizeGPU;
+            set
+            {
+                _optimizeGPU = value;
+                OnSave?.Invoke();
+            }
+        }
+
+        public bool ParkCores
+        {
+            get => _parkCores;
+            set
+            {
+                _parkCores = value;
+                OnSave?.Invoke();
+            }
+        }
+
+        public bool ParkCoresAuto
+        {
+            get => _parkCoresAuto;
+            set
+            {
+                _parkCoresAuto = value;
+                OnSave?.Invoke();
+            }
+        }
+
+        public bool PinCores
+        {
+            get => _pinCores;
+            set
+            {
+                _pinCores = value;
+                OnSave?.Invoke();
+            }
+        }
+
+        public bool PinCoresAuto
+        {
+            get => _pinCoresAuto;
+            set
+            {
+                _pinCoresAuto = value;
+                OnSave?.Invoke();
+            }
+        }
+
+        public bool PowerGovernor
+        {
+            get => _powerGovernor;
+            set
+            {
+                _powerGovernor = value;
+                OnSave?.Invoke();
+            }
+        }
+
+
+        public bool SoftRealTime
+        {
+            get => _softrealtime;
+            set
+            {
+                _softrealtime = value;
+                OnSave?.Invoke();
+            }
+        }
+
+        public uint StopScriptTimeout
+        {
+            get => _stopScriptTimeout;
+            set
+            {
+                _stopScriptTimeout = value;
+                OnSave?.Invoke();
+            }
+        }
+
+        public uint GPUID
+        {
+            get => _gpuID;
+            set
+            {
+                _gpuID = value;
+                OnSave?.Invoke();
+            }
+        }
+
+        public uint NvCoreClockOffset
+        {
+            get => _nvCoreClockOffset;
+            set
+            {
+                _nvCoreClockOffset = value;
+                OnSave?.Invoke();
+            }
+        }
+
+        public uint NvMemClockOffset
+        {
+            get => _nvMemClockOffset;
+            set
+            {
+                _nvMemClockOffset = value;
+                OnSave?.Invoke();
+            }
+        }
+
+        public uint StartupScriptTimeout
+        {
+            get => _startupScriptTimeout;
+            set
+            {
+                _startupScriptTimeout = value;
+                OnSave?.Invoke();
+            }
+        }
+
+        public bool RequireRootPermissions => Prioritize || PrioritizeIO || OptimizeGPU; // TODO
+
+        public object Clone()
+        {
+            // TODO
+            throw new NotImplementedException();
+        }
+
+        public AppSettings CreateShadowCopy(App app)
+        {
+            _shadowApp = app;
+            OnSave += ShadowCopySave;
+            return this;
+        }
+
+        private void ShadowCopySave()
+        {
+            // TODO
+            _shadowApp = null;
+            OnSave -= ShadowCopySave;
+        }
+
         public override void ReadSettings(Stream stream)
         {
             var bufferByte = stream.ReadByte();
@@ -88,7 +356,7 @@ namespace Gamerun.Shared
             MangoHUD.WriteSettings(stream);
         }
 
-        public override string GenerateCommand()
+        public override GamerunStartArguments GenerateArgs(GamerunStartArguments args)
         {
             // TODO: Find and use GPU
             // lspci -k | grep -A3 -i 'VGA\|3D' shows this:

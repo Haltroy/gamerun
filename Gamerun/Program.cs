@@ -70,7 +70,10 @@ internal class Program
     {
         if (args.Contains("--daemon", StringComparer.OrdinalIgnoreCase))
         {
+            Shared.Gamerun.Init();
+            Console.WriteLine($"[Daemon] [I] Initialized with {Shared.Gamerun.Apps.Count} total app(s).");
             var runInSocket = GetRunnableSocket();
+            Console.WriteLine($"[Daemon] [I] Running in socket \"{runInSocket}\"...");
             var endPoint = new UnixDomainSocketEndPoint(runInSocket);
             if (File.Exists(runInSocket))
             {
@@ -78,17 +81,22 @@ internal class Program
                 using var client = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);
                 try
                 {
+                    Console.WriteLine(
+                        $"[Daemon] [I] Connecting to socket \"{runInSocket}\" for replacement shutdown request...");
                     client.Connect(endPoint);
                 }
                 catch (SocketException)
                 {
+                    Console.WriteLine(
+                        $"[Daemon] [I] Socket \"{runInSocket}\" exist but nothing is running. Deleting file...");
                     File.Delete(runInSocket);
                     skipShutdownRequest = true;
                 }
                 catch (Exception ex)
                 {
                     Console.Error.WriteLine(
-                        $"FATAL! Cannot replace socket (\"{runInSocket}\"). Exception caught: {ex}");
+                        $"[Daemon] [F] Cannot replace socket (\"{runInSocket}\"). Exception caught: {ex}");
+                    Environment.ExitCode = 1;
                     return;
                 }
 
@@ -96,15 +104,18 @@ internal class Program
                 {
                     var message = "shutdown"u8.ToArray();
                     client.Send(message);
+                    Console.WriteLine($"[Daemon] [I] Socket \"{runInSocket}\" killed.");
                 }
             }
 
             var listener = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);
             listener.Bind(endPoint);
             listener.Listen(5);
+            Console.WriteLine($"[Daemon] [I] Started listening on socket \"{runInSocket}\".");
 
             while (true)
             {
+                Console.WriteLine("[Daemon] [I] Client connected...");
                 var client = listener.Accept();
                 var buffer = new byte[1024];
                 var bytesRead = client.Receive(buffer);
@@ -112,6 +123,7 @@ internal class Program
 
                 if (message.StartsWith("shutdown", StringComparison.OrdinalIgnoreCase))
                 {
+                    Console.WriteLine($"[Daemon] [I] Shutting down socket \"{runInSocket}\".");
                     client.Close();
                     listener.Disconnect(true);
                     listener.Shutdown(SocketShutdown.Both);
@@ -121,6 +133,7 @@ internal class Program
 
                 if (message.StartsWith("alive", StringComparison.OrdinalIgnoreCase))
                 {
+                    Console.WriteLine("[Daemon] [I] Alive request received.");
                     client.Send("I AM ALIVE"u8.ToArray());
                     continue;
                 }
@@ -135,16 +148,17 @@ internal class Program
                     case "revert": // reverts boost from app
                         // TODO
                         break;
-                    case "refresh": // refreshes configuration
-                        // TODO
+                    case "refresh":
+                        Shared.Gamerun.Refresh();
+                        Console.WriteLine($"[Daemon] [I] Refreshed with {Shared.Gamerun.Apps.Count} total app(s).");
                         break;
 
                     case null:
-                        Console.WriteLine($"Cannot parse arguments or message not received: {message}");
+                        Console.WriteLine($"[Daemon] [E] Received message \"{message}\" is not well-formed. Ignored.");
                         break;
 
                     default:
-                        Console.WriteLine($"Unknown command: {message}");
+                        Console.WriteLine($"[Daemon] [E] Message \"{runInSocket}\" unknown. Ignored.");
                         break;
                 }
 
@@ -158,6 +172,7 @@ internal class Program
 
         if (args.Contains("--shutdown", StringComparer.OrdinalIgnoreCase))
         {
+            Console.WriteLine("[Client] [I] Sending shutdown request...");
             var endPoint = new UnixDomainSocketEndPoint(runningSocket);
             using var client = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);
             client.Connect(endPoint);
@@ -169,26 +184,33 @@ internal class Program
 
         try
         {
-            var endPoint = new UnixDomainSocketEndPoint(runningSocket);
-            using var client = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);
-            client.Connect(endPoint);
+            var appCommandLine = args[0];
+            var app = Shared.Gamerun.GetApp(appCommandLine);
 
-            var message = "boost-on"u8.ToArray(); // TODO
-            client.Send(message);
+            if (app.Settings.RequireRootPermissions)
+            {
+                var endPoint = new UnixDomainSocketEndPoint(runningSocket);
+                using var client = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);
+                client.Connect(endPoint);
+
+                var message = "boost-on"u8.ToArray(); // TODO
+                client.Send(message);
+            }
+            // TODO: Boost app
         }
         catch (SocketException soEx) // added "o" in the middle, you know why
         {
             Console.Error.WriteLine(
-                $"Cannot connect to the socket (located in \"{runningSocket}\"). Exception caught: {soEx}");
+                $"[Client] [F] Cannot connect to the socket (located in \"{runningSocket}\"). Exception caught: {soEx}");
         }
         catch (SecurityException secEx)
         {
             Console.Error.WriteLine(
-                $"Cannot connect to the socket (located in \"{runningSocket}\") due to an security error. Exception caught: {secEx}");
+                $"[Client] [F] Cannot connect to the socket (located in \"{runningSocket}\") due to an security error. Exception caught: {secEx}");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Cannot set it to high performance. Exception caught: {ex}");
+            Console.Error.WriteLine($"[Client] [F] Cannot set it to high performance. Exception caught: {ex}");
         }
     }
 
@@ -206,18 +228,26 @@ internal class Program
         // TODO
     }
 
-    /*
-     const ulong sys_ioprio_set = 251;
-     cont int IOPRIO_CLASS_RT = 1;
-     int result syscall(sys_ioprio_set, 1, // process
-      pid, (IOPRIO_CLASS_RT << 13) | 0);
-     */
+
     [DllImport("libc", SetLastError = true)]
     private static extern int syscall(ulong number, int which, int who, int ioprio);
 
-    // which = 0 (PRIO_PROCESS), who = PID, prio = -10 (lower means higher)
+    // Needs root privileges!
+    private static int SetIOPriority(int pid)
+    {
+        const ulong sys_ioprio_set = 251;
+        const int IOPRIO_CLASS_RT = 1;
+        return syscall(sys_ioprio_set, 1, pid, (IOPRIO_CLASS_RT << 13) | 0);
+    }
+
     [DllImport("libc", SetLastError = true)]
     private static extern int setpriority(int which, int who, int prio);
+
+    // Needs root privileges!
+    private static int SetPriority(int pid)
+    {
+        return setpriority(0, pid, -10);
+    }
 
     [DllImport("libc")]
     private static extern uint getuid();

@@ -10,19 +10,26 @@ namespace Gamerun.Shared
     {
         #region Functions and Events
 
-        public override string GenerateCommand()
+        public override GamerunStartArguments GenerateArgs(GamerunStartArguments args)
         {
-            // TODO: Convert this to Environment Variables
-            return !Enabled
-                ? ""
-                : $"{Tools.GetCommand("strangle")} " +
-                  $"{(VulkanOnly ? "-k" : "")} " +
-                  $"{(VulkanOnly && Trilinear ? "-t" : "")} " +
-                  $"{(NoDlsym ? "-n" : "")} " +
-                  $"{(PICMIP != 0 ? $"-p {PICMIP}" : "")} " +
-                  $"{(AnisotropicFiltering > 0 ? $"-a {AnisotropicFiltering}" : "")} " +
-                  $"{(VSync > 0 ? $"-v {VSync - 1}" : "")}" +
-                  $"{FPS}:{BatteryFPS}";
+            if (!Enabled)
+            {
+                args.Environment["DISABLE_VK_LAYER_TORKEL104_libstrangle"] = "1";
+                return args;
+            }
+
+            args.Environment["ENABLE_VK_LAYER_TORKEL104_libstrangle"] = "1";
+            if (VulkanOnly) args.Environment["STRANGLE_VKONLY"] = "1";
+            if (VulkanOnly && Trilinear) args.Environment["STRANGLE_TRILINEAR"] = "1";
+            if (NoDlsym) args.Environment["STRANGLE_NODLSYM"] = "1";
+            if (PICMIP != 0) args.Environment["STRANGLE_PICMIP"] = PICMIP.ToString();
+            if (AnisotropicFiltering > 0) args.Environment["STRANGLE_AF"] = AnisotropicFiltering.ToString();
+            if (VSync > 0) args.Environment["STRANGLE_VSYNC"] = (VSync - 1).ToString();
+            args.Environment["STRANGLE_FPS"] = FPS.ToString();
+            args.Environment["STRANGLE_FPS_BATTERY"] = BatteryFPS.ToString();
+
+            // TODO: GLFINISH (0 or 1), BICUBIC (Vulkan only, 0 or 1), RETRO (Vulkan only, 0 or 1)
+            return args;
         }
 
         public override void ReadSettings(Stream stream)
@@ -42,12 +49,12 @@ namespace Gamerun.Shared
             bufferByte = stream.ReadByte();
             if (bufferByte == -1) throw new Exception(); // TODO
             var afVLE = Tools.IsBitSet(bufferByte, 0);
-            var battfpsVLE = Tools.IsBitSet(bufferByte, 0);
-            var fpsVLE = Tools.IsBitSet(bufferByte, 0);
-            var vsyncVLE = Tools.IsBitSet(bufferByte, 0);
-            var picmipHasValue = Tools.IsBitSet(bufferByte, 0);
-            var picmipVLE = Tools.IsBitSet(bufferByte, 0);
-            var picmipNegative = Tools.IsBitSet(bufferByte, 0);
+            var battfpsVLE = Tools.IsBitSet(bufferByte, 1);
+            var fpsVLE = Tools.IsBitSet(bufferByte, 2);
+            var vsyncVLE = Tools.IsBitSet(bufferByte, 3);
+            var picmipHasValue = Tools.IsBitSet(bufferByte, 4);
+            var picmipVLE = Tools.IsBitSet(bufferByte, 5);
+            var picmipNegative = Tools.IsBitSet(bufferByte, 6);
 
             if (afHasValue)
             {

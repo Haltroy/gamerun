@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 
 namespace Gamerun.Shared
@@ -25,15 +26,26 @@ namespace Gamerun.Shared
         public abstract void WriteSettings(Stream stream);
 
         /// <summary>
-        ///     Generates the command.
+        ///     Generates the command, environment variables and start/end script(s).
         /// </summary>
+        /// <param name="args">Arguments from previous module(s).</param>
         /// <returns>Command to run.</returns>
-        public abstract string
-            GenerateCommand(); // TODO: This should return a class that has EnvironmentVariables and Command
+        public abstract GamerunStartArguments GenerateArgs(GamerunStartArguments args);
 
         /// <summary>
         ///     This event will be fired when a setting changes to dynamically save it.
         /// </summary>
         public abstract event GamerunSettingSaveDelegate? OnSave;
     }
+}
+
+public class GamerunStartArguments
+{
+    public string Prefix { get; set; }
+    public string Postfix { get; set; }
+    public Dictionary<string, string> Environment { get; set; }
+    public string StartScript { get; set; }
+    public string EndScript { get; set; }
+    public int StartScriptTimeout { get; set; }
+    public int EndScriptTimeout { get; set; }
 }

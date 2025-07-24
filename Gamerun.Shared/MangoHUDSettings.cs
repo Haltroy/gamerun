@@ -100,12 +100,12 @@ namespace Gamerun.Shared
             writer.Write(Configuration);
         }
 
-        public override string GenerateCommand()
+        public override GamerunStartArguments GenerateArgs(GamerunStartArguments args)
         {
-            if (Enabled) Environment.SetEnvironmentVariable("MANGOHUD", "1");
-            if (ConfigIsFile) Environment.SetEnvironmentVariable("MANGOHUD_CONFIGFILE", Configuration);
-            else Environment.SetEnvironmentVariable("MANGOHUD_CONFIG", Configuration);
-            return "";
+            if (Enabled) args.Environment["MANGOHUD"] = "1";
+            if (ConfigIsFile) args.Environment["MANGOHUD_CONFIGFILE"] = Configuration;
+            else args.Environment["MANGOHUD_CONFIG"] = Configuration;
+            return args;
         }
 
         public override event GamerunSettingSaveDelegate? OnSave;
