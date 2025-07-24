@@ -10,11 +10,13 @@ Currently only intended for Nvidia users with Nvidia's drivers (both propriety a
 
 # IMPORTANT
 
-I decided to make this script into an actual full-fledged application where you can even edit stuff (enabling/disabling components or changing their configuration) per app via GUI. The development of that version will continue on [GitLab](https://gitlab.com/Haltroy) (currently I haven't started it so here's my profile instead). App will be Linux only (just like this script).
+I decided to make this script into an actual full-fledged application where you can even edit stuff (enabling/disabling components or changing their configuration) per app via GUI. The development of that version will continue on [this brnach](https://github.com/haltroy/gamerun/tree/gamerun-next). App will be Linux only (just like this script).
 
 This script should still work, except there won't be any updates on it starting now (not like there are people use this shit and actually reading this anyways).
 
 # INSTALLATION
+
+For script (`main` branch or the current version):
 
 1. Clone the repository with `git clone https://github.com/haltroy/gamerun.git` or [Download ZIP](https://github.com/Haltroy/gamerun/archive/refs/heads/main.zip)
 2. On Arch Linux (and Arch-based distributions), use `makepkg -si` to install it directly or (for all distributions)
@@ -28,12 +30,28 @@ This script should still work, except there won't be any updates on it starting 
         - For FISH: run `fish_add_path "$HOME/.local/bin"`
 3. Run games with `gamerun` command.
    - For Steam, open up properties for game and add `gamerun %command%` to the Additional Argument section.
-   
+
+For the upcoming version (in `gamerun-next` branch):
+
+1. Clone the repository with `git clone -b gamerun-next https://github.com/haltroy/gamerun.git` or [Download ZIP](https://github.com/Haltroy/gamerun/archive/refs/heads/gamerun-next.zip)
+2. Install [.NET SDK](https://dotnet.microsoft.com) (Latest LTS is recommended).
+3. Open `Gamerun/Gamerun` folder in terminal (by either using "Open in terminal" option in your file manager or navigating there on your terminal emulator of choice).
+4. Run `dotnet publish -c Release -r <your system RID> -o ./publish/`.
+   - Your system RID depends on 2 things, the C library that your ysstem uses (just `linux-<processor>` if it's GNU and `linux-musl-<processor>` if its MUSL) and your processor (`x86` for 32-bit Intel and/or AMD, `x64` for 64-bit Intel and/or AMD, `arm` for 32-bit ARM and  `arm64` for 64-bit ARM). For example, if you want to build for Fedora 42 on an Intel system it should be `linux-x64` and if you want to build for an Alpine machine running in a 64-bit ARM machine it should be `linux-musl-arm64`.
+5. There should be an executable named `Gamerun` in the `publish` folder. Run it by passing a game as argument (ex. `./Gamerun vkcube`).
+6. If you want to test/use deamon then start it with `--daemon` argument. If you want to use renicing, IO renicing and other stuff that needs root privileges then you need to run it with sudo `sudo ./Gamerun --daemon`.
+7. If you want to change settings for apps, go to the `Gamerun\Gamerun.Editor` folder and build it with the command mentioned in the 4th entry. 
+
+In the future, there will be a service file for all init systems for daemon mode, fine-tuned GUI as well as an proper AUR & DEB & RPM packages available in the Releases when it is done. For now most of the stuff are very prone to changes and might feel unfinished.
+
 ## UNINSTALL
 
 Just either remove the script or use `pacman -R gamerun` on Arch & Arch-based systems.
 
 # CONFIGURE
+
+This section is subject to change in the next version (as you won't be needing to configure using command-line/file methods but directly from GUI app).
+The rest of the document is for the script.
 
 Configuration is made with multiple files.
 
@@ -55,12 +73,14 @@ Here's a list of each file and what they configure:
 
 Any requests and PRs are welcomed. Just don't forget to update the SHA512 checksum on PKGBUILD file if you changed anything on the main script.
 
-Future big development of this script halted in favor of an upcoming project.
+Future big development on this project halted in favor of an upcoming update.
 
 I originally intended this for my own personal use (hence why there's not enough stuff here in the first place) but I thought maybe others can use it as well.
 
 
 # WELL KNOWN ISSUES
+
+This list is subject to change in the next version of script.
 
 ### Game doesn't launch:
 This usually caused by libstrangle. You can:
