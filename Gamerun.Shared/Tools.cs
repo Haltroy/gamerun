@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -9,8 +10,7 @@ namespace Gamerun.Shared
     {
         public static readonly uint VLEMaxSize = 268435455;
 
-        // TODO: Hopefully we won't be needing this in the future since I set libstrangle and MangoHUD stuff with environment variables and use native solutions for nvidia-prime/switcherooctl and gamemode instead.
-        [Obsolete("Use this as less as possible. Switch to Environment Variables if possible.")]
+        // We need this for Gamescope, compositors, power management, fan control and notification daemons
         public static string GetCommand(string command)
         {
             var pathEnv = Environment.GetEnvironmentVariable("PATH");
@@ -53,6 +53,78 @@ namespace Gamerun.Shared
 
             return value;
         }
+
+        public static bool IsIntelCpu()
+        {
+            try
+            {
+                var cpuInfo = File.ReadAllText("/proc/cpuinfo");
+                return cpuInfo.Contains("GenuineIntel");
+            }
+            catch
+            {
+                return false; // Assume not Intel if cannot detect
+            }
+        }
+
+        public static ProcessorCore[] DetectCpuTopology()
+        {
+            var cores = new List<ProcessorCore>();
+            var cpus = Directory.GetDirectories("/sys/devices/system/cpu", "cpu[0-9]*");
+
+            foreach (var cpuPath in cpus)
+            {
+                var cpuIdStr = Path.GetFileName(cpuPath).Replace("cpu", "");
+                if (!int.TryParse(cpuIdStr, out var cpuId))
+                    continue;
+
+                var core = new ProcessorCore { Id = cpuId, Type = ProcessorCoreType.Normal };
+
+                var eppPath = Path.Combine(cpuPath, "cpufreq/energy_performance_preference");
+                if (File.Exists(eppPath))
+                {
+                    using var eppStream = new FileStream(eppPath, FileMode.Open, FileAccess.Read);
+                    using var eppReader = new StreamReader(eppStream);
+                    var epp = eppReader.ReadToEnd();
+                    switch (epp.ToLower())
+                    {
+                        case "power":
+                        case "balance-power":
+                            core.Type = ProcessorCoreType.LowPower;
+                            break;
+
+                        case "performance":
+                            core.Type = ProcessorCoreType.HighPower;
+                            break;
+                        default:
+                            core.Type = ProcessorCoreType.Normal;
+                            break;
+                    }
+                }
+
+                var capPath = Path.Combine(cpuPath, "cpu_capacity");
+                if (File.Exists(capPath))
+                {
+                    using var capStream = new FileStream(capPath, FileMode.Open, FileAccess.Read);
+                    using var capReader = new StreamReader(capStream);
+                    var capacityString = capReader.ReadToEnd();
+                    if (int.TryParse(capacityString, out var capacity))
+                    {
+                        if (capacity >= 1024)
+                            core.Type = ProcessorCoreType.HighPower;
+                        else if (capacity <= 512)
+                            core.Type = ProcessorCoreType.LowPower;
+                        else
+                            core.Type = ProcessorCoreType.Normal;
+                    }
+                }
+
+                cores.Add(core);
+            }
+
+            return cores.OrderBy(c => c.Id).ToArray();
+        }
+
 
         public static void WriteVarUInt(Stream stream, uint value)
         {

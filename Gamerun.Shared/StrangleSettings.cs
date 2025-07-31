@@ -1,10 +1,12 @@
 using System;
 using System.IO;
+using Gamerun.Shared.Exceptions;
 
 namespace Gamerun.Shared
 {
     /// <summary>
-    ///     LibStrangle settings. LibStrangle is a tool that limits frame rates in order to use less energy and for longevity.
+    ///     LibStrangle settings. LibStrangle is a tool that limits frame rates in order to use less energy and for longevity
+    ///     of hardware as well as making less noise.
     /// </summary>
     public class StrangleSettings : GamerunSettingsAbstract
     {
@@ -21,23 +23,29 @@ namespace Gamerun.Shared
             args.Environment["ENABLE_VK_LAYER_TORKEL104_libstrangle"] = "1";
             if (VulkanOnly) args.Environment["STRANGLE_VKONLY"] = "1";
             if (VulkanOnly && Trilinear) args.Environment["STRANGLE_TRILINEAR"] = "1";
+            if (VulkanOnly && Bicubic) args.Environment["STRANGLE_BICUBIC"] = "1";
+            if (VulkanOnly && Retro) args.Environment["STRANGLE_RETRO"] = "1";
+            if (GLFinish) args.Environment["STRANGLE_GLFINISH"] = "1";
             if (NoDlsym) args.Environment["STRANGLE_NODLSYM"] = "1";
             if (PICMIP != 0) args.Environment["STRANGLE_PICMIP"] = PICMIP.ToString();
             if (AnisotropicFiltering > 0) args.Environment["STRANGLE_AF"] = AnisotropicFiltering.ToString();
             if (VSync > 0) args.Environment["STRANGLE_VSYNC"] = (VSync - 1).ToString();
             args.Environment["STRANGLE_FPS"] = FPS.ToString();
             args.Environment["STRANGLE_FPS_BATTERY"] = BatteryFPS.ToString();
-
-            // TODO: GLFINISH (0 or 1), BICUBIC (Vulkan only, 0 or 1), RETRO (Vulkan only, 0 or 1)
             return args;
         }
+
+        public override bool IsDefaults => _vulkanOnly == null && _enabled == null && _trilinear == null &&
+                                           _noDlsym == null && _picmip == null && _anisotropicFiltering == null &&
+                                           _vSync == null && _fps == null && _batteryFps == null && _glfinish == null &&
+                                           _bicubic == null && _retro == null;
 
         public override void ReadSettings(Stream stream)
         {
             var bufferByte = stream.ReadByte();
             int bufferRead;
             byte[] buffer;
-            if (bufferByte == -1) throw new Exception(); // TODO
+            if (bufferByte == -1) throw new GamerunEndOfStreamException(stream.Position);
             _enabled = Tools.IsBitSet(bufferByte, 0);
             _vulkanOnly = Tools.IsBitSet(bufferByte, 1);
             _noDlsym = Tools.IsBitSet(bufferByte, 2);
@@ -47,7 +55,7 @@ namespace Gamerun.Shared
             var fpsHasValue = Tools.IsBitSet(bufferByte, 6);
             var vsyncHasValue = Tools.IsBitSet(bufferByte, 7);
             bufferByte = stream.ReadByte();
-            if (bufferByte == -1) throw new Exception(); // TODO
+            if (bufferByte == -1) throw new GamerunEndOfStreamException(stream.Position);
             var afVLE = Tools.IsBitSet(bufferByte, 0);
             var battfpsVLE = Tools.IsBitSet(bufferByte, 1);
             var fpsVLE = Tools.IsBitSet(bufferByte, 2);
@@ -55,6 +63,11 @@ namespace Gamerun.Shared
             var picmipHasValue = Tools.IsBitSet(bufferByte, 4);
             var picmipVLE = Tools.IsBitSet(bufferByte, 5);
             var picmipNegative = Tools.IsBitSet(bufferByte, 6);
+            bufferByte = stream.ReadByte();
+            if (bufferByte == -1) throw new GamerunEndOfStreamException(stream.Position);
+            _glfinish = Tools.IsBitSet(bufferByte, 0);
+            _bicubic = Tools.IsBitSet(bufferByte, 1);
+            _retro = Tools.IsBitSet(bufferByte, 2);
 
             if (afHasValue)
             {
@@ -66,7 +79,7 @@ namespace Gamerun.Shared
                 {
                     buffer = new byte[sizeof(uint)];
                     bufferRead = stream.Read(buffer, 0, buffer.Length);
-                    if (bufferRead != buffer.Length) throw new Exception(); // TODO
+                    if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
                     _anisotropicFiltering = BitConverter.ToUInt32(buffer);
                 }
             }
@@ -81,7 +94,7 @@ namespace Gamerun.Shared
                 {
                     buffer = new byte[sizeof(uint)];
                     bufferRead = stream.Read(buffer, 0, buffer.Length);
-                    if (bufferRead != buffer.Length) throw new Exception(); // TODO
+                    if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
                     _batteryFps = BitConverter.ToUInt32(buffer);
                 }
             }
@@ -96,7 +109,7 @@ namespace Gamerun.Shared
                 {
                     buffer = new byte[sizeof(uint)];
                     bufferRead = stream.Read(buffer, 0, buffer.Length);
-                    if (bufferRead != buffer.Length) throw new Exception(); // TODO
+                    if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
                     _fps = BitConverter.ToUInt32(buffer);
                 }
             }
@@ -111,7 +124,7 @@ namespace Gamerun.Shared
                 {
                     buffer = new byte[sizeof(uint)];
                     bufferRead = stream.Read(buffer, 0, buffer.Length);
-                    if (bufferRead != buffer.Length) throw new Exception(); // TODO
+                    if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
                     _vSync = BitConverter.ToUInt32(buffer);
                 }
             }
@@ -125,7 +138,7 @@ namespace Gamerun.Shared
             {
                 buffer = new byte[sizeof(int)];
                 bufferRead = stream.Read(buffer, 0, buffer.Length);
-                if (bufferRead != buffer.Length) throw new Exception(); // TODO
+                if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
                 _picmip = BitConverter.ToInt32(buffer);
             }
         }
@@ -151,6 +164,11 @@ namespace Gamerun.Shared
             bufferByte += (byte)(PICMIP != 0 ? 16 : 0);
             bufferByte += (byte)(Math.Abs(PICMIP) < Tools.VLEMaxSize ? 32 : 0);
             bufferByte += (byte)(PICMIP < 0 ? 64 : 0);
+            stream.WriteByte(bufferByte);
+            bufferByte = 0;
+            bufferByte += (byte)(GLFinish ? 1 : 0);
+            bufferByte += (byte)(Bicubic ? 2 : 0);
+            bufferByte += (byte)(Retro ? 4 : 0);
             stream.WriteByte(bufferByte);
 
             if (AnisotropicFiltering > 0)
@@ -230,7 +248,7 @@ namespace Gamerun.Shared
         /// </summary>
         public bool Enabled
         {
-            get => _enabled;
+            get => _enabled ?? Gamerun.Default.Strangle.Enabled;
             set
             {
                 _enabled = value;
@@ -245,7 +263,7 @@ namespace Gamerun.Shared
         // ReSharper disable once InconsistentNaming
         public uint BatteryFPS
         {
-            get => _batteryFps;
+            get => _batteryFps ?? Gamerun.Default.Strangle.BatteryFPS;
             set
             {
                 _batteryFps = value;
@@ -259,7 +277,7 @@ namespace Gamerun.Shared
         // ReSharper disable once InconsistentNaming
         public uint FPS
         {
-            get => _fps;
+            get => _fps ?? Gamerun.Default.Strangle.FPS;
             set
             {
                 _fps = value;
@@ -273,7 +291,7 @@ namespace Gamerun.Shared
 
         public bool NoDlsym
         {
-            get => _noDlsym;
+            get => _noDlsym ?? Gamerun.Default.Strangle.NoDlsym;
             set
             {
                 _noDlsym = value;
@@ -287,7 +305,7 @@ namespace Gamerun.Shared
 
         public bool Trilinear
         {
-            get => _trilinear;
+            get => _trilinear ?? Gamerun.Default.Strangle.Trilinear;
             set
             {
                 _trilinear = value;
@@ -300,7 +318,7 @@ namespace Gamerun.Shared
         /// </summary>
         public bool VulkanOnly
         {
-            get => _vulkanOnly;
+            get => _vulkanOnly ?? Gamerun.Default.Strangle.VulkanOnly;
             set
             {
                 _vulkanOnly = value;
@@ -369,10 +387,9 @@ namespace Gamerun.Shared
 
         public uint VSync
         {
-            get => _vSync;
+            get => _vSync ?? Gamerun.Default.Strangle.VSync;
             set
             {
-                // TODO: more safety when setting this, this is only limiting vulkan
                 _vSync = VulkanOnly && value > 4 ? (uint)(FPS > 0 ? 4 : 0) : value;
                 OnSave?.Invoke();
             }
@@ -384,7 +401,7 @@ namespace Gamerun.Shared
         // ReSharper disable once InconsistentNaming
         public int PICMIP
         {
-            get => _picmip;
+            get => _picmip ?? Gamerun.Default.Strangle.PICMIP;
             set
             {
                 if (value < -16) _picmip = -16;
@@ -400,10 +417,49 @@ namespace Gamerun.Shared
         /// </summary>
         public uint AnisotropicFiltering
         {
-            get => _anisotropicFiltering;
+            get => _anisotropicFiltering ?? Gamerun.Default.Strangle.AnisotropicFiltering;
             set
             {
                 _anisotropicFiltering = value > 16 ? 16 : value;
+                OnSave?.Invoke();
+            }
+        }
+
+        /// <summary>
+        ///     Forces glFinish() to run after every frame. OpenGL only.
+        /// </summary>
+        public bool GLFinish
+        {
+            get => _glfinish ?? Gamerun.Default.Strangle.GLFinish;
+            set
+            {
+                _glfinish = value;
+                OnSave?.Invoke();
+            }
+        }
+
+        /// <summary>
+        ///     Disables linear texture filtering. Makes textures look blocky. Vulkan only.
+        /// </summary>
+        public bool Retro
+        {
+            get => _retro ?? Gamerun.Default.Strangle.Retro;
+            set
+            {
+                _retro = value;
+                OnSave?.Invoke();
+            }
+        }
+
+        /// <summary>
+        ///     Forces Bicubic filtering. Vulkan only.
+        /// </summary>
+        public bool Bicubic
+        {
+            get => _bicubic ?? Gamerun.Default.Strangle.Bicubic;
+            set
+            {
+                _bicubic = value;
                 OnSave?.Invoke();
             }
         }
@@ -412,15 +468,18 @@ namespace Gamerun.Shared
 
         #region PRIVATE FIELDS
 
-        private uint _anisotropicFiltering;
-        private uint _batteryFps;
-        private bool _enabled;
-        private uint _fps;
-        private bool _noDlsym;
-        private int _picmip;
-        private bool _trilinear;
-        private uint _vSync;
-        private bool _vulkanOnly;
+        private uint? _anisotropicFiltering;
+        private uint? _batteryFps;
+        private bool? _enabled;
+        private uint? _fps;
+        private bool? _noDlsym;
+        private int? _picmip;
+        private bool? _trilinear;
+        private uint? _vSync;
+        private bool? _vulkanOnly;
+        private bool? _glfinish;
+        private bool? _bicubic;
+        private bool? _retro;
 
         #endregion PRIVATE FIELDS
     }

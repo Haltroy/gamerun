@@ -1,19 +1,23 @@
 using System;
 using System.IO;
 using System.Text;
+using Gamerun.Shared.Exceptions;
 
 namespace Gamerun.Shared
 {
-    // TODO: Add XML documentation
+    /// <summary>
+    ///     MangoHUD is a layer that shows system information on apps.
+    /// </summary>
     public class MangoHUDSettings : GamerunSettingsAbstract
     {
-        private bool _configIsFile;
-        private string _configuration = string.Empty;
-        private bool _enabled;
+        #region PUBLIC PROPERTIES
 
+        /// <summary>
+        ///     Configuration of MangoHUD or a path of file.
+        /// </summary>
         public string Configuration
         {
-            get => _configuration;
+            get => _configuration ?? Gamerun.Default.MangoHUD.Configuration;
             set
             {
                 _configuration = value;
@@ -21,9 +25,12 @@ namespace Gamerun.Shared
             }
         }
 
+        /// <summary>
+        ///     Determines if MangoHUD should be enabled or not.
+        /// </summary>
         public bool Enabled
         {
-            get => _enabled;
+            get => _enabled ?? Gamerun.Default.MangoHUD.Enabled;
             set
             {
                 _enabled = value;
@@ -31,9 +38,12 @@ namespace Gamerun.Shared
             }
         }
 
+        /// <summary>
+        ///     Determines if <see cref="Configuration" /> is a path to a file or the whole configuration itself.
+        /// </summary>
         public bool ConfigIsFile
         {
-            get => _configIsFile;
+            get => _configIsFile ?? Gamerun.Default.MangoHUD.ConfigIsFile;
             set
             {
                 _configIsFile = value;
@@ -41,12 +51,18 @@ namespace Gamerun.Shared
             }
         }
 
+        #endregion PUBLIC PROPERTIES
+
+        #region OVERRIDES
+
+        public override bool IsDefaults => _enabled == null && _configIsFile == null && _configuration == null;
+
         public override void ReadSettings(Stream stream)
         {
             var bufferByte = stream.ReadByte();
             var bufferRead = 0;
             byte[] buffer;
-            if (bufferByte == -1) throw new Exception(); // TODO
+            if (bufferByte == -1) throw new GamerunEndOfStreamException(stream.Position);
             _enabled = Tools.IsBitSet(bufferByte, 0);
             _configIsFile = Tools.IsBitSet(bufferByte, 1);
             var configIsEmpty = Tools.IsBitSet(bufferByte, 2);
@@ -64,14 +80,14 @@ namespace Gamerun.Shared
             {
                 buffer = new byte[sizeof(int)];
                 bufferRead = stream.Read(buffer, 0, buffer.Length);
-                if (bufferRead != buffer.Length) throw new Exception(); // TODO
+                if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
                 configLength = BitConverter.ToInt32(buffer, 0);
             }
 
             if (configLength == 0) return;
             buffer = new byte[configLength];
             bufferRead = stream.Read(buffer, 0, buffer.Length);
-            if (bufferRead != buffer.Length) throw new Exception(); // TODO
+            if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
             _configuration = Encoding.UTF8.GetString(buffer, 0, configLength);
         }
 
@@ -109,5 +125,15 @@ namespace Gamerun.Shared
         }
 
         public override event GamerunSettingSaveDelegate? OnSave;
+
+        #endregion OVERRIDES
+
+        #region PRIVATE
+
+        private bool? _configIsFile;
+        private string? _configuration = string.Empty;
+        private bool? _enabled;
+
+        #endregion PRIVATE
     }
 }

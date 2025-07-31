@@ -2,12 +2,11 @@ namespace Gamerun.Shared
 {
     public class App
     {
-        private AppSettings? _settings;
 
         public App(string commandLine, AppSettings? settings = null)
         {
             CommandLine = commandLine;
-            _settings = settings;
+            Settings = settings;
         }
 
         public App(uint id, bool user, bool template = false)
@@ -18,15 +17,6 @@ namespace Gamerun.Shared
         public string CommandLine { get; set; }
         public uint ID { get; set; }
 
-        public AppSettings Settings
-        {
-            get
-            {
-                if (_settings != null || !(Gamerun.Default.Clone() is AppSettings settings)) return _settings;
-                _settings = settings.CreateShadowCopy(this);
-                return settings;
-            }
-            set => _settings = value;
-        }
+        public AppSettings? Settings { get; set; }
     }
 }

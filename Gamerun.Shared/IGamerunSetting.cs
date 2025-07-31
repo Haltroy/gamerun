@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.IO;
 
 namespace Gamerun.Shared
@@ -12,6 +11,11 @@ namespace Gamerun.Shared
         ///     Delegate for the save event.
         /// </summary>
         public delegate void GamerunSettingSaveDelegate();
+
+        /// <summary>
+        ///     Determines if this uses the defaults. Used to detect if a class needs saving to a file.
+        /// </summary>
+        public abstract bool IsDefaults { get; }
 
         /// <summary>
         ///     Reads data from <paramref name="stream" /> and sets the settings accordingly.
@@ -37,15 +41,4 @@ namespace Gamerun.Shared
         /// </summary>
         public abstract event GamerunSettingSaveDelegate? OnSave;
     }
-}
-
-public class GamerunStartArguments
-{
-    public string Prefix { get; set; }
-    public string Postfix { get; set; }
-    public Dictionary<string, string> Environment { get; set; }
-    public string StartScript { get; set; }
-    public string EndScript { get; set; }
-    public int StartScriptTimeout { get; set; }
-    public int EndScriptTimeout { get; set; }
 }

@@ -2,14 +2,17 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
+using Gamerun.Shared.Exceptions;
 
 namespace Gamerun.Shared
 {
-// TODO: Gamescope settings
+    // TODO: Gamescope settings
 
-// TODO: Notification system settings
+    // TODO: Notification system settings
 
-// TODO: Compositor Settings
+    // TODO: Compositor Settings
+
+    // TODO: Re-structure this, store configs in a place and apps use same configs, if an app needs a config just create a new config and assign it
     public static class Gamerun
     {
         public static AppSettings Default = new AppSettings();
@@ -24,8 +27,8 @@ namespace Gamerun.Shared
         public static string GlobalListingPath => Path.Combine(GlobalConfigPath, "listing");
         public static string UserListingPath => Path.Combine(UserConfigPath, "listing");
 
-        public static string GlobalSettingsPath => Path.Combine(GlobalConfigPath, "apps");
-        public static string UserSettingsPath => Path.Combine(UserConfigPath, "apps");
+        public static string GlobalSettingsPath => Path.Combine(GlobalConfigPath, "configs");
+        public static string UserSettingsPath => Path.Combine(UserConfigPath, "configs");
 
         public static uint? GetAppID(string commandLine)
         {
@@ -57,7 +60,7 @@ namespace Gamerun.Shared
             {
                 if (createIfNotExists) return CreateApp(commandLine);
 
-                throw new Exception(); // TODO
+                throw new GamerunAppNotFoundException(commandLine);
             }
 
             var userFile = Path.Combine(UserSettingsPath, id.ToString());
@@ -69,7 +72,7 @@ namespace Gamerun.Shared
             if (globalExist) return new App((uint)id, false, true);
 
             if (createIfNotExists) return CreateApp(commandLine, id);
-            throw new Exception(); // TODO
+            throw new GamerunAppNotFoundException((uint)id);
         }
 
         private static App CreateApp(string commandLine, uint? id = null)
