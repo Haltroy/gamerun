@@ -5,9 +5,6 @@ namespace Gamerun;
 
 internal class Program
 {
-    private const int SCHED_RR = 2;
-
-
     private static void Main(string[] args)
     {
         // TODO: better arg reading
@@ -36,8 +33,9 @@ internal class Program
         {
             var appCommandLine = args[0];
             var app = Shared.Gamerun.GetApp(appCommandLine);
+            var settings = app.Settings ?? Shared.Gamerun.Default;
 
-            if (app.Settings.RequireRootPermissions)
+            if (settings.RequireRootPermissions)
             {
                 var endPoint = new UnixDomainSocketEndPoint(runningSocket);
                 using var client = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);
