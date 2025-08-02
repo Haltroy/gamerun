@@ -1,0 +1,16 @@
+# This should be installed to /usr/lib/systemd/system
+# The CLI executable should be in /usr/bin/gamerun and NativeAOT compiled! (use dotnet publish -c Release -r linux-[x64 for Intel/AMD, arm for 32-bit ARM, arm64 for 64-bit ARM])
+[Unit]
+Description=Gamerun Daemon
+
+[Service]
+ExecStart=/usr/bin/gamerun --daemon
+ExecStop=(usr/bin/gamerun --shutdown
+Restart=on-failure
+Type=forking
+TimeoutStopSec=20
+PIDFile=/run/gamerun-daemon.pid
+
+[Install]
+WantedBy=multi-user.target
+
