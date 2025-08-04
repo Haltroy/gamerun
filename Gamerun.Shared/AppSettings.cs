@@ -429,7 +429,7 @@ public class AppSettings : GamerunSettingsAbstract
                 Destination = "org.freedesktop.ScreenSaver",
                 ObjectPath = "/org/freedesktop/ScreenSaver",
                 Method = "org.freedesktop.ScreenSaver.Inhibit",
-                Arguments = ["Gamerun", "App is running..."] // TODO: Translate this
+                Arguments = ["Gamerun", Translations.Translations.AppIsRunning]
             });
             args.StartDBusCalls.Add(new GamerunDBusCalls
             {

@@ -3,16 +3,20 @@ using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
 using Gamerun.Shared;
+using Gamerun.Shared.Exceptions;
+using Gamerun.Shared.Translations;
 
 namespace Gamerun;
 
 public static class Daemon
 {
     private const int SCHED_RR = 2;
-    [DllImport("libc")]
-    private static extern uint getuid();
+
     private static string[] SocketPaths =>
         ["/run/gamerun.sock", $"/run/user/{getuid()}/gamerun.sock", "/tmp/gamerun.sock"];
+
+    [DllImport("libc")]
+    private static extern uint getuid();
 
     public static string GetRunningSocket()
     {
@@ -39,7 +43,7 @@ public static class Daemon
             }
         }
 
-        throw new Exception("Cannot find socket.");
+        throw new GamerunScoketNoFoundException(true);
     }
 
     private static string GetRunnableSocket()
@@ -67,13 +71,14 @@ public static class Daemon
                 // ignored
             }
 
-        throw new Exception("Cannot find socket.");
+        throw new GamerunScoketNoFoundException(false);
     }
+
     public static void DaemonMode()
     {
-        Console.WriteLine($"[Daemon] [I] Initialized with {Shared.Gamerun.Apps.Count} total app(s).");
+        Console.WriteLine(Translations.DaemonInitizalized, Shared.Gamerun.Apps.Count);
         var runInSocket = GetRunnableSocket();
-        Console.WriteLine($"[Daemon] [I] Running in socket \"{runInSocket}\"...");
+        Console.WriteLine(Translations.DaemonRunningInScoket, runInSocket);
         var endPoint = new UnixDomainSocketEndPoint(runInSocket);
         if (File.Exists(runInSocket))
         {
@@ -81,21 +86,19 @@ public static class Daemon
             using var client = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);
             try
             {
-                Console.WriteLine(
-                    $"[Daemon] [I] Connecting to socket \"{runInSocket}\" for replacement shutdown request...");
+                Console.WriteLine(Translations.DameonConnnectToSocketForShutdown, runInSocket);
                 client.Connect(endPoint);
             }
             catch (SocketException)
             {
-                Console.WriteLine(
-                    $"[Daemon] [I] Socket \"{runInSocket}\" exist but nothing is running. Deleting file...");
+                Console.WriteLine(Translations.DameonSocketEmpty, runInSocket);
                 File.Delete(runInSocket);
                 skipShutdownRequest = true;
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine(
-                    $"[Daemon] [F] Cannot replace socket (\"{runInSocket}\"). Exception caught: {ex}");
+                Console.Error.WriteLine(Translations.DaemonCannotReplaceSocket.Replace("%runInSocket%", runInSocket)
+                    .Replace("%ex%", ex.ToString()));
                 Environment.ExitCode = 1;
                 return;
             }
@@ -104,20 +107,20 @@ public static class Daemon
             {
                 var message = "shutdown"u8.ToArray();
                 client.Send(message);
-                Console.WriteLine($"[Daemon] [I] Socket \"{runInSocket}\" killed.");
+                Console.WriteLine(Translations.DaemonSocketKilled, runInSocket);
             }
         }
-        
-        var currentApps =  new List<GamerunDaemonArgs>();
+
+        var currentApps = new List<GamerunDaemonArgs>();
 
         var listener = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);
         listener.Bind(endPoint);
         listener.Listen(5);
-        Console.WriteLine($"[Daemon] [I] Started listening on socket \"{runInSocket}\".");
+        Console.WriteLine(Translations.DaemonStarted, runInSocket);
 
         while (true)
         {
-            Console.WriteLine("[Daemon] [I] Client connected...");
+            Console.WriteLine(Translations.DaemonClientConnected);
             var client = listener.Accept();
             var buffer = new byte[1024];
             var bytesRead = client.Receive(buffer);
@@ -125,7 +128,7 @@ public static class Daemon
 
             if (message.StartsWith("shutdown", StringComparison.OrdinalIgnoreCase))
             {
-                Console.WriteLine($"[Daemon] [I] Shutting down socket \"{runInSocket}\".");
+                Console.WriteLine(Translations.DaemonShutdown, runInSocket);
                 client.Close();
                 listener.Disconnect(true);
                 listener.Shutdown(SocketShutdown.Both);
@@ -135,8 +138,15 @@ public static class Daemon
 
             if (message.StartsWith("alive", StringComparison.OrdinalIgnoreCase))
             {
-                Console.WriteLine("[Daemon] [I] Alive request received.");
+                Console.WriteLine(Translations.DaemonAliveRequested);
                 client.Send("I AM ALIVE"u8.ToArray());
+                continue;
+            }
+
+            if (message.StartsWith("busy", StringComparison.OrdinalIgnoreCase))
+            {
+                Console.WriteLine(Translations.DaemonBusyRequested);
+                client.Send((currentApps.Count > 0 ? "YES"u8 : "NO"u8).ToArray());
                 continue;
             }
 
@@ -147,36 +157,20 @@ public static class Daemon
                 case "boost": // boost <base64>
                     if (arguments.Length <= 1) break;
                     var decoded = new GamerunDaemonArgs(arguments[1]);
+
+                    Console.WriteLine(Translations.DaemonBoostRequested, decoded.PID);
                     currentApps.Add(decoded);
-                    if (decoded.SetTLP)
-                    {
-                        Process.Start(new ProcessStartInfo(Tools.GetCommand("tlp"), "ac"));
-                    }
+                    if (decoded.SetTLP) Process.Start(new ProcessStartInfo(Tools.GetCommand("tlp"), "ac"));
 
-                    if (decoded.Prioritize)
-                    {
-                        SetPriority(decoded.PID);
-                    }
+                    if (decoded.Prioritize) SetPriority(decoded.PID);
 
-                    if (decoded.PrioritizeIO)
-                    {
-                        SetIOPriority(decoded.PID);
-                    }
+                    if (decoded.PrioritizeIO) SetIOPriority(decoded.PID);
 
-                    if (decoded.SetSplitLockMitigation)
-                    {
-                        SetSplitLockMitigation(true);
-                    }
+                    if (decoded.SetSplitLockMitigation) SetSplitLockMitigation(true);
 
-                    if (decoded.ParkCores)
-                    {
-                        CPUSetting.ParkCores(decoded.ParkedCores, false);
-                    }
+                    if (decoded.ParkCores) CPUSetting.ParkCores(decoded.ParkedCores, false);
 
-                    if (decoded.PinCores)
-                    {
-                        CPUSetting.PinCores(decoded.PID, decoded.PinnedCores);
-                    }
+                    if (decoded.PinCores) CPUSetting.PinCores(decoded.PID, decoded.PinnedCores);
 
                     if (decoded.OptimizeGPU)
                     {
@@ -195,7 +189,7 @@ public static class Daemon
                         {
                             // Nvidia mem clock overclock
                         }
-                        
+
                         if (decoded.NvCoreClockOffset > 0)
                         {
                             // Nvidia core clock overclock
@@ -211,20 +205,15 @@ public static class Daemon
                 case "revert": // revert <pid>
                     if (arguments.Length <= 1) break;
                     if (!int.TryParse(arguments[1], out var pid)) break;
+                    Console.WriteLine(Translations.DaemonRevertRequested, pid);
                     var found = currentApps.Find(it => it.PID == pid);
                     if (found == null) break;
                     if (found.SetTLP && currentApps.FindAll(it => it.SetTLP).Count <= 1)
-                    {
                         Process.Start(new ProcessStartInfo(Tools.GetCommand("tlp"), "bat"));
-                    }
                     if (found.SetSplitLockMitigation && currentApps.FindAll(it => it.SetSplitLockMitigation).Count <= 1)
-                    {
                         SetSplitLockMitigation(false);
-                    }
-                    if (found.ParkCores &&  currentApps.FindAll(it => it.ParkCores).Count <= 1)
-                    {
+                    if (found.ParkCores && currentApps.FindAll(it => it.ParkCores).Count <= 1)
                         CPUSetting.ParkCores(found.ParkedCores, true);
-                    }
 
                     if (found.OptimizeGPU)
                     {
@@ -243,7 +232,7 @@ public static class Daemon
                         {
                             // Nvidia mem clock overclock
                         }
-                        
+
                         if (found.NvCoreClockOffset > 0)
                         {
                             // Nvidia core clock overclock
@@ -254,15 +243,16 @@ public static class Daemon
                     {
                         // TODO: iGPU stuff here
                     }
+
                     currentApps.Remove(found);
                     break;
 
                 case null:
-                    Console.WriteLine($"[Daemon] [E] Received message \"{message}\" is not well-formed. Ignored.");
+                    Console.WriteLine(Translations.DaemonReceivedGarbage, message);
                     break;
 
                 default:
-                    Console.WriteLine($"[Daemon] [E] Message \"{runInSocket}\" unknown. Ignored.");
+                    Console.WriteLine(Translations.DaemonReceivedNothing, runInSocket);
                     break;
             }
 
@@ -283,9 +273,9 @@ public static class Daemon
 
     [DllImport("libc", SetLastError = true)]
     private static extern int setpriority(int which, int who, int prio);
-    
+
     [DllImport("libc")]
-    private static extern int sched_setscheduler(int pid, int policy, ref sched_param param);
+    private static extern int sched_setscheduler(int pid, int policy, ref sched_param param); // TODO
 
 
     // TODO: iGPU Governor and Treshold
@@ -295,7 +285,8 @@ public static class Daemon
     private static void SetSplitLockMitigation(bool disabled)
     {
         if (!File.Exists("/proc/sys/kernel/split_lock_mitigate")) return;
-        using var fileStream = new FileStream("/proc/sys/kernel/split_lock_mitigate",  FileMode.Truncate, FileAccess.Write);
+        using var fileStream =
+            new FileStream("/proc/sys/kernel/split_lock_mitigate", FileMode.Truncate, FileAccess.Write);
         fileStream.SetLength(0);
         using var writer = new StreamWriter(fileStream);
         writer.Write(disabled ? "0" : "1");

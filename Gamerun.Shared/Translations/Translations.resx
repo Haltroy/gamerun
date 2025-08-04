@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<root>
+    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata"
+                id="root"
+                xmlns="">
+        <xsd:element name="root" msdata:IsDataSet="true">
+
+        </xsd:element>
+    </xsd:schema>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>1.3</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <data name="AppIsRunning" xml:space="preserve">
+        <value>An app is running with Gamerun...</value>
+    </data>
+    <data name="ExceptionEndOfStream" xml:space="preserve">
+        <value>End of stream reached at %pos% prematurely.</value>
+    </data>
+    <data name="AppNotFound" xml:space="preserve">
+        <value>App not found with command-line "%cmd%".</value>
+    </data>
+    <data name="ClientSocketException" xml:space="preserve">
+        <value>[Client] [F] Cannot connect to the socket (located in "%l%"). Exception caught: %ex%</value>
+    </data>
+    <data name="ClientSecurityException" xml:space="preserve">
+        <value>[Client] [F] Cannot connect to the socket (located in "%runningSocket%") due to an security error. Exception caught: %secEx%</value>
+    </data>
+    <data name="ClientRunException" xml:space="preserve">
+        <value>[Client] [F] Cannot set it to high performance. Exception caught: %ex%</value>
+    </data>
+    <data name="DaemonInitizalized" xml:space="preserve">
+        <value>[Daemon] [I] Initialized with {0} total app(s).</value>
+    </data>
+    <data name="DaemonRunningInScoket" xml:space="preserve">
+        <value>[Daemon] [I] Running in socket "{0}"...</value>
+    </data>
+    <data name="DameonConnnectToSocketForShutdown" xml:space="preserve">
+        <value>[Daemon] [I] Connecting to socket "{0}" for replacement shutdown request...</value>
+    </data>
+    <data name="DameonSocketEmpty" xml:space="preserve">
+        <value>[Daemon] [I] Socket "{0}" exist but nothing is running. Deleting file...</value>
+    </data>
+    <data name="DaemonSocketKilled" xml:space="preserve">
+        <value>[Daemon] [I] Socket "{0}" killed.</value>
+    </data>
+    <data name="DaemonStarted" xml:space="preserve">
+        <value>[Daemon] [I] Started listening on socket "{0}".</value>
+    </data>
+    <data name="DaemonRevertRequested" xml:space="preserve">
+        <value>[Daemon] [I] Revert requested for app with PID {0}.</value>
+    </data>
+    <data name="DaemonClientConnected" xml:space="preserve">
+        <value>[Daemon] [I] Client connected...</value>
+    </data>
+    <data name="ClientCannotFindApp" xml:space="preserve">
+        <value>[Client] [F] Cannot find "%cmd%".</value>
+    </data>
+    <data name="ExceptionSocketNotFound" xml:space="preserve">
+        <value>Gamerun socket is not found.</value>
+    </data>
+    <data name="ExceptionSocketNotUsable" xml:space="preserve">
+        <value>Gamerun socket is not usable.</value>
+    </data>
+    <data name="DaemonShutdown" xml:space="preserve">
+        <value>[Daemon] [I] Shutting down socket "{0}".</value>
+    </data>
+    <data name="DaemonAliveRequested" xml:space="preserve">
+        <value>[Daemon] [I] Alive request received.</value>
+    </data>
+    <data name="DaemonBusyRequested" xml:space="preserve">
+        <value>[Daemon] [I] Busy request received.</value>
+    </data>
+    <data name="DaemonBoostRequested" xml:space="preserve">
+        <value>[Daemon] [I] Boost requested for app with PID {0}.</value>
+    </data>
+    <data name="DaemonReceivedGarbage" xml:space="preserve">
+        <value>[Daemon] [E] Received message "{0}" is not well-formed. Ignored.</value>
+    </data>
+    <data name="DaemonReceivedNothing" xml:space="preserve">
+        <value>[Daemon] [E] Message "{0}" unknown. Ignored.</value>
+    </data>
+    <data name="DaemonCannotReplaceSocket" xml:space="preserve">
+        <value>[Daemon] [F] Cannot replace socket ("%runInSocket%"). Exception caught: %ex%</value>
+    </data>
+</root>

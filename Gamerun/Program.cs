@@ -1,5 +1,8 @@
-﻿using System.Net.Sockets;
+﻿using System.Diagnostics;
+using System.Net.Sockets;
 using System.Security;
+using System.Text;
+using Gamerun.Shared.Translations;
 
 namespace Gamerun;
 
@@ -7,8 +10,11 @@ internal class Program
 {
     private static void Main(string[] args)
     {
-        // TODO: better arg reading
-        // gamerun [--daemon|--editor|--help|--shutdown|--alive] [COMMAND]
+        if (args.Length <= 0 || args.Contains("--daemon", StringComparer.OrdinalIgnoreCase))
+            //TODO: Help
+            // gamerun [--daemon|--help|--shutdown|--alive|--busy] [COMMAND]
+            return;
+
         if (args.Contains("--daemon", StringComparer.OrdinalIgnoreCase))
         {
             Daemon.DaemonMode();
@@ -19,7 +25,6 @@ internal class Program
 
         if (args.Contains("--shutdown", StringComparer.OrdinalIgnoreCase))
         {
-            Console.WriteLine("[Client] [I] Sending shutdown request...");
             var endPoint = new UnixDomainSocketEndPoint(runningSocket);
             using var client = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);
             client.Connect(endPoint);
@@ -29,36 +34,145 @@ internal class Program
             return;
         }
 
+        if (args.Contains("--alive", StringComparer.OrdinalIgnoreCase))
+        {
+            var endPoint = new UnixDomainSocketEndPoint(runningSocket);
+            using var client = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);
+            client.Connect(endPoint);
+
+            var message = "alive"u8.ToArray();
+            client.Send(message);
+            var buffer = new byte[1024];
+            var received = client.Receive(buffer);
+            var response = Encoding.UTF8.GetString(buffer, 0, received);
+            Console.WriteLine(response);
+            return;
+        }
+
+        if (args.Contains("--busy", StringComparer.OrdinalIgnoreCase))
+        {
+            var endPoint = new UnixDomainSocketEndPoint(runningSocket);
+            using var client = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);
+            client.Connect(endPoint);
+
+            var message = "busy"u8.ToArray();
+            client.Send(message);
+            var buffer = new byte[1024];
+            var received = client.Receive(buffer);
+            var response = Encoding.UTF8.GetString(buffer, 0, received);
+            Console.WriteLine(response);
+            return;
+        }
+
         try
         {
             var appCommandLine = args[0];
-            var app = Shared.Gamerun.GetApp(appCommandLine, true, true);
-            var settings = app.Settings ?? Shared.Gamerun.Default;
+            if (!File.Exists(appCommandLine))
+            {
+                Console.Error.WriteLine(Translations.ClientCannotFindApp.Replace("%cmd%", appCommandLine));
+                return;
+            }
 
+            var app = Shared.Gamerun.GetApp(appCommandLine, true, true);
+            UnixDomainSocketEndPoint? endPoint = null;
+            Socket? client = null;
+            var settings = app.Settings ?? Shared.Gamerun.Default;
+            var appArgs = new GamerunStartArguments();
+            settings.GenerateArgs(appArgs);
+            foreach (var env in appArgs.Environment) Environment.SetEnvironmentVariable(env.Key, env.Value);
+
+            foreach (var call in appArgs.StartDBusCalls)
+            {
+                var callArgs = new object[call.Arguments.Length];
+                for (var i = 0; i < call.Arguments.Length; i++) callArgs[i] = call.Arguments[i];
+                SimpleDBus.Send(call.Destination, call.ObjectPath, call.Destination, call.Method, callArgs);
+            }
+
+            foreach (var startCommand in appArgs.StartCommands) Process.Start(startCommand);
+
+            if (!string.IsNullOrWhiteSpace(appArgs.StartScript))
+            {
+                var startCommandUser = Process.Start(appArgs.StartScript);
+                switch (appArgs.StartScriptTimeout)
+                {
+                    case -1:
+                        startCommandUser.WaitForExit();
+                        break;
+                    case 0:
+                        break;
+                    default:
+                        Thread.Sleep(1000 * appArgs.StartScriptTimeout);
+                        if (!startCommandUser.HasExited) startCommandUser.Kill();
+                        break;
+                }
+            }
+
+            var process = Process.Start(appArgs.Prefix + (appArgs.Prefix.EndsWith(' ') ? "" : " ") + appCommandLine +
+                                        (appArgs.Postfix.StartsWith(' ') ? "" : " ") + appArgs.Postfix);
+            appArgs.DaemonArgs.PID = process.Id;
             if (settings.RequireRootPermissions)
             {
-                var endPoint = new UnixDomainSocketEndPoint(runningSocket);
-                using var client = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);
+                endPoint = new UnixDomainSocketEndPoint(runningSocket);
+                client = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);
                 client.Connect(endPoint);
 
-                var message = "boost-on"u8.ToArray(); // TODO
+                var message = Encoding.UTF8.GetBytes($"boost {appArgs.DaemonArgs.ToBase64()}");
                 client.Send(message);
             }
-            // TODO: Boost app
+
+            process.WaitForExit();
+            var skipDbus = false;
+            if (client != null && endPoint != null)
+            {
+                client.Send(Encoding.UTF8.GetBytes($"revert {appArgs.DaemonArgs.PID}"));
+                client.Send("busy"u8.ToArray());
+                var buffer = new byte[1024];
+                var received = client.Receive(buffer);
+                var response = Encoding.UTF8.GetString(buffer, 0, received);
+                if (response.Equals("yes", StringComparison.CurrentCultureIgnoreCase)) skipDbus = true;
+            }
+
+            if (!skipDbus)
+            {
+                foreach (var call in appArgs.EndDBusCalls)
+                {
+                    var callArgs = new object[call.Arguments.Length];
+                    for (var i = 0; i < call.Arguments.Length; i++) callArgs[i] = call.Arguments[i];
+
+                    SimpleDBus.Send(call.Destination, call.ObjectPath, call.Destination, call.Method, callArgs);
+                }
+
+                foreach (var endCommand in appArgs.EndCommands) Process.Start(endCommand);
+            }
+
+            if (string.IsNullOrWhiteSpace(appArgs.EndScript)) return;
+            var endCommandUser = Process.Start(appArgs.StartScript);
+            switch (appArgs.EndScriptTimeout)
+            {
+                case -1:
+                    endCommandUser.WaitForExit();
+                    break;
+                case 0:
+                    break;
+                default:
+                    Thread.Sleep(1000 * appArgs.EndScriptTimeout);
+                    if (!endCommandUser.HasExited) endCommandUser.Kill();
+                    break;
+            }
         }
         catch (SocketException soEx) // added "o" in the middle, you know why
         {
-            Console.Error.WriteLine(
-                $"[Client] [F] Cannot connect to the socket (located in \"{runningSocket}\"). Exception caught: {soEx}");
+            Console.Error.WriteLine(Translations.ClientSocketException.Replace("%l%", runningSocket)
+                .Replace("%ex%", soEx.ToString()));
         }
         catch (SecurityException secEx)
         {
-            Console.Error.WriteLine(
-                $"[Client] [F] Cannot connect to the socket (located in \"{runningSocket}\") due to an security error. Exception caught: {secEx}");
+            Console.Error.WriteLine(Translations.ClientSecurityException.Replace("%runningSocket%", runningSocket)
+                .Replace("%secEx%", secEx.ToString()));
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"[Client] [F] Cannot set it to high performance. Exception caught: {ex}");
+            Console.Error.WriteLine(Translations.ClientRunException.Replace("%ex%", ex.ToString()));
         }
     }
 }

@@ -41,7 +41,7 @@ public static class SimpleDBus
         object[] args)
     {
         using var ms = new MemoryStream();
-        using var writer = new BinaryWriter(ms, Encoding.UTF8, leaveOpen: true);
+        using var writer = new BinaryWriter(ms, Encoding.UTF8, true);
 
         // Header
         writer.Write((byte)'l'); // little endian
@@ -55,17 +55,17 @@ public static class SimpleDBus
 
         // Prepare header fields (fields 1, 2, 3, 6, 7)
         var headerFields = new MemoryStream();
-        var headerWriter = new BinaryWriter(headerFields, Encoding.UTF8, leaveOpen: true);
+        var headerWriter = new BinaryWriter(headerFields, Encoding.UTF8, true);
 
-        WriteHeaderField(1, path);
-        WriteHeaderField(2, interfaceName);
-        WriteHeaderField(3, method);
-        WriteHeaderField(6, destination);
+        headerWriter.WriteHeaderField(1, path);
+        headerWriter.WriteHeaderField(2, interfaceName);
+        headerWriter.WriteHeaderField(3, method);
+        headerWriter.WriteHeaderField(6, destination);
 
         // Signature
         var signature = BuildSignature(args);
         if (!string.IsNullOrEmpty(signature))
-            WriteHeaderField(8, signature);
+            headerWriter.WriteHeaderField(8, signature);
 
         // Align to 8 before writing body
         Align(writer, 8);
@@ -93,21 +93,20 @@ public static class SimpleDBus
         writer.Write(bodyLen);
 
         return ms.ToArray();
+    }
 
-        void WriteHeaderField(byte code, string value)
-        {
-            headerWriter.Write(code);
-            headerWriter.Write((byte)'s'); // signature = string
-            Align(headerWriter, 4);
-            WriteDBusString(headerWriter, value);
-        }
+    private static void WriteHeaderField(this BinaryWriter headerWriter, byte code, string value)
+    {
+        headerWriter.Write(code);
+        headerWriter.Write((byte)'s'); // signature = string
+        Align(headerWriter, 4);
+        WriteDBusString(headerWriter, value);
     }
 
     private static string BuildSignature(object[] args)
     {
         var sb = new StringBuilder();
         foreach (var arg in args)
-        {
             sb.Append(arg switch
             {
                 string => "s",
@@ -117,7 +116,6 @@ public static class SimpleDBus
                 string[] => "as",
                 _ => throw new NotSupportedException($"Unsupported type {arg.GetType()}")
             });
-        }
 
         return sb.ToString();
     }
@@ -145,10 +143,7 @@ public static class SimpleDBus
                 Align(writer, 4);
                 var start = writer.BaseStream.Position;
                 writer.Write(0); // placeholder for array length
-                foreach (var s in arr)
-                {
-                    WriteDBusString(writer, s);
-                }
+                foreach (var s in arr) WriteDBusString(writer, s);
 
                 var end = writer.BaseStream.Position;
                 var length = (int)(end - start - 4);
@@ -172,7 +167,7 @@ public static class SimpleDBus
     private static void Align(BinaryWriter writer, int alignment)
     {
         var pos = writer.BaseStream.Position;
-        var pad = (int)((alignment - (pos % alignment)) % alignment);
+        var pad = (int)((alignment - pos % alignment) % alignment);
         for (var i = 0; i < pad; i++)
             writer.Write((byte)0);
     }
