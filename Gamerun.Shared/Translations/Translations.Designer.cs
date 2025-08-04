@@ -188,5 +188,59 @@ namespace Gamerun.Shared.Translations {
                 return ResourceManager.GetString("DaemonCannotReplaceSocket", resourceCulture);
             }
         }
+        
+        public static string ClientHelpCommand {
+            get {
+                return ResourceManager.GetString("ClientHelpCommand", resourceCulture);
+            }
+        }
+        
+        public static string ClientHelpDesc {
+            get {
+                return ResourceManager.GetString("ClientHelpDesc", resourceCulture);
+            }
+        }
+        
+        public static string ClientHelpUsage {
+            get {
+                return ResourceManager.GetString("ClientHelpUsage", resourceCulture);
+            }
+        }
+        
+        public static string ClientHelpDaemon {
+            get {
+                return ResourceManager.GetString("ClientHelpDaemon", resourceCulture);
+            }
+        }
+        
+        public static string ClientHelpHelp {
+            get {
+                return ResourceManager.GetString("ClientHelpHelp", resourceCulture);
+            }
+        }
+        
+        public static string ClientHelpShutdown {
+            get {
+                return ResourceManager.GetString("ClientHelpShutdown", resourceCulture);
+            }
+        }
+        
+        public static string ClientHelpAlive {
+            get {
+                return ResourceManager.GetString("ClientHelpAlive", resourceCulture);
+            }
+        }
+        
+        public static string ClientHelpBusy {
+            get {
+                return ResourceManager.GetString("ClientHelpBusy", resourceCulture);
+            }
+        }
+        
+        public static string ClientHelpCMD {
+            get {
+                return ResourceManager.GetString("ClientHelpCMD", resourceCulture);
+            }
+        }
     }
 }

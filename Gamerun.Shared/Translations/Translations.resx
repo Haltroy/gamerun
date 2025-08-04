@@ -96,4 +96,31 @@
     <data name="DaemonCannotReplaceSocket" xml:space="preserve">
         <value>[Daemon] [F] Cannot replace socket ("%runInSocket%"). Exception caught: %ex%</value>
     </data>
+    <data name="ClientHelpCommand" xml:space="preserve">
+        <value>COMMAND</value>
+    </data>
+    <data name="ClientHelpDesc" xml:space="preserve">
+        <value>Run apps (mostly games) with higher optimizations.</value>
+    </data>
+    <data name="ClientHelpUsage" xml:space="preserve">
+        <value>USAGE:</value>
+    </data>
+    <data name="ClientHelpDaemon" xml:space="preserve">
+        <value/>
+    </data>
+    <data name="ClientHelpHelp" xml:space="preserve">
+        <value/>
+    </data>
+    <data name="ClientHelpShutdown" xml:space="preserve">
+        <value/>
+    </data>
+    <data name="ClientHelpAlive" xml:space="preserve">
+        <value/>
+    </data>
+    <data name="ClientHelpBusy" xml:space="preserve">
+        <value/>
+    </data>
+    <data name="ClientHelpCMD" xml:space="preserve">
+        <value/>
+    </data>
 </root>

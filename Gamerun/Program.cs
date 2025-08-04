@@ -11,9 +11,34 @@ internal class Program
     private static void Main(string[] args)
     {
         if (args.Length <= 0 || args.Contains("--daemon", StringComparer.OrdinalIgnoreCase))
-            //TODO: Help
-            // gamerun [--daemon|--help|--shutdown|--alive|--busy] [COMMAND]
+        {
+            var consoleLength = Console.BufferWidth;
+            // ReSharper disable once LocalizableElement
+            Console.WriteLine($"gamerun [--daemon|--help--shutdown|--alive|--busy] <{Translations.ClientHelpCommand}>");
+            Console.WriteLine(Translations.ClientHelpDesc);
+            Console.WriteLine();
+            Console.WriteLine(Translations.ClientHelpUsage);
+            foreach (var arguments in new List<string[]>
+                     {
+                         new[] { "Daemon", Translations.ClientHelpDaemon },
+                         new[] { "Help", Translations.ClientHelpHelp },
+                         new[] { "Shutdown", Translations.ClientHelpShutdown },
+                         new[] { "Alive", Translations.ClientHelpAlive },
+                         new[] { "Busy", Translations.ClientHelpBusy },
+                         new[] { "CMD", Translations.ClientHelpCMD }
+                     })
+            {
+                var leftSide = arguments[0];
+                var rightSide = arguments[1];
+                var spaceLength = consoleLength - (leftSide.Length + rightSide.Length);
+                var space = string.Empty;
+                for (var i = 0; i < spaceLength; i++) space += " ";
+                // ReSharper disable once LocalizableElement
+                Console.WriteLine($"{leftSide}{space}{rightSide}");
+            }
+
             return;
+        }
 
         if (args.Contains("--daemon", StringComparer.OrdinalIgnoreCase))
         {
