@@ -61,6 +61,22 @@ public class StrangleSettings : GamerunSettingsAbstract
         return args;
     }
 
+    public override void SetAsDefault()
+    {
+        _vulkanOnly = false;
+        _enabled = true;
+        _trilinear = false;
+        _noDlsym = false;
+        _picmip = 0;
+        _anisotropicFiltering = 0;
+        _vSync = 0;
+        _fps = 60;
+        _batteryFps = _fps / 2;
+        _glfinish = false;
+        _bicubic = false;
+        _retro = false;
+    }
+
     public override bool IsDefaults => _vulkanOnly == null && _enabled == null && _trilinear == null &&
                                        _noDlsym == null && _picmip == null && _anisotropicFiltering == null &&
                                        _vSync == null && _fps == null && _batteryFps == null && _glfinish == null &&
@@ -69,7 +85,7 @@ public class StrangleSettings : GamerunSettingsAbstract
     public override void ReadSettings(Stream stream)
     {
         var settingLength = Settings.Length;
-        var buffer = new byte[settingLength / 8];
+        var buffer = new byte[(int)Math.Ceiling((double)settingLength / 8)];
         var bufferRead = stream.Read(buffer);
         if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
         var decoded = Tools.UnpackBytesToBools(buffer, settingLength);

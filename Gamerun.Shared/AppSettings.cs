@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using Gamerun.Shared.Exceptions;
 
@@ -6,46 +5,17 @@ namespace Gamerun.Shared;
 
 public class AppSettings : GamerunSettingsAbstract
 {
-    private bool? _amdPerfLevel;
-    private bool? _blockScreenSaver;
-
-    private readonly ProcessorCore[] _cores = [];
-    private bool? _cpuGovernor;
-    private bool? _disableSplitLockMitigation;
-    private bool? _enableFanController;
-    private bool? _enablePowerDaemon;
-    private uint? _gpuID;
-    private bool? _igpuGovernor;
-    private float? _igpuTreshold; // default 0.3F, iGPU Watts / CPU Watts
-    private uint? _nvCoreClockOffset;
-    private uint? _nvMemClockOffset;
-    private bool? _nvPowerMizer;
-    private bool? _optimizeGPU;
-
-    private bool? _parkCores;
-
-    private bool? _parkCoresAuto;
-
-    private bool? _pinCores;
-    private bool? _pinCoresAuto;
-
-    private bool? _powerGovernor;
-    private bool? _prioritize;
-    private bool? _prioritizeIO;
-
-    private bool? _softrealtime;
-    private string? _startupScriptPath;
-    private uint? _startupScriptTimeout;
-    private string? _stopScriptPath;
-    private uint? _stopScriptTimeout;
-
-    // ReSharper disable once InconsistentNaming
-    private bool? _useGPU = true;
+    #region CONSTRUCTORS
 
     public AppSettings()
     {
         Cores = Tools.DetectCpuTopology();
+        foreach (var cpu in Cores) cpu.ParkedPinnedChanged += () => OnSave?.Invoke();
     }
+
+    #endregion CONSTRUCTORS
+
+    #region OTHER SETTINGS
 
     // ReSharper disable once InconsistentNaming
     // ReSharper disable once MemberCanBePrivate.Global
@@ -54,6 +24,11 @@ public class AppSettings : GamerunSettingsAbstract
     // ReSharper disable once MemberCanBePrivate.Global
     public StrangleSettings Strangle { get; } = new();
 
+    public GamescopeSettings Gamescope { get; } = new();
+
+    #endregion OTHER SETTINGS
+
+    #region PROPERTIES
 
     // ReSharper disable once InconsistentNaming
     public bool UseGPU
@@ -116,15 +91,7 @@ public class AppSettings : GamerunSettingsAbstract
         }
     }
 
-    public ProcessorCore[] Cores
-    {
-        get => _cores ?? Gamerun.Default.Cores;
-        init
-        {
-            _cores = value;
-            OnSave?.Invoke();
-        }
-    }
+    public ProcessorCore[] Cores { get; set; }
 
     public string StartupScriptPath
     {
@@ -327,17 +294,70 @@ public class AppSettings : GamerunSettingsAbstract
         }
     }
 
-    public bool RequireRootPermissions => Prioritize || PrioritizeIO || OptimizeGPU; // TODO
-
-    public override bool IsDefaults => throw
-        // TODO
-        new NotImplementedException();
-
-    public object Clone()
+    public bool DisableNotificationSystem
     {
-        // TODO
-        throw new NotImplementedException();
+        get => _notifications ?? Gamerun.Default.DisableNotificationSystem;
+        set
+        {
+            _notifications = value;
+            OnSave?.Invoke();
+        }
     }
+
+    public bool OptimizeCompositor
+    {
+        get => _compositor ?? Gamerun.Default.OptimizeCompositor;
+        set
+        {
+            _compositor = value;
+            OnSave?.Invoke();
+        }
+    }
+
+    public bool RequireRootPermissions => Prioritize
+                                          || PrioritizeIO
+                                          || OptimizeGPU
+                                          || (EnablePowerDaemon && InitSystemHelper.IsServiceActiveAsync("tlp"))
+                                          || ParkCores
+                                          || PinCores
+                                          || (Tools.IsIntelCpu() && DisableSplitLockMitigation)
+                                          || SoftRealTime
+                                          || OptimizeGPU;
+
+    public override bool IsDefaults => Strangle.IsDefaults &&
+                                       MangoHUD.IsDefaults &&
+                                       _amdPerfLevel == null &&
+                                       _blockScreenSaver == null &&
+                                       _cpuGovernor == null &&
+                                       _disableSplitLockMitigation == null &&
+                                       _enableFanController == null &&
+                                       _enablePowerDaemon == null &&
+                                       _gpuID == null &&
+                                       _igpuGovernor == null &&
+                                       _igpuTreshold == null &&
+                                       _nvCoreClockOffset == null &&
+                                       _nvMemClockOffset == null &&
+                                       _nvPowerMizer == null &&
+                                       _optimizeGPU == null &&
+                                       _parkCores == null &&
+                                       _parkCoresAuto == null &&
+                                       _pinCores == null &&
+                                       _pinCoresAuto == null &&
+                                       _powerGovernor == null &&
+                                       _prioritize == null &&
+                                       _prioritizeIO == null &&
+                                       _softrealtime == null &&
+                                       _startupScriptPath == null &&
+                                       _startupScriptTimeout == null &&
+                                       _stopScriptPath == null &&
+                                       _stopScriptTimeout == null &&
+                                       _compositor == null &&
+                                       _notifications == null &&
+                                       _useGPU == null;
+
+    #endregion PROPERTIES
+
+    #region OVERRIDES
 
     public override void ReadSettings(Stream stream)
     {
@@ -348,6 +368,7 @@ public class AppSettings : GamerunSettingsAbstract
         // TODO
         Strangle.ReadSettings(stream);
         MangoHUD.ReadSettings(stream);
+        Gamescope.ReadSettings(stream);
     }
 
     public override void WriteSettings(Stream stream)
@@ -358,12 +379,14 @@ public class AppSettings : GamerunSettingsAbstract
         stream.WriteByte(buffer);
         Strangle.WriteSettings(stream);
         MangoHUD.WriteSettings(stream);
+        Gamescope.WriteSettings(stream);
     }
 
     public override GamerunStartArguments GenerateArgs(GamerunStartArguments args)
     {
         args = Strangle.GenerateArgs(args);
         args = MangoHUD.GenerateArgs(args);
+        args = Gamescope.GenerateArgs(args);
 
         if (InitSystemHelper.IsServiceActiveAsync("power-profiles-daemon"))
         {
@@ -434,6 +457,12 @@ public class AppSettings : GamerunSettingsAbstract
             core.IsParked ??= core.Type == ProcessorCoreType.LowPower;
         }
 
+        args.DaemonArgs.SetSplitLockMitigation = Tools.IsIntelCpu() && DisableSplitLockMitigation;
+
+        // TODO: Notification system settings
+
+        // TODO: Compositor Settings
+
         // TODO: Find and use GPU
         // lspci -k | grep -A3 -i 'VGA\|3D' shows this:
         /*
@@ -451,5 +480,81 @@ public class AppSettings : GamerunSettingsAbstract
         return args;
     }
 
+    public override void SetAsDefault()
+    {
+        Strangle.SetAsDefault();
+        MangoHUD.SetAsDefault();
+        _notifications = true;
+        _compositor = true;
+        _amdPerfLevel = true;
+        _blockScreenSaver = true;
+        _cpuGovernor = true;
+        _disableSplitLockMitigation = Tools.IsIntelCpu();
+        _enableFanController = true;
+        _enablePowerDaemon = true;
+        _igpuGovernor = true;
+        _igpuTreshold = 0.3F;
+        _nvCoreClockOffset = 0;
+        _nvMemClockOffset = 0;
+        _nvPowerMizer = true;
+        _optimizeGPU = true;
+        _parkCores = false;
+        _parkCoresAuto = true;
+        _pinCores = false;
+        _pinCoresAuto = true;
+        _powerGovernor = true;
+        _prioritize = true;
+        _prioritizeIO = true;
+        _softrealtime = false;
+        _startupScriptPath = string.Empty;
+        _startupScriptTimeout = 10;
+        _stopScriptPath = string.Empty;
+        _stopScriptTimeout = 10;
+        _useGPU = true;
+        _gpuID = 0;
+    }
+
     public override event GamerunSettingSaveDelegate? OnSave;
+
+    #endregion OVERRIDES
+
+    #region PRIVATES
+
+    private bool? _notifications;
+    private bool? _compositor;
+    private bool? _amdPerfLevel;
+    private bool? _blockScreenSaver;
+    private bool? _cpuGovernor;
+    private bool? _disableSplitLockMitigation;
+    private bool? _enableFanController;
+    private bool? _enablePowerDaemon;
+    private uint? _gpuID;
+    private bool? _igpuGovernor;
+    private float? _igpuTreshold; // default 0.3F, iGPU Watts / CPU Watts
+    private uint? _nvCoreClockOffset;
+    private uint? _nvMemClockOffset;
+    private bool? _nvPowerMizer;
+    private bool? _optimizeGPU;
+
+    private bool? _parkCores;
+
+    private bool? _parkCoresAuto;
+
+    private bool? _pinCores;
+    private bool? _pinCoresAuto;
+
+    private bool? _powerGovernor;
+    private bool? _prioritize;
+    private bool? _prioritizeIO;
+
+    private bool? _softrealtime;
+    private string? _startupScriptPath;
+    private uint? _startupScriptTimeout;
+    private string? _stopScriptPath;
+    private uint? _stopScriptTimeout;
+
+    // ReSharper disable once InconsistentNaming
+    private bool? _useGPU;
+
+    #endregion PRIVATES
 }

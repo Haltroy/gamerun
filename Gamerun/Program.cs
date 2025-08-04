@@ -32,7 +32,7 @@ internal class Program
         try
         {
             var appCommandLine = args[0];
-            var app = Shared.Gamerun.GetApp(appCommandLine);
+            var app = Shared.Gamerun.GetApp(appCommandLine, true, true);
             var settings = app.Settings ?? Shared.Gamerun.Default;
 
             if (settings.RequireRootPermissions)
