@@ -76,7 +76,6 @@ public static class Daemon
 
     public static void DaemonMode()
     {
-        Console.WriteLine(Translations.DaemonInitizalized, Shared.Gamerun.Apps.Count);
         var runInSocket = GetRunnableSocket();
         Console.WriteLine(Translations.DaemonRunningInScoket, runInSocket);
         var endPoint = new UnixDomainSocketEndPoint(runInSocket);
@@ -133,6 +132,7 @@ public static class Daemon
                 listener.Disconnect(true);
                 listener.Shutdown(SocketShutdown.Both);
                 listener.Close();
+                foreach (var apps in currentApps) Process.GetProcessById(apps.PID).Kill();
                 break;
             }
 

@@ -1,0 +1,114 @@
+<root>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>1.3</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <data name="AppIsRunning" xml:space="preserve">
+        <value>Bir uygulama Gamerun ile çalıştırıldı...</value>
+    </data>
+    <data name="AppNotFound" xml:space="preserve">
+        <value>Uygulama "%cm%" komutuyla bulunamadı.</value>
+    </data>
+    <data name="ClientCannotFindApp" xml:space="preserve">
+        <value>[TEKİL] [H] %cm% bulunamadı.</value>
+    </data>
+    <data name="ClientHelpAlive" xml:space="preserve">
+        <value>Arkaplan hizmeti açık olup olmadığını kontrol eder.</value>
+    </data>
+    <data name="ClientHelpBusy" xml:space="preserve">
+        <value>Başka bir uygulamanın da Gamerun ile yürütülüp yürütülmediğine bakar.</value>
+    </data>
+    <data name="ClientHelpCMD" xml:space="preserve">
+        <value>Uygulamanın konumu. Stem uygulamalarında "Özellikler" penceresi için "%command%" kullanın.</value>
+    </data>
+    <data name="ClientHelpCommand" xml:space="preserve">
+        <value>KOMUT</value>
+    </data>
+    <data name="ClientHelpDaemon" xml:space="preserve">
+        <value>Arkaplan hizmeti olarak çalışır, diğer istekleri hızlandırır.</value>
+    </data>
+    <data name="ClientHelpDesc" xml:space="preserve">
+        <value>Uygulamalrı (genellikle oyunları) daha hızlı çalıştırın.</value>
+    </data>
+    <data name="ClientHelpHelp" xml:space="preserve">
+        <value>Yardım yazısını (bu yazıyı) yazar ve çıkar.</value>
+    </data>
+    <data name="ClientHelpShutdown" xml:space="preserve">
+        <value>Arkaplan hizmetine kapatma emri verir.</value>
+    </data>
+    <data name="ClientHelpUsage" xml:space="preserve">
+        <value>KULLANIM:</value>
+    </data>
+    <data name="ClientRunException" xml:space="preserve">
+        <value>[TEKİL] [H] Yüksek performansa ayarlanamadı, oluşan hata: %ex% </value>
+    </data>
+    <data name="ExceptionSocketNotFound" xml:space="preserve">
+        <value>Gamerun soketi bulunamadı.</value>
+    </data>
+    <data name="ExceptionSocketNotUsable" xml:space="preserve">
+        <value>Gamerun soketi kullanılamıyor.</value>
+    </data>
+    <data name="ExceptionEndOfStream" xml:space="preserve">
+        <value>Akışın sonuna %pos% noktasında çok önceden erişildi.</value>
+    </data>
+    <data name="DameonSocketEmpty" xml:space="preserve">
+        <value>[HİZMET] [B] Soket "{0}" var ama hiçbir şey çalışmıyor. Dosya siliniyor...</value>
+    </data>
+    <data name="DameonConnnectToSocketForShutdown" xml:space="preserve">
+        <value>[HİZMET] [B] Soket "{0}" bağlanılıp değiştirme için kapatma izni isteniyor...</value>
+    </data>
+    <data name="DaemonStarted" xml:space="preserve">
+        <value>[HİZMET] [B] Soket "[0}" içinde dinlenmeye başlandı. </value>
+    </data>
+    <data name="DaemonSocketKilled" xml:space="preserve">
+        <value>[HİZMET] [B] Soket "{0}" sona erdirildi.</value>
+    </data>
+    <data name="DaemonShutdown" xml:space="preserve">
+        <value>[HİZMET] [B] Soket "{0}" kapatılıyor.</value>
+    </data>
+    <data name="DaemonRunningInScoket" xml:space="preserve">
+        <value>[HİZMET] [B] Soket "{0}" içinde çalıştırılıyor...</value>
+    </data>
+    <data name="DaemonRevertRequested" xml:space="preserve">
+        <value>[HİZMET] [B] {0} PID'li işlem için düzeltme istendi.</value>
+    </data>
+    <data name="DaemonReceivedGarbage" xml:space="preserve">
+        <value>[HİZMET] [U] "{0}" mesajı alındı ama okunamıyor. Önemsenilmedi.</value>
+    </data>
+    <data name="DaemonReceivedNothing" xml:space="preserve">
+        <value>[HİZMET] [U] "{0}" bilinmeyen mesajı alındı. Önemsenilmedi.</value>
+    </data>
+    <data name="DaemonClientConnected" xml:space="preserve">
+        <value>[HİZMET] [B] Tekil bağlandı</value>
+    </data>
+    <data name="DaemonCannotReplaceSocket" xml:space="preserve">
+        <value>[HİZMET] [H] Soket ("%runInSocket%") değiştirilemedi. Oluşan arıza: %ex%</value>
+    </data>
+    <data name="DaemonAliveRequested" xml:space="preserve">
+        <value>[HİZMET] [B] Çalışma isteği algılandı.</value>
+    </data>
+    <data name="DaemonBusyRequested" xml:space="preserve">
+        <value>[HİZMET] [B] Meşgul isteği alındı.</value>
+    </data>
+    <data name="ClientSecurityException" xml:space="preserve">
+        <value>[TEKİL] [H] Sokete bağlanılamadı ("%runningSocket%" konumundaki), güvenlik arızası. oluşan arıza: %secEx%</value>
+    </data>
+    <data name="ClientSocketException" xml:space="preserve">
+        <value>[TEKİL] [H] Sokete bağlanılamadı ("%l%" konumundaki). Oluşan arıza: %ex%</value>
+    </data>
+    <data name="DaemonBoostRequested" xml:space="preserve">
+        <value>[HİZMET] [B] PID {0} için hızlandırma istendi.</value>
+    </data>
+</root>

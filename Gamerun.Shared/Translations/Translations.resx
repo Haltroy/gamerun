@@ -106,21 +106,21 @@
         <value>USAGE:</value>
     </data>
     <data name="ClientHelpDaemon" xml:space="preserve">
-        <value/>
+        <value>Runs in Daemon mode, receives boost commands from other instances.</value>
     </data>
     <data name="ClientHelpHelp" xml:space="preserve">
-        <value/>
+        <value>Displays help (this text) and exits.</value>
     </data>
     <data name="ClientHelpShutdown" xml:space="preserve">
-        <value/>
+        <value>Sends a shutdown request to daemon.</value>
     </data>
     <data name="ClientHelpAlive" xml:space="preserve">
-        <value/>
+        <value>Checks if daemon is alive.</value>
     </data>
     <data name="ClientHelpBusy" xml:space="preserve">
-        <value/>
+        <value>Checks if another app is also running in Gamerun.</value>
     </data>
     <data name="ClientHelpCMD" xml:space="preserve">
-        <value/>
+        <value>Path to app. Use "%command%" on Steam games' "Properties" menu.</value>
     </data>
 </root>

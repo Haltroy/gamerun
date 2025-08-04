@@ -17,14 +17,20 @@
         <OptimizationPreference>Size</OptimizationPreference>
         <PublishAot>true</PublishAot>
         <DebugSymbols>false</DebugSymbols>
-        <DebugType>embedded</DebugType>
+        <DebugType>None</DebugType>
         <StripSymbols>true</StripSymbols>
         <DebuggerSupport>false</DebuggerSupport>
-        <TrimMode>full</TrimMode>
+        <TrimMode>link</TrimMode>
         <TrimmerRemoveSymbols>true</TrimmerRemoveSymbols>
         <PublishTrimmed>true</PublishTrimmed>
         <InvariantGlobalization>true</InvariantGlobalization>
     </PropertyGroup>
+
+    <ItemGroup>
+        <!-- Preserve Avalonia types for reflection -->
+        <TrimmerRootAssembly Include="Avalonia.Themes.Fluent"/>
+        <TrimmerRootAssembly Include="Avalonia.Controls"/>
+    </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Avalonia" Version="11.3.2"/>

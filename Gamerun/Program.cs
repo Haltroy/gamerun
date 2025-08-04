@@ -32,7 +32,11 @@ internal class Program
                 var rightSide = arguments[1];
                 var spaceLength = consoleLength - (leftSide.Length + rightSide.Length);
                 var space = string.Empty;
-                for (var i = 0; i < spaceLength; i++) space += " ";
+                if (spaceLength <= 0) space = "|";
+                else
+                    for (var i = 0; i < spaceLength; i++)
+                        space += " ";
+
                 // ReSharper disable once LocalizableElement
                 Console.WriteLine($"{leftSide}{space}{rightSide}");
             }
