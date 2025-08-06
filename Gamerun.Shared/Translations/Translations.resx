@@ -42,9 +42,6 @@
     <data name="ClientRunException" xml:space="preserve">
         <value>[Client] [F] Cannot set it to high performance. Exception caught: %ex%</value>
     </data>
-    <data name="DaemonInitizalized" xml:space="preserve">
-        <value>[Daemon] [I] Initialized with {0} total app(s).</value>
-    </data>
     <data name="DaemonRunningInScoket" xml:space="preserve">
         <value>[Daemon] [I] Running in socket "{0}"...</value>
     </data>
@@ -122,5 +119,8 @@
     </data>
     <data name="ClientHelpCMD" xml:space="preserve">
         <value>Path to app. Use "%command%" on Steam games' "Properties" menu.</value>
+    </data>
+    <data name="DaemonError" xml:space="preserve">
+        <value>[Daemon] [E] Exception caught: {0}</value>
     </data>
 </root>

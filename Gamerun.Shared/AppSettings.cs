@@ -81,7 +81,7 @@ public class AppSettings : GamerunSettingsAbstract
         }
     }
 
-    public float iGPUTreshold
+    public uint iGPUTreshold
     {
         get => _igpuTreshold ?? Gamerun.Default.iGPUTreshold;
         set
@@ -462,21 +462,47 @@ public class AppSettings : GamerunSettingsAbstract
         // TODO: Notification system settings
 
         // TODO: Compositor Settings
+        var gpu = Gamerun.GPUs[GPUID];
+        if (Gamerun.GPUs.Length > 1)
+            switch (gpu.Driver.ToLower())
+            {
+                case "nvidia":
+                    args.Environment["__NV_PRIME_RENDER_OFFLOAD"] = "1";
+                    args.Environment["__VK_LAYER_NV_optimus"] = "NVIDIA_only";
+                    args.Environment["__GLX_VENDOR_LIBRARY_NAME"] = "nvidia";
+                    break;
+                default:
+                    args.Environment["DRI_PRIME"] = gpu.PciId;
+                    break;
+            }
 
-        // TODO: Find and use GPU
-        // lspci -k | grep -A3 -i 'VGA\|3D' shows this:
-        /*
-         00:02.0 VGA compatible controller: Intel Corporation CoffeeLake-H GT2 [UHD Graphics 630]
-                   DeviceName: Intel(R) UHD Graphics 630
-                   Subsystem: Hewlett-Packard Company Device 85fc
-                   Kernel driver in use: i915
-           --
-           01:00.0 VGA compatible controller: NVIDIA Corporation TU117M [GeForce GTX 1650 Mobile / Max-Q] (rev a1)
-                   Subsystem: Hewlett-Packard Company Device 85fc
-                   Kernel driver in use: nvidia
-                   Kernel modules: nouveau, nvidia_drm, nvidia
-         */
-        // Use line "Kernel driver in use" to get the driver name. If it's "nvidia" on an Nvidia GPU then it is ready to PRIME otherwise use DRI_PRIME or switcherooctl
+        if (OptimizeGPU)
+        {
+            args.DaemonArgs.OptimizeGPU = true;
+            switch (gpu.Driver.ToLower())
+            {
+                case "nvidia":
+                    args.DaemonArgs.NvPowerMizer = true;
+                    args.DaemonArgs.NvCoreClockOffset = NvCoreClockOffset;
+                    args.DaemonArgs.NvMemClockOffset = NvMemClockOffset;
+                    break;
+                case "amdgpu":
+                    args.DaemonArgs.AMDPerfLevel = true;
+                    break;
+                case "intel":
+                case "xe":
+                case "i915":
+                    break;
+            }
+        }
+
+        if (Gamerun.GPUs.Length > 1)
+            if (iGPUGovernor)
+            {
+                args.DaemonArgs.iGPUGovernor = true;
+                args.DaemonArgs.iGPUTreshold = iGPUTreshold;
+            }
+
         return args;
     }
 
@@ -493,7 +519,7 @@ public class AppSettings : GamerunSettingsAbstract
         _enableFanController = true;
         _enablePowerDaemon = true;
         _igpuGovernor = true;
-        _igpuTreshold = 0.3F;
+        _igpuTreshold = 1200;
         _nvCoreClockOffset = 0;
         _nvMemClockOffset = 0;
         _nvPowerMizer = true;
@@ -530,7 +556,7 @@ public class AppSettings : GamerunSettingsAbstract
     private bool? _enablePowerDaemon;
     private uint? _gpuID;
     private bool? _igpuGovernor;
-    private float? _igpuTreshold; // default 0.3F, iGPU Watts / CPU Watts
+    private uint? _igpuTreshold;
     private uint? _nvCoreClockOffset;
     private uint? _nvMemClockOffset;
     private bool? _nvPowerMizer;

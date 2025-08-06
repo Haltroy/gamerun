@@ -81,12 +81,6 @@ namespace Gamerun.Shared.Translations {
             }
         }
         
-        public static string DaemonInitizalized {
-            get {
-                return ResourceManager.GetString("DaemonInitizalized", resourceCulture);
-            }
-        }
-        
         public static string DaemonRunningInScoket {
             get {
                 return ResourceManager.GetString("DaemonRunningInScoket", resourceCulture);
@@ -240,6 +234,12 @@ namespace Gamerun.Shared.Translations {
         public static string ClientHelpCMD {
             get {
                 return ResourceManager.GetString("ClientHelpCMD", resourceCulture);
+            }
+        }
+        
+        public static string DaemonError {
+            get {
+                return ResourceManager.GetString("DaemonError", resourceCulture);
             }
         }
     }

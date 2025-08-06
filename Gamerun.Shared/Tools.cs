@@ -70,7 +70,7 @@ public static class Tools
             // Attempt to find matching DRM card and read first mode
             var defaultMode = TryGetDrmDefaultMode(pciId);
 
-            gpus.Add(new GpuInfo(pciId, driver, vendor, device, defaultMode));
+            gpus.Add(new GpuInfo(devPath, pciId, driver, vendor, device, defaultMode.mode, defaultMode.drm));
         }
 
         return gpus.OrderByDescending(gpu => GetGpuPriority(gpu.Driver)).ToArray();
@@ -93,7 +93,7 @@ public static class Tools
     }
 
 
-    private static string TryGetDrmDefaultMode(string pciId)
+    private static (string mode, string drm) TryGetDrmDefaultMode(string pciId)
     {
         foreach (var cardPath in Directory.GetDirectories("/sys/class/drm/", "card*"))
         {
@@ -114,10 +114,10 @@ public static class Tools
             if (!File.Exists(modesPath)) continue;
             var modes = File.ReadAllLines(modesPath);
             if (modes.Length > 0)
-                return modes[0]; // first mode is typically current
+                return (modes[0], cardPath); // first mode is typically current
         }
 
-        return "";
+        return (string.Empty, string.Empty);
     }
 
     private static string Run(string command, string args)

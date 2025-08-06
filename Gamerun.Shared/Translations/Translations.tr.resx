@@ -111,4 +111,7 @@
     <data name="DaemonBoostRequested" xml:space="preserve">
         <value>[HİZMET] [B] PID {0} için hızlandırma istendi.</value>
     </data>
+    <data name="DaemonError" xml:space="preserve">
+        <value>[HİZMET] [H] Hata yakalandı: {0}</value>
+    </data>
 </root>

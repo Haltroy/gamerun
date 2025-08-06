@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
+using Gamerun.GPU;
 using Gamerun.Shared;
 using Gamerun.Shared.Exceptions;
 using Gamerun.Shared.Translations;
@@ -118,169 +119,196 @@ public static class Daemon
         Console.WriteLine(Translations.DaemonStarted, runInSocket);
 
         while (true)
-        {
-            Console.WriteLine(Translations.DaemonClientConnected);
-            var client = listener.Accept();
-            var buffer = new byte[1024];
-            var bytesRead = client.Receive(buffer);
-            var message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-
-            if (message.StartsWith("shutdown", StringComparison.OrdinalIgnoreCase))
+            try
             {
-                Console.WriteLine(Translations.DaemonShutdown, runInSocket);
+                Console.WriteLine(Translations.DaemonClientConnected);
+                var client = listener.Accept();
+                var buffer = new byte[1024];
+                var bytesRead = client.Receive(buffer);
+                var message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+
+                if (message.StartsWith("shutdown", StringComparison.OrdinalIgnoreCase))
+                {
+                    Console.WriteLine(Translations.DaemonShutdown, runInSocket);
+                    client.Close();
+                    listener.Disconnect(true);
+                    listener.Shutdown(SocketShutdown.Both);
+                    listener.Close();
+                    foreach (var apps in currentApps) Process.GetProcessById(apps.PID).Kill();
+                    break;
+                }
+
+                if (message.StartsWith("alive", StringComparison.OrdinalIgnoreCase))
+                {
+                    Console.WriteLine(Translations.DaemonAliveRequested);
+                    client.Send("I AM ALIVE"u8.ToArray());
+                    continue;
+                }
+
+                if (message.StartsWith("busy", StringComparison.OrdinalIgnoreCase))
+                {
+                    Console.WriteLine(Translations.DaemonBusyRequested);
+                    client.Send((currentApps.Count > 0 ? "YES"u8 : "NO"u8).ToArray());
+                    continue;
+                }
+
+                var controller = new GpuPowerController();
+
+                var arguments = message.Split(' ');
+
+                switch (arguments[0])
+                {
+                    case "boost": // boost <base64>
+                        if (arguments.Length <= 1) break;
+                        var decoded = new GamerunDaemonArgs(arguments[1]);
+
+                        Console.WriteLine(Translations.DaemonBoostRequested, decoded.PID);
+                        currentApps.Add(decoded);
+                        if (decoded.SetTLP) Process.Start(new ProcessStartInfo(Tools.GetCommand("tlp"), "ac"));
+
+                        if (decoded.Prioritize) SetPriority(decoded.PID);
+
+                        if (decoded.PrioritizeIO) SetIOPriority(decoded.PID);
+
+                        if (decoded.SetSplitLockMitigation) SetSplitLockMitigation(true);
+
+                        if (decoded.ParkCores) CPUSetting.ParkCores(decoded.ParkedCores, false);
+
+                        if (decoded.PinCores) CPUSetting.PinCores(decoded.PID, decoded.PinnedCores);
+
+                        if (decoded.SoftRealtime) SetSoftRealtime(decoded.PID);
+
+                        if (decoded.OptimizeGPU)
+                        {
+                            if (decoded.AMDPerfLevel)
+                            {
+                                var dGpu = Shared.Gamerun.GPUs.FirstOrDefault();
+                                if (dGpu != null && dGpu.Driver.Contains("amdgpu", StringComparison.OrdinalIgnoreCase))
+                                    controller.TrySetAmdPerfLevel(dGpu, "high");
+                            }
+
+                            if (decoded.NvPowerMizer)
+                                Process.Start(Tools.GetCommand("nvidia-settings"), "-a '[gpu:0]/GPUPowerMizerMode=1'");
+
+                            if (decoded.NvMemClockOffset > 0)
+                                Process.Start(Tools.GetCommand("nvidia-settings"),
+                                    $"-a \"[gpu:0]/GPUMemoryTransferRateOffset[3]={decoded.NvMemClockOffset}\"");
+
+                            if (decoded.NvCoreClockOffset > 0)
+                                Process.Start(Tools.GetCommand("nvidia-settings"),
+                                    $"-a \"[gpu:0]/GPUGraphicsClockOffset[3]={decoded.NvCoreClockOffset}\" ");
+                        }
+
+                        if (decoded.iGPUGovernor)
+                        {
+                            var igpu = Shared.Gamerun.GPUs.LastOrDefault();
+                            if (igpu != null)
+                            {
+                                if (igpu.Driver.Contains("i915", StringComparison.OrdinalIgnoreCase) ||
+                                    igpu.Driver.Contains("intel", StringComparison.OrdinalIgnoreCase))
+                                    controller.TrySetIgpuGovernorAndThreshold(igpu, "powersave",
+                                        (int)decoded.iGPUTreshold);
+                                else if (igpu.Driver.Contains("amdgpu", StringComparison.OrdinalIgnoreCase))
+                                    controller.TrySetIgpuGovernorAndThreshold(igpu, "low");
+                            }
+                        }
+
+                        break;
+                    case "revert": // revert <pid>
+                        if (arguments.Length <= 1) break;
+                        if (!int.TryParse(arguments[1], out var pid)) break;
+                        Console.WriteLine(Translations.DaemonRevertRequested, pid);
+                        var found = currentApps.Find(it => it.PID == pid);
+                        if (found == null) break;
+                        if (found.SetTLP && currentApps.FindAll(it => it.SetTLP).Count <= 1)
+                            Process.Start(new ProcessStartInfo(Tools.GetCommand("tlp"), "bat"));
+                        if (found.SetSplitLockMitigation &&
+                            currentApps.FindAll(it => it.SetSplitLockMitigation).Count <= 1)
+                            SetSplitLockMitigation(false);
+                        if (found.ParkCores && currentApps.FindAll(it => it.ParkCores).Count <= 1)
+                            CPUSetting.ParkCores(found.ParkedCores, true);
+
+                        if (found.OptimizeGPU)
+                        {
+                            if (found.AMDPerfLevel && currentApps.FindAll(it => it.AMDPerfLevel).Count <= 1)
+                            {
+                                var dGpu = Shared.Gamerun.GPUs.FirstOrDefault();
+                                if (dGpu != null && dGpu.Driver.Contains("amdgpu", StringComparison.OrdinalIgnoreCase))
+                                    controller.TrySetAmdPerfLevel(dGpu, "auto");
+                            }
+
+                            if (found.NvPowerMizer && currentApps.FindAll(it => it.NvPowerMizer).Count <= 1)
+                                Process.Start(Tools.GetCommand("nvidia-settings"), "-a '[gpu:0]/GPUPowerMizerMode=0'");
+
+                            if (found.NvMemClockOffset > 0 &&
+                                currentApps.FindAll(it => it.NvMemClockOffset > 0).Count <= 1)
+                                Process.Start(Tools.GetCommand("nvidia-settings"),
+                                    "-a \"[gpu:0]/GPUMemoryTransferRateOffset[3]=0\"");
+
+                            if (found.NvCoreClockOffset > 0 &&
+                                currentApps.FindAll(it => it.NvCoreClockOffset > 0).Count <= 1)
+                                Process.Start(Tools.GetCommand("nvidia-settings"),
+                                    "-a \"[gpu:0]/GPUGraphicsClockOffset[3]=0\" ");
+                        }
+
+                        if (found.iGPUGovernor)
+                        {
+                            var igpu = Shared.Gamerun.GPUs.LastOrDefault();
+                            if (igpu != null)
+                            {
+                                if (igpu.Driver.Contains("i915", StringComparison.OrdinalIgnoreCase) ||
+                                    igpu.Driver.Contains("intel", StringComparison.OrdinalIgnoreCase))
+                                    controller.TrySetIgpuGovernorAndThreshold(igpu, "balanced", 0);
+                                else if (igpu.Driver.Contains("amdgpu", StringComparison.OrdinalIgnoreCase))
+                                    controller.TrySetIgpuGovernorAndThreshold(igpu, "auto");
+                            }
+                        }
+
+                        currentApps.Remove(found);
+                        break;
+
+                    case null:
+                        Console.WriteLine(Translations.DaemonReceivedGarbage, message);
+                        break;
+
+                    default:
+                        Console.WriteLine(Translations.DaemonReceivedNothing, runInSocket);
+                        break;
+                }
+
                 client.Close();
-                listener.Disconnect(true);
-                listener.Shutdown(SocketShutdown.Both);
-                listener.Close();
-                foreach (var apps in currentApps) Process.GetProcessById(apps.PID).Kill();
-                break;
             }
-
-            if (message.StartsWith("alive", StringComparison.OrdinalIgnoreCase))
+            catch (Exception ex)
             {
-                Console.WriteLine(Translations.DaemonAliveRequested);
-                client.Send("I AM ALIVE"u8.ToArray());
-                continue;
+                Console.WriteLine(Translations.DaemonError, ex);
             }
-
-            if (message.StartsWith("busy", StringComparison.OrdinalIgnoreCase))
-            {
-                Console.WriteLine(Translations.DaemonBusyRequested);
-                client.Send((currentApps.Count > 0 ? "YES"u8 : "NO"u8).ToArray());
-                continue;
-            }
-
-            var arguments = message.Split(' ');
-
-            switch (arguments[0])
-            {
-                case "boost": // boost <base64>
-                    if (arguments.Length <= 1) break;
-                    var decoded = new GamerunDaemonArgs(arguments[1]);
-
-                    Console.WriteLine(Translations.DaemonBoostRequested, decoded.PID);
-                    currentApps.Add(decoded);
-                    if (decoded.SetTLP) Process.Start(new ProcessStartInfo(Tools.GetCommand("tlp"), "ac"));
-
-                    if (decoded.Prioritize) SetPriority(decoded.PID);
-
-                    if (decoded.PrioritizeIO) SetIOPriority(decoded.PID);
-
-                    if (decoded.SetSplitLockMitigation) SetSplitLockMitigation(true);
-
-                    if (decoded.ParkCores) CPUSetting.ParkCores(decoded.ParkedCores, false);
-
-                    if (decoded.PinCores) CPUSetting.PinCores(decoded.PID, decoded.PinnedCores);
-
-                    if (decoded.OptimizeGPU)
-                    {
-                        // TODO: Optimize GPUs here
-                        if (decoded.AMDPerfLevel)
-                        {
-                            // AMD performance level
-                        }
-
-                        if (decoded.NvPowerMizer)
-                        {
-                            // Nvidia PowerMizer
-                        }
-
-                        if (decoded.NvMemClockOffset > 0)
-                        {
-                            // Nvidia mem clock overclock
-                        }
-
-                        if (decoded.NvCoreClockOffset > 0)
-                        {
-                            // Nvidia core clock overclock
-                        }
-                    }
-
-                    if (decoded.iGPUGovernor)
-                    {
-                        // TODO: iGPU stuff here
-                    }
-
-                    break;
-                case "revert": // revert <pid>
-                    if (arguments.Length <= 1) break;
-                    if (!int.TryParse(arguments[1], out var pid)) break;
-                    Console.WriteLine(Translations.DaemonRevertRequested, pid);
-                    var found = currentApps.Find(it => it.PID == pid);
-                    if (found == null) break;
-                    if (found.SetTLP && currentApps.FindAll(it => it.SetTLP).Count <= 1)
-                        Process.Start(new ProcessStartInfo(Tools.GetCommand("tlp"), "bat"));
-                    if (found.SetSplitLockMitigation && currentApps.FindAll(it => it.SetSplitLockMitigation).Count <= 1)
-                        SetSplitLockMitigation(false);
-                    if (found.ParkCores && currentApps.FindAll(it => it.ParkCores).Count <= 1)
-                        CPUSetting.ParkCores(found.ParkedCores, true);
-
-                    if (found.OptimizeGPU)
-                    {
-                        // TODO: revert GPUs here
-                        if (found.AMDPerfLevel)
-                        {
-                            // AMD performance level
-                        }
-
-                        if (found.NvPowerMizer)
-                        {
-                            // Nvidia PowerMizer
-                        }
-
-                        if (found.NvMemClockOffset > 0)
-                        {
-                            // Nvidia mem clock overclock
-                        }
-
-                        if (found.NvCoreClockOffset > 0)
-                        {
-                            // Nvidia core clock overclock
-                        }
-                    }
-
-                    if (found.iGPUGovernor)
-                    {
-                        // TODO: iGPU stuff here
-                    }
-
-                    currentApps.Remove(found);
-                    break;
-
-                case null:
-                    Console.WriteLine(Translations.DaemonReceivedGarbage, message);
-                    break;
-
-                default:
-                    Console.WriteLine(Translations.DaemonReceivedNothing, runInSocket);
-                    break;
-            }
-
-            client.Close();
-        }
     }
 
     [DllImport("libc", SetLastError = true)]
     private static extern int syscall(ulong number, int which, int who, int ioprio);
 
-    // Needs root privileges!
-    private static int SetIOPriority(int pid)
+    private static void SetIOPriority(int pid)
     {
         const ulong sys_ioprio_set = 251;
         const int IOPRIO_CLASS_RT = 1;
-        return syscall(sys_ioprio_set, 1, pid, (IOPRIO_CLASS_RT << 13) | 0);
+        var result = syscall(sys_ioprio_set, 1, pid, (IOPRIO_CLASS_RT << 13) | 0);
+        if (result > 0) throw new Exception("Error setting IOPriority");
     }
 
     [DllImport("libc", SetLastError = true)]
     private static extern int setpriority(int which, int who, int prio);
 
     [DllImport("libc")]
-    private static extern int sched_setscheduler(int pid, int policy, ref sched_param param); // TODO
+    private static extern int sched_setscheduler(int pid, int policy, ref sched_param param);
 
-
-    // TODO: iGPU Governor and Treshold
-    // /sys/class/drm/card0/device/power_dpm_force_performance_level
-    // low auto high normal
+    private static void SetSoftRealtime(int pid, int priority = 10)
+    {
+        var param = new sched_param { sched_priority = priority };
+        var res = sched_setscheduler(pid, SCHED_RR, ref param);
+        if (res == 0) return;
+        var errno = Marshal.GetLastWin32Error();
+        Console.Error.WriteLine($"sched_setscheduler failed: {errno}");
+    }
 
     private static void SetSplitLockMitigation(bool disabled)
     {
@@ -292,12 +320,10 @@ public static class Daemon
         writer.Write(disabled ? "0" : "1");
     }
 
-    // TODO: GPU Overclocking
-
-    // Needs root privileges!
-    private static int SetPriority(int pid)
+    private static void SetPriority(int pid)
     {
-        return setpriority(0, pid, -10);
+        var result = setpriority(0, pid, -10);
+        if (result > 0) throw new Exception("Error setting priority");
     }
 
     private struct sched_param
