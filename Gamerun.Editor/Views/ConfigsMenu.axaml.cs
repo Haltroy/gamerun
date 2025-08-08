@@ -13,6 +13,6 @@ public partial class ConfigsMenu : GamerunUserControl
 
     public override void ReceivedCommand(object? command)
     {
-        // TODO: string "refresh" refreshes it, AppSettings opens edit menu for that item
+        // TODO: string "refresh" refreshes it, AppConfig opens edit menu for that item
     }
 }

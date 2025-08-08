@@ -8,7 +8,7 @@ namespace Gamerun.Shared;
 /// <summary>
 ///     MangoHUD is a layer that shows system information on apps.
 /// </summary>
-public class MangoHUDSettings : GamerunSettingsAbstract
+public class MangoHudConfig : GamerunSettingsAbstract
 {
     #region PUBLIC PROPERTIES
 
@@ -120,8 +120,9 @@ public class MangoHUDSettings : GamerunSettingsAbstract
         return args;
     }
 
-    public override void SetAsDefault()
+    internal override void SetAsDefault()
     {
+        base.SetAsDefault();
         _configIsFile = true;
         _configuration = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "MangoHud",
             "MangoHud.conf");

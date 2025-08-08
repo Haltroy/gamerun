@@ -32,10 +32,7 @@ public class GpuPowerController : IDisposable
 
         // fallback: find device via /sys/bus/pci/devices/<pci>/... as earlier
         var candidate = $"/sys/bus/pci/devices/{gpu.PciId}";
-        if (Directory.Exists(candidate))
-            return candidate;
-
-        return null;
+        return Directory.Exists(candidate) ? candidate : string.Empty;
     }
 
     #region AMD perf level

@@ -4,6 +4,7 @@ namespace Gamerun.Shared;
 ///     Represent a machine's graphical processing unit.
 /// </summary>
 /// <param name="FilePath">Path of the card.</param>
+/// <param name="Name">name of the GPU.</param>
 /// <param name="PciId">PCI ID of this GPU (ex. 01:00.0 for Nvidia cards).</param>
 /// <param name="Driver">Driver name of the card. Mostly used for detecting if a Nvidia card is using Nvidia's drivers.</param>
 /// <param name="VendorId">
@@ -18,6 +19,7 @@ namespace Gamerun.Shared;
 /// <param name="DRMPath">Path of the DRM (Direct Rendering Mode) card.</param>
 public record GpuInfo(
     string FilePath,
+    string Name,
     string PciId,
     string Driver,
     string VendorId,

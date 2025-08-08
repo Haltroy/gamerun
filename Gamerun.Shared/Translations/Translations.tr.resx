@@ -114,4 +114,28 @@
     <data name="DaemonError" xml:space="preserve">
         <value>[HİZMET] [H] Hata yakalandı: {0}</value>
     </data>
+    <data name="ConfigDefaultName" xml:space="preserve">
+        <value>Varsayılan</value>
+    </data>
+    <data name="ConfigNewName" xml:space="preserve">
+        <value>Yeni Ayar {0}</value>
+    </data>
+    <data name="SidebarApps" xml:space="preserve">
+        <value>Uygulamalar</value>
+    </data>
+    <data name="SidebarConfigs" xml:space="preserve">
+        <value>Ayarlamalar</value>
+    </data>
+    <data name="SidebarStrangle" xml:space="preserve">
+        <value>Sınırla</value>
+    </data>
+    <data name="SidebarSettings" xml:space="preserve">
+        <value>Ayarlar</value>
+    </data>
+    <data name="SidebarAbout" xml:space="preserve">
+        <value>Hakkında</value>
+    </data>
+    <data name="GamerunEditorTitle" xml:space="preserve">
+        <value>Gamerun Düzenleyicisi</value>
+    </data>
 </root>

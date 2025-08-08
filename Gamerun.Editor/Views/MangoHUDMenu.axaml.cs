@@ -14,6 +14,6 @@ public partial class MangoHUDMenu : GamerunUserControl
 
     public override void ReceivedCommand(object? command)
     {
-        // TODO: string "refresh" refreshes list, MangoHUDSettings opens the edit menu for that page
+        // TODO: string "refresh" refreshes list, MangoHudConfig opens the edit menu for that page
     }
 }

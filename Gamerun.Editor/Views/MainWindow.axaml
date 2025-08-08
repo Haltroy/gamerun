@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:ic="using:FluentIcons.Avalonia"
         xmlns:views="clr-namespace:Gamerun.Editor.Views"
+        xmlns:trans="using:Gamerun.Shared.Translations"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Gamerun.Editor.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
@@ -43,7 +44,8 @@
             <ToggleButton CornerRadius="10" Name="SearchToggle" DockPanel.Dock="Left">
                 <ic:FluentIcon Width="16" Height="16" Icon="Search" />
             </ToggleButton>
-            <TextBlock Text="Gamerun Editor" VerticalAlignment="Center" HorizontalAlignment="Center" />
+            <TextBlock Text="{x:Static trans:Translations.GamerunEditorTitle}" VerticalAlignment="Center"
+                       HorizontalAlignment="Center" />
         </DockPanel>
         <Grid ColumnDefinitions="Auto,*">
             <Border Grid.Column="0" Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}"
@@ -55,12 +57,13 @@
                         <Button.Content>
                             <StackPanel Orientation="Horizontal">
                                 <ic:FluentIcon Width="16" Height="16" Icon="Games" />
-                                <TextBlock VerticalAlignment="Center" Text="Applications"
+                                <TextBlock Margin="5" VerticalAlignment="Center"
+                                           Text="{x:Static trans:Translations.SidebarApps}"
                                            IsVisible="{CompiledBinding #SidebarShowHide.IsChecked}" />
                             </StackPanel>
                         </Button.Content>
                         <ToolTip.Tip>
-                            <TextBlock Text="Applications" />
+                            <TextBlock Text="{x:Static trans:Translations.SidebarApps}" />
                         </ToolTip.Tip>
                     </Button>
                     <Button Click="SidebarButtonClicked" Tag="{CompiledBinding #ConfigMenu}" CornerRadius="10"
@@ -69,12 +72,13 @@
                         <Button.Content>
                             <StackPanel Orientation="Horizontal">
                                 <ic:FluentIcon Width="16" Height="16" Icon="Gauge" />
-                                <TextBlock VerticalAlignment="Center" Text="Configurations"
+                                <TextBlock Margin="5" VerticalAlignment="Center"
+                                           Text="{x:Static trans:Translations.SidebarConfigs}"
                                            IsVisible="{CompiledBinding #SidebarShowHide.IsChecked}" />
                             </StackPanel>
                         </Button.Content>
                         <ToolTip.Tip>
-                            <TextBlock Text="Configurations" />
+                            <TextBlock Text="{x:Static trans:Translations.SidebarConfigs}" />
                         </ToolTip.Tip>
                     </Button>
                     <Button Click="SidebarButtonClicked" Tag="{CompiledBinding #MangoHudMenu}" CornerRadius="10"
@@ -83,12 +87,13 @@
                         <Button.Content>
                             <StackPanel Orientation="Horizontal">
                                 <ic:FluentIcon Width="16" Height="16" Icon="Fps960" />
-                                <TextBlock VerticalAlignment="Center" Text="MangoHUD"
+                                <TextBlock Margin="5" VerticalAlignment="Center"
+                                           Text="{x:Static trans:Translations.SidebarMangoHUD}"
                                            IsVisible="{CompiledBinding #SidebarShowHide.IsChecked}" />
                             </StackPanel>
                         </Button.Content>
                         <ToolTip.Tip>
-                            <TextBlock Text="MangoHUD" />
+                            <TextBlock Text="{x:Static trans:Translations.SidebarMangoHUD}" />
                         </ToolTip.Tip>
                     </Button>
                     <Button Click="SidebarButtonClicked" Tag="{CompiledBinding #GamescopeMenu}" CornerRadius="10"
@@ -97,12 +102,13 @@
                         <Button.Content>
                             <StackPanel Orientation="Horizontal">
                                 <ic:FluentIcon Width="16" Height="16" Icon="Window" />
-                                <TextBlock VerticalAlignment="Center" Text="Gamescope"
+                                <TextBlock Margin="5" VerticalAlignment="Center"
+                                           Text="{x:Static trans:Translations.SidebarGamescope}"
                                            IsVisible="{CompiledBinding #SidebarShowHide.IsChecked}" />
                             </StackPanel>
                         </Button.Content>
                         <ToolTip.Tip>
-                            <TextBlock Text="Gamescope" />
+                            <TextBlock Text="{x:Static trans:Translations.SidebarGamescope}" />
                         </ToolTip.Tip>
                     </Button>
                     <Button Click="SidebarButtonClicked" Tag="{CompiledBinding #About}" CornerRadius="10"
@@ -111,12 +117,13 @@
                         <Button.Content>
                             <StackPanel Orientation="Horizontal">
                                 <ic:FluentIcon Width="16" Height="16" Icon="Info" />
-                                <TextBlock VerticalAlignment="Center" Text="About"
+                                <TextBlock Margin="5" VerticalAlignment="Center"
+                                           Text="{x:Static trans:Translations.SidebarAbout}"
                                            IsVisible="{CompiledBinding #SidebarShowHide.IsChecked}" />
                             </StackPanel>
                         </Button.Content>
                         <ToolTip.Tip>
-                            <TextBlock Text="About" />
+                            <TextBlock Text="{x:Static trans:Translations.SidebarAbout}" />
                         </ToolTip.Tip>
                     </Button>
                     <Button Click="SidebarButtonClicked" Tag="{CompiledBinding #Settings}" CornerRadius="10"
@@ -125,12 +132,13 @@
                         <Button.Content>
                             <StackPanel Orientation="Horizontal">
                                 <ic:FluentIcon Width="16" Height="16" Icon="Settings" />
-                                <TextBlock VerticalAlignment="Center" Text="Settings"
+                                <TextBlock Margin="5" VerticalAlignment="Center"
+                                           Text="{x:Static trans:Translations.SidebarSettings}"
                                            IsVisible="{CompiledBinding #SidebarShowHide.IsChecked}" />
                             </StackPanel>
                         </Button.Content>
                         <ToolTip.Tip>
-                            <TextBlock Text="Settings" />
+                            <TextBlock Text="{x:Static trans:Translations.SidebarSettings}" />
                         </ToolTip.Tip>
                     </Button>
                 </DockPanel>

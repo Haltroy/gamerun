@@ -3,11 +3,11 @@ using Gamerun.Shared.Exceptions;
 
 namespace Gamerun.Shared;
 
-public class AppSettings : GamerunSettingsAbstract
+public class AppConfig : GamerunSettingsAbstract
 {
     #region CONSTRUCTORS
 
-    public AppSettings()
+    public AppConfig()
     {
         Cores = Tools.DetectCpuTopology();
         foreach (var cpu in Cores) cpu.ParkedPinnedChanged += () => OnSave?.Invoke();
@@ -358,20 +358,20 @@ public class AppSettings : GamerunSettingsAbstract
         if (InitSystemHelper.IsServiceActiveAsync("power-profiles-daemon"))
         {
             args.StartDBusCalls.Add(new GamerunDBusCalls
-            {
-                Destination = "org.freedesktop.PowerProfiles",
-                ObjectPath = "/org/freedesktop/PowerProfiles",
-                Method = "org.freedesktop.PowerProfiles.SetActiveProfile",
-                Arguments = ["performance"]
-            });
+            (
+                "org.freedesktop.PowerProfiles",
+                "/org/freedesktop/PowerProfiles",
+                "org.freedesktop.PowerProfiles.SetActiveProfile",
+                ["performance"]
+            ));
 
             args.EndDBusCalls.Add(new GamerunDBusCalls
-            {
-                Destination = "org.freedesktop.PowerProfiles",
-                ObjectPath = "/org/freedesktop/PowerProfiles",
-                Method = "org.freedesktop.PowerProfiles.SetActiveProfile",
-                Arguments = ["balanced"]
-            });
+            (
+                "org.freedesktop.PowerProfiles",
+                "/org/freedesktop/PowerProfiles",
+                "org.freedesktop.PowerProfiles.SetActiveProfile",
+                ["balanced"]
+            ));
             return args;
         }
 
@@ -392,19 +392,19 @@ public class AppSettings : GamerunSettingsAbstract
         if (BlockScreenSaver)
         {
             args.StartDBusCalls.Add(new GamerunDBusCalls
-            {
-                Destination = "org.freedesktop.ScreenSaver",
-                ObjectPath = "/org/freedesktop/ScreenSaver",
-                Method = "org.freedesktop.ScreenSaver.Inhibit",
-                Arguments = ["Gamerun", Translations.Translations.AppIsRunning]
-            });
+            (
+                "org.freedesktop.ScreenSaver",
+                "/org/freedesktop/ScreenSaver",
+                "org.freedesktop.ScreenSaver.Inhibit",
+                ["Gamerun", Translations.Translations.AppIsRunning]
+            ));
             args.StartDBusCalls.Add(new GamerunDBusCalls
-            {
-                Destination = "org.freedesktop.ScreenSaver",
-                ObjectPath = "/org/freedesktop/ScreenSaver",
-                Method = "org.freedesktop.ScreenSaver.UnInhibit",
-                Arguments = []
-            });
+            (
+                "org.freedesktop.ScreenSaver",
+                "/org/freedesktop/ScreenSaver",
+                "org.freedesktop.ScreenSaver.UnInhibit",
+                []
+            ));
         }
 
         // Core pinning
@@ -426,9 +426,15 @@ public class AppSettings : GamerunSettingsAbstract
 
         args.DaemonArgs.SetSplitLockMitigation = Tools.IsIntelCpu() && DisableSplitLockMitigation;
 
-        // TODO: Notification system settings
+        if (DisableNotificationSystem)
+        {
+            // TODO: Notification system settings
+        }
 
-        // TODO: Compositor Settings
+        if (OptimizeCompositor)
+        {
+            // TODO: Compositor Settings
+        }
 
         var gpu = Gamerun.GPUs[GPUID];
         if (Gamerun.GPUs.Length > 1)
@@ -474,8 +480,9 @@ public class AppSettings : GamerunSettingsAbstract
         return args;
     }
 
-    public override void SetAsDefault()
+    internal override void SetAsDefault()
     {
+        base.SetAsDefault();
         _notifications = true;
         _compositor = true;
         _amdPerfLevel = true;

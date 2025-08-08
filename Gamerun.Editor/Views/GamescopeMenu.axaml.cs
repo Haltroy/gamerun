@@ -13,6 +13,6 @@ public partial class GamescopeMenu : GamerunUserControl
 
     public override void ReceivedCommand(object? command)
     {
-        // TODO: string "refresh" refreshes list, GamescopeSettings shoudl open edit menu for that config
+        // TODO: string "refresh" refreshes list, GamescopeConfig shoudl open edit menu for that config
     }
 }

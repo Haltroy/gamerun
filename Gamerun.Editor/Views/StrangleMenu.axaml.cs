@@ -13,6 +13,6 @@ public partial class StrangleMenu : GamerunUserControl
 
     public override void ReceivedCommand(object? command)
     {
-        // TODO: string "refresh" refreshes it, StrangleSettings should open settings for that item
+        // TODO: string "refresh" refreshes it, StrangleConfig should open settings for that item
     }
 }

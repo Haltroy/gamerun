@@ -5,7 +5,7 @@ using Gamerun.Shared.Exceptions;
 
 namespace Gamerun.Shared;
 
-public class GamescopeSettings : GamerunSettingsAbstract
+public class GamescopeConfig : GamerunSettingsAbstract
 {
     public override bool IsDefaults => _outputWidth == null &&
                                        _outputHeight == null &&
@@ -474,8 +474,9 @@ public class GamescopeSettings : GamerunSettingsAbstract
         return args;
     }
 
-    public override void SetAsDefault()
+    internal override void SetAsDefault()
     {
+        base.SetAsDefault();
         var monitor = Gamerun.GPUs[0].Modes.Split('x');
         if (uint.TryParse(monitor[0], out var w) && uint.TryParse(monitor[1], out var h))
         {

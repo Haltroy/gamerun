@@ -8,7 +8,7 @@ namespace Gamerun.Shared;
 ///     LibStrangle settings. LibStrangle is a tool that limits frame rates in order to use less energy and for longevity
 ///     of hardware as well as making less noise.
 /// </summary>
-public class StrangleSettings : GamerunSettingsAbstract
+public class StrangleConfig : GamerunSettingsAbstract
 {
     #region PRIVATE PROPERTIES
 
@@ -61,8 +61,9 @@ public class StrangleSettings : GamerunSettingsAbstract
         return args;
     }
 
-    public override void SetAsDefault()
+    internal override void SetAsDefault()
     {
+        base.SetAsDefault();
         _vulkanOnly = false;
         _enabled = true;
         _trilinear = false;

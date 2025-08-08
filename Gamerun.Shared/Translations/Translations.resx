@@ -123,4 +123,34 @@
     <data name="DaemonError" xml:space="preserve">
         <value>[Daemon] [E] Exception caught: {0}</value>
     </data>
+    <data name="ConfigDefaultName" xml:space="preserve">
+        <value>Default</value>
+    </data>
+    <data name="ConfigNewName" xml:space="preserve">
+        <value>New Config {0}</value>
+    </data>
+    <data name="SidebarApps" xml:space="preserve">
+        <value>Applications</value>
+    </data>
+    <data name="SidebarConfigs" xml:space="preserve">
+        <value>Configurations</value>
+    </data>
+    <data name="SidebarMangoHUD" xml:space="preserve">
+        <value>MangoHUD</value>
+    </data>
+    <data name="SidebarStrangle" xml:space="preserve">
+        <value>Strangle</value>
+    </data>
+    <data name="SidebarGamescope" xml:space="preserve">
+        <value>Gamescope</value>
+    </data>
+    <data name="SidebarSettings" xml:space="preserve">
+        <value>Settings</value>
+    </data>
+    <data name="SidebarAbout" xml:space="preserve">
+        <value>About</value>
+    </data>
+    <data name="GamerunEditorTitle" xml:space="preserve">
+        <value>Gamerun Editor</value>
+    </data>
 </root>

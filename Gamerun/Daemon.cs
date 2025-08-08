@@ -44,7 +44,7 @@ public static class Daemon
             }
         }
 
-        throw new GamerunScoketNoFoundException(true);
+        throw new GamerunSocketNoFoundException(true);
     }
 
     private static string GetRunnableSocket()
@@ -72,7 +72,7 @@ public static class Daemon
                 // ignored
             }
 
-        throw new GamerunScoketNoFoundException(false);
+        throw new GamerunSocketNoFoundException(false);
     }
 
     public static void DaemonMode()

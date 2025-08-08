@@ -1,5 +1,6 @@
 using System.Collections.Generic;
-using Gamerun.Shared;
+
+namespace Gamerun.Shared;
 
 /// <summary>
 ///     Arguments to run & set on game start and end.
@@ -10,33 +11,33 @@ public class GamerunStartArguments
     ///     Adds commands before the app path.
     ///     <para>PREFIX /usr/bin/game</para>
     /// </summary>
-    public string Prefix { get; set; }
+    public string Prefix { get; set; } = string.Empty;
 
     /// <summary>
     ///     Adds commands after the app path. Mostly will be interpreted as arguments for the app.
     ///     <para>/usr/bin/game POSTFIX</para>
     /// </summary>
-    public string Postfix { get; set; }
+    public string Postfix { get; set; } = string.Empty;
 
     /// <summary>
     ///     Environment variables to set before launching the app.
     /// </summary>
-    public Dictionary<string, string> Environment { get; set; }
+    public Dictionary<string, string> Environment { get; set; } = new();
 
     /// <summary>
     ///     User's start script path. This will be executed before app starts.
     /// </summary>
-    public string StartScript { get; set; }
+    public string StartScript { get; set; } = string.Empty;
 
     /// <summary>
     ///     Determines if Daemon should be called or not.
     /// </summary>
-    public bool RequireDaemonUse { get; set; }
+    public bool RequireDaemonUse { get; set; } = false;
 
     /// <summary>
     ///     User's end script path. This will be executed after the app closes.
     /// </summary>
-    public string EndScript { get; set; }
+    public string EndScript { get; set; } = string.Empty;
 
     /// <summary>
     ///     Determines wait time for <see cref="StartScript" />.
@@ -59,7 +60,7 @@ public class GamerunStartArguments
     ///         </item>
     ///     </list>
     /// </summary>
-    public int StartScriptTimeout { get; set; }
+    public int StartScriptTimeout { get; set; } = 0;
 
     /// <summary>
     ///     Determines wait time for <see cref="EndScript" />.
@@ -82,27 +83,27 @@ public class GamerunStartArguments
     ///         </item>
     ///     </list>
     /// </summary>
-    public int EndScriptTimeout { get; set; }
+    public int EndScriptTimeout { get; set; } = 0;
 
     /// <summary>
     ///     Commands to execute before starting the app, used by modules. Recommended to only use non-root commands.
     /// </summary>
-    public List<string> StartCommands { get; set; }
+    public List<string> StartCommands { get; set; } = [];
 
     /// <summary>
     ///     Commands to execute after closing the app, used by modules. Recommended to only use non-root commands.
     /// </summary>
-    public List<string> EndCommands { get; set; }
+    public List<string> EndCommands { get; set; } = [];
 
     /// <summary>
     ///     DBus calls to do when starting the app, used by modules.
     /// </summary>
-    public List<GamerunDBusCalls> StartDBusCalls { get; set; }
+    public List<GamerunDBusCalls> StartDBusCalls { get; set; } = [];
 
     /// <summary>
     ///     DBus calls to do when closing the app, used by modules.
     /// </summary>
-    public List<GamerunDBusCalls> EndDBusCalls { get; set; }
+    public List<GamerunDBusCalls> EndDBusCalls { get; set; } = [];
 
     /// <summary>
     ///     Arguments to give to Gamerun daemon. It only accepts a fixed set of things for security reasons since it runs on

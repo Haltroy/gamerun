@@ -242,5 +242,65 @@ namespace Gamerun.Shared.Translations {
                 return ResourceManager.GetString("DaemonError", resourceCulture);
             }
         }
+        
+        public static string ConfigDefaultName {
+            get {
+                return ResourceManager.GetString("ConfigDefaultName", resourceCulture);
+            }
+        }
+        
+        public static string ConfigNewName {
+            get {
+                return ResourceManager.GetString("ConfigNewName", resourceCulture);
+            }
+        }
+        
+        public static string SidebarApps {
+            get {
+                return ResourceManager.GetString("SidebarApps", resourceCulture);
+            }
+        }
+        
+        public static string SidebarConfigs {
+            get {
+                return ResourceManager.GetString("SidebarConfigs", resourceCulture);
+            }
+        }
+        
+        public static string SidebarMangoHUD {
+            get {
+                return ResourceManager.GetString("SidebarMangoHUD", resourceCulture);
+            }
+        }
+        
+        public static string SidebarStrangle {
+            get {
+                return ResourceManager.GetString("SidebarStrangle", resourceCulture);
+            }
+        }
+        
+        public static string SidebarGamescope {
+            get {
+                return ResourceManager.GetString("SidebarGamescope", resourceCulture);
+            }
+        }
+        
+        public static string SidebarSettings {
+            get {
+                return ResourceManager.GetString("SidebarSettings", resourceCulture);
+            }
+        }
+        
+        public static string SidebarAbout {
+            get {
+                return ResourceManager.GetString("SidebarAbout", resourceCulture);
+            }
+        }
+        
+        public static string GamerunEditorTitle {
+            get {
+                return ResourceManager.GetString("GamerunEditorTitle", resourceCulture);
+            }
+        }
     }
 }

@@ -13,7 +13,6 @@ public class App
     ///     Creats a new App.
     /// </summary>
     /// <param name="commandLine">Command line of this app.</param>
-    /// <param name="settings">Configuration of this app, use <c>null</c> for using the default configuration instead.</param>
     public App(string commandLine)
     {
         CommandLine = commandLine;
@@ -23,21 +22,32 @@ public class App
 
     #region FUNCTIONS
 
+    /// <summary>
+    ///     Generates a <see cref="GamerunStartArguments" /> to run the app with Gamerun settings.
+    /// </summary>
+    /// <returns>
+    ///     <see cref="GamerunStartArguments" />
+    /// </returns>
     public GamerunStartArguments GenerateStartArgs()
     {
-        // TODO
-        throw new NotImplementedException();
+        var args = new GamerunStartArguments();
+        args = (Strangle ?? Gamerun.DefaultStrangleConfig).GenerateArgs(args);
+        args = (MangoHUD ?? Gamerun.DefaultMangoHUDConfig).GenerateArgs(args);
+        args = (Gamescope ?? Gamerun.DefaultGamescopeConfig).GenerateArgs(args);
+        args = (Settings ?? Gamerun.DefaultAppConfig).GenerateArgs(args);
+        return args;
     }
 
     #endregion FUNCTIONS
 
     #region PRIVATES
 
-    private string _CommandLine;
-    private AppSettings? _Settings;
-    private MangoHUDSettings? _MangoHUDSettings;
-    private StrangleSettings? _StrangleSettings;
-    private GamescopeSettings? _GamescopeSettings;
+    private string? _CommandLine;
+    private AppConfig? _Settings;
+    private MangoHudConfig? _MangoHUDSettings;
+    private StrangleConfig? _StrangleSettings;
+    private GamescopeConfig? _GamescopeSettings;
+    private DateTime _LastAccess = DateTime.Now;
 
     #endregion PRIVATES
 
@@ -48,7 +58,7 @@ public class App
     /// </summary>
     public string CommandLine
     {
-        get => _CommandLine;
+        get => _CommandLine ?? string.Empty;
         set
         {
             _CommandLine = value;
@@ -57,9 +67,22 @@ public class App
     }
 
     /// <summary>
-    ///     Configuration of this app. If it is null, use <see cref="Gamerun.Default" /> instead.
+    /// Determines the last access of this app.
     /// </summary>
-    public AppSettings? Settings
+    public DateTime LastAccess
+    {
+        get => _LastAccess;
+        set
+        {
+            _LastAccess = value;
+            Gamerun.SaveListing();
+        }
+    }
+
+    /// <summary>
+    ///     Configuration of this app. If it is null, use <see cref="Gamerun.DefaultAppConfig" /> instead.
+    /// </summary>
+    public AppConfig? Settings
     {
         get => _Settings;
         set
@@ -74,7 +97,7 @@ public class App
     /// </summary>
     // ReSharper disable once InconsistentNaming
     // ReSharper disable once MemberCanBePrivate.Global
-    public MangoHUDSettings? MangoHUD
+    public MangoHudConfig? MangoHUD
     {
         get => _MangoHUDSettings;
         set
@@ -84,8 +107,11 @@ public class App
         }
     }
 
+    /// <summary>
+    ///     LibStrangle settings. If it is null, use <see cref="Gamerun.DefaultStrangleConfig" /> instead.
+    /// </summary>
     // ReSharper disable once MemberCanBePrivate.Global
-    public StrangleSettings? Strangle
+    public StrangleConfig? Strangle
     {
         get => _StrangleSettings;
         set
@@ -95,7 +121,10 @@ public class App
         }
     }
 
-    public GamescopeSettings? Gamescope
+    /// <summary>
+    ///     Gamescope settings. If it is null, use <see cref="Gamerun.DefaultGamescopeConfig" /> instead.
+    /// </summary>
+    public GamescopeConfig? Gamescope
     {
         get => _GamescopeSettings;
         set

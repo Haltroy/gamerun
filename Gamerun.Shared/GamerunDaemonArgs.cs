@@ -334,12 +334,12 @@ public class GamerunDaemonArgs
     /// <summary>
     ///     Array of parked (disabled) processor cores.
     /// </summary>
-    public bool[] ParkedCores { get; set; }
+    public bool[] ParkedCores { get; set; } = [];
 
     /// <summary>
     ///     Array of pinned processor cores tp this app.
     /// </summary>
-    public bool[] PinnedCores { get; set; }
+    public bool[] PinnedCores { get; set; }= [];
 
     /// <summary>
     ///     Changes the scheduler policy to SCHED_ISO on kernels that supports it.
