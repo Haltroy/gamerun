@@ -9,9 +9,15 @@ namespace Gamerun.Shared;
 
 public static class Gamerun
 {
-    public static AppSettings Default = new();
+    public static AppSettings DefaultAppConfig = new();
+    public static MangoHUDSettings DefaultMangoHUDConfig = new();
+    public static StrangleSettings DefaultStrangleConfig = new();
+    public static GamescopeSettings DefaultGamescopeConfig = new();
     public static List<App> Apps = [];
-    public static List<AppSettings> Configs = [Default];
+    public static List<AppSettings> Configs = [DefaultAppConfig];
+    public static List<MangoHUDSettings> MangoHUDConfigs = [DefaultMangoHUDConfig];
+    public static List<StrangleSettings> StrangleConfigs = [DefaultStrangleConfig];
+    public static List<GamescopeSettings> GamescopeConfigs = [DefaultGamescopeConfig];
     public static GpuInfo[] GPUs { get; set; } = Tools.GetAllGpus();
 
     private static string AppPath =>
@@ -49,8 +55,8 @@ public static class Gamerun
                 {
                     using var configStream =
                         new FileStream(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                    Default.ReadSettings(configStream);
-                    settings = Default;
+                    DefaultAppConfig.ReadSettings(configStream);
+                    settings = DefaultAppConfig;
                 }
                 else
                 {
@@ -60,7 +66,7 @@ public static class Gamerun
                     settings.ReadSettings(configStream);
                 }
 
-                return new App(commandLine, settings);
+                return new App(commandLine) { Settings = settings };
             }
 
             if (createIfNotExists) return CreateApp(commandLine);
@@ -88,7 +94,7 @@ public static class Gamerun
 
     private static App CreateApp(string commandLine, AppSettings? settings = null)
     {
-        var app = new App(commandLine, settings);
+        var app = new App(commandLine) { Settings = settings };
         SaveListing();
         return app;
     }
@@ -99,7 +105,7 @@ public static class Gamerun
         if (!Directory.Exists(ConfigsPath)) Directory.CreateDirectory(ConfigsPath);
         using var configStream =
             new FileStream(Path.Combine(ConfigsPath, "0"), FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-        Default.ReadSettings(configStream);
+        DefaultAppConfig.ReadSettings(configStream);
         if (full) Refresh();
     }
 
@@ -119,7 +125,7 @@ public static class Gamerun
                 if (!int.TryParse(lineSplit[0], out var configId)) continue;
                 if (configId == 0)
                 {
-                    found[0].Settings = Default;
+                    found[0].Settings = DefaultAppConfig;
                 }
                 else
                 {
@@ -140,7 +146,7 @@ public static class Gamerun
                 AppSettings? settings;
                 if (configId == 0)
                 {
-                    settings = Default;
+                    settings = DefaultAppConfig;
                 }
                 else
                 {
@@ -154,7 +160,7 @@ public static class Gamerun
                     Configs.Add(settings);
                 }
 
-                Apps.Add(new App(lineSplit[1], settings));
+                Apps.Add(new App(lineSplit[1]) { Settings = settings });
             }
         }
     }

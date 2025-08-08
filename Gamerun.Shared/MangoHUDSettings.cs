@@ -17,7 +17,7 @@ public class MangoHUDSettings : GamerunSettingsAbstract
     /// </summary>
     public string Configuration
     {
-        get => _configuration ?? Gamerun.Default.MangoHUD.Configuration;
+        get => _configuration ?? Gamerun.DefaultMangoHUDConfig.Configuration;
         set
         {
             _configuration = value;
@@ -30,7 +30,7 @@ public class MangoHUDSettings : GamerunSettingsAbstract
     /// </summary>
     public bool Enabled
     {
-        get => _enabled ?? Gamerun.Default.MangoHUD.Enabled;
+        get => _enabled ?? Gamerun.DefaultMangoHUDConfig.Enabled;
         set
         {
             _enabled = value;
@@ -43,7 +43,7 @@ public class MangoHUDSettings : GamerunSettingsAbstract
     /// </summary>
     public bool ConfigIsFile
     {
-        get => _configIsFile ?? Gamerun.Default.MangoHUD.ConfigIsFile;
+        get => _configIsFile ?? Gamerun.DefaultMangoHUDConfig.ConfigIsFile;
         set
         {
             _configIsFile = value;

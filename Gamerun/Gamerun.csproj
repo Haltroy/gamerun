@@ -9,6 +9,7 @@
         <InvariantGlobalization>true</InvariantGlobalization>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <LangVersion>latest</LangVersion>
+        <AssemblyName>gamerun</AssemblyName>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Release'">
@@ -18,7 +19,7 @@
         <DebugType>None</DebugType>
         <StripSymbols>true</StripSymbols>
         <DebuggerSupport>false</DebuggerSupport>
-        <TrimMode>full</TrimMode>
+        <TrimMode>link</TrimMode>
         <TrimmerRemoveSymbols>true</TrimmerRemoveSymbols>
         <PublishTrimmed>true</PublishTrimmed>
         <InvariantGlobalization>true</InvariantGlobalization>

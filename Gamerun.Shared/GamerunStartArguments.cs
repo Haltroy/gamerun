@@ -29,6 +29,11 @@ public class GamerunStartArguments
     public string StartScript { get; set; }
 
     /// <summary>
+    ///     Determines if Daemon should be called or not.
+    /// </summary>
+    public bool RequireDaemonUse { get; set; }
+
+    /// <summary>
     ///     User's end script path. This will be executed after the app closes.
     /// </summary>
     public string EndScript { get; set; }
@@ -88,19 +93,20 @@ public class GamerunStartArguments
     ///     Commands to execute after closing the app, used by modules. Recommended to only use non-root commands.
     /// </summary>
     public List<string> EndCommands { get; set; }
-    
+
     /// <summary>
-    /// DBus calls to do when starting the app, used by modules.
+    ///     DBus calls to do when starting the app, used by modules.
     /// </summary>
     public List<GamerunDBusCalls> StartDBusCalls { get; set; }
-    
+
     /// <summary>
-    /// DBus calls to do when closing the app, used by modules. 
+    ///     DBus calls to do when closing the app, used by modules.
     /// </summary>
     public List<GamerunDBusCalls> EndDBusCalls { get; set; }
 
     /// <summary>
-    /// Arguments to give to Gamerun daemon. It only accepts a fixed set of things for security reasons since it runs on root.
+    ///     Arguments to give to Gamerun daemon. It only accepts a fixed set of things for security reasons since it runs on
+    ///     root.
     /// </summary>
-    public GamerunDaemonArgs DaemonArgs { get; internal set; } = new GamerunDaemonArgs();
+    public GamerunDaemonArgs DaemonArgs { get; internal set; } = new();
 }

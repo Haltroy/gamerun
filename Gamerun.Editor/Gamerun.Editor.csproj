@@ -6,10 +6,10 @@
         <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
         <ApplicationManifest>app.manifest</ApplicationManifest>
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+        <AssemblyName>gamerun-editor</AssemblyName>
     </PropertyGroup>
 
     <ItemGroup>
-        <Folder Include="Models\"/>
         <AvaloniaResource Include="Assets\**"/>
     </ItemGroup>
 
@@ -22,6 +22,7 @@
         <DebuggerSupport>false</DebuggerSupport>
         <TrimMode>link</TrimMode>
         <TrimmerRemoveSymbols>true</TrimmerRemoveSymbols>
+        <RunAOTCompilation>True</RunAOTCompilation>
         <PublishTrimmed>true</PublishTrimmed>
         <InvariantGlobalization>true</InvariantGlobalization>
     </PropertyGroup>
@@ -34,6 +35,7 @@
 
     <ItemGroup>
         <PackageReference Include="Avalonia" Version="11.3.2"/>
+        <PackageReference Include="Avalonia.Controls.ItemsRepeater" Version="11.1.5"/>
         <PackageReference Include="Avalonia.Desktop" Version="11.3.2"/>
         <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.2"/>
         <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.2"/>
@@ -43,6 +45,7 @@
             <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
         </PackageReference>
         <PackageReference Include="Avalonia.ReactiveUI" Version="11.3.2"/>
+        <PackageReference Include="FluentIcons.Avalonia" Version="1.1.303"/>
     </ItemGroup>
 
     <ItemGroup>

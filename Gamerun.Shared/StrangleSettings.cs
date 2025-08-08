@@ -264,7 +264,7 @@ public class StrangleSettings : GamerunSettingsAbstract
     /// </summary>
     public bool Enabled
     {
-        get => _enabled ?? Gamerun.Default.Strangle.Enabled;
+        get => _enabled ?? Gamerun.DefaultStrangleConfig.Enabled;
         set
         {
             _enabled = value;
@@ -279,7 +279,7 @@ public class StrangleSettings : GamerunSettingsAbstract
     // ReSharper disable once InconsistentNaming
     public uint BatteryFPS
     {
-        get => _batteryFps ?? Gamerun.Default.Strangle.BatteryFPS;
+        get => _batteryFps ?? Gamerun.DefaultStrangleConfig.BatteryFPS;
         set
         {
             _batteryFps = value;
@@ -293,7 +293,7 @@ public class StrangleSettings : GamerunSettingsAbstract
     // ReSharper disable once InconsistentNaming
     public uint FPS
     {
-        get => _fps ?? Gamerun.Default.Strangle.FPS;
+        get => _fps ?? Gamerun.DefaultStrangleConfig.FPS;
         set
         {
             _fps = value;
@@ -307,7 +307,7 @@ public class StrangleSettings : GamerunSettingsAbstract
 
     public bool NoDlsym
     {
-        get => _noDlsym ?? Gamerun.Default.Strangle.NoDlsym;
+        get => _noDlsym ?? Gamerun.DefaultStrangleConfig.NoDlsym;
         set
         {
             _noDlsym = value;
@@ -321,7 +321,7 @@ public class StrangleSettings : GamerunSettingsAbstract
 
     public bool Trilinear
     {
-        get => _trilinear ?? Gamerun.Default.Strangle.Trilinear;
+        get => _trilinear ?? Gamerun.DefaultStrangleConfig.Trilinear;
         set
         {
             _trilinear = value;
@@ -334,7 +334,7 @@ public class StrangleSettings : GamerunSettingsAbstract
     /// </summary>
     public bool VulkanOnly
     {
-        get => _vulkanOnly ?? Gamerun.Default.Strangle.VulkanOnly;
+        get => _vulkanOnly ?? Gamerun.DefaultStrangleConfig.VulkanOnly;
         set
         {
             _vulkanOnly = value;
@@ -403,7 +403,7 @@ public class StrangleSettings : GamerunSettingsAbstract
 
     public uint VSync
     {
-        get => _vSync ?? Gamerun.Default.Strangle.VSync;
+        get => _vSync ?? Gamerun.DefaultStrangleConfig.VSync;
         set
         {
             _vSync = VulkanOnly && value > 4 ? (uint)(FPS > 0 ? 4 : 0) : value;
@@ -417,7 +417,7 @@ public class StrangleSettings : GamerunSettingsAbstract
     // ReSharper disable once InconsistentNaming
     public int PICMIP
     {
-        get => _picmip ?? Gamerun.Default.Strangle.PICMIP;
+        get => _picmip ?? Gamerun.DefaultStrangleConfig.PICMIP;
         set
         {
             if (value < -16) _picmip = -16;
@@ -433,7 +433,7 @@ public class StrangleSettings : GamerunSettingsAbstract
     /// </summary>
     public uint AnisotropicFiltering
     {
-        get => _anisotropicFiltering ?? Gamerun.Default.Strangle.AnisotropicFiltering;
+        get => _anisotropicFiltering ?? Gamerun.DefaultStrangleConfig.AnisotropicFiltering;
         set
         {
             _anisotropicFiltering = value > 16 ? 16 : value;
@@ -446,7 +446,7 @@ public class StrangleSettings : GamerunSettingsAbstract
     /// </summary>
     public bool GLFinish
     {
-        get => _glfinish ?? Gamerun.Default.Strangle.GLFinish;
+        get => _glfinish ?? Gamerun.DefaultStrangleConfig.GLFinish;
         set
         {
             _glfinish = value;
@@ -459,7 +459,7 @@ public class StrangleSettings : GamerunSettingsAbstract
     /// </summary>
     public bool Retro
     {
-        get => _retro ?? Gamerun.Default.Strangle.Retro;
+        get => _retro ?? Gamerun.DefaultStrangleConfig.Retro;
         set
         {
             _retro = value;
@@ -472,7 +472,7 @@ public class StrangleSettings : GamerunSettingsAbstract
     /// </summary>
     public bool Bicubic
     {
-        get => _bicubic ?? Gamerun.Default.Strangle.Bicubic;
+        get => _bicubic ?? Gamerun.DefaultStrangleConfig.Bicubic;
         set
         {
             _bicubic = value;

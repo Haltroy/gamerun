@@ -6,7 +6,7 @@ using Gamerun.Shared.Translations;
 
 namespace Gamerun;
 
-internal class Program
+internal static class Program
 {
     private static void Main(string[] args)
     {
@@ -105,9 +105,7 @@ internal class Program
             var app = Shared.Gamerun.GetApp(appCommandLine, true, true);
             UnixDomainSocketEndPoint? endPoint = null;
             Socket? client = null;
-            var settings = app.Settings ?? Shared.Gamerun.Default;
-            var appArgs = new GamerunStartArguments();
-            settings.GenerateArgs(appArgs);
+            var appArgs = app.GenerateStartArgs();
             foreach (var env in appArgs.Environment) Environment.SetEnvironmentVariable(env.Key, env.Value);
 
             foreach (var call in appArgs.StartDBusCalls)
@@ -139,7 +137,7 @@ internal class Program
             var process = Process.Start(appArgs.Prefix + (appArgs.Prefix.EndsWith(' ') ? "" : " ") + appCommandLine +
                                         (appArgs.Postfix.StartsWith(' ') ? "" : " ") + appArgs.Postfix);
             appArgs.DaemonArgs.PID = process.Id;
-            if (settings.RequireRootPermissions)
+            if (appArgs.RequireDaemonUse)
             {
                 endPoint = new UnixDomainSocketEndPoint(runningSocket);
                 client = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);

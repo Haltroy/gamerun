@@ -1,3 +1,5 @@
+using System;
+
 namespace Gamerun.Shared;
 
 /// <summary>
@@ -12,18 +14,30 @@ public class App
     /// </summary>
     /// <param name="commandLine">Command line of this app.</param>
     /// <param name="settings">Configuration of this app, use <c>null</c> for using the default configuration instead.</param>
-    public App(string commandLine, AppSettings? settings = null)
+    public App(string commandLine)
     {
         CommandLine = commandLine;
-        _Settings = settings;
     }
 
     #endregion CONSTRUCTORS
+
+    #region FUNCTIONS
+
+    public GamerunStartArguments GenerateStartArgs()
+    {
+        // TODO
+        throw new NotImplementedException();
+    }
+
+    #endregion FUNCTIONS
 
     #region PRIVATES
 
     private string _CommandLine;
     private AppSettings? _Settings;
+    private MangoHUDSettings? _MangoHUDSettings;
+    private StrangleSettings? _StrangleSettings;
+    private GamescopeSettings? _GamescopeSettings;
 
     #endregion PRIVATES
 
@@ -51,6 +65,42 @@ public class App
         set
         {
             _Settings = value;
+            Gamerun.SaveListing();
+        }
+    }
+
+    /// <summary>
+    ///     Configuration for MangoHUD for this app. If it is null, use <see cref="Gamerun.DefaultMangoHUDConfig" /> instead.
+    /// </summary>
+    // ReSharper disable once InconsistentNaming
+    // ReSharper disable once MemberCanBePrivate.Global
+    public MangoHUDSettings? MangoHUD
+    {
+        get => _MangoHUDSettings;
+        set
+        {
+            _MangoHUDSettings = value;
+            Gamerun.SaveListing();
+        }
+    }
+
+    // ReSharper disable once MemberCanBePrivate.Global
+    public StrangleSettings? Strangle
+    {
+        get => _StrangleSettings;
+        set
+        {
+            _StrangleSettings = value;
+            Gamerun.SaveListing();
+        }
+    }
+
+    public GamescopeSettings? Gamescope
+    {
+        get => _GamescopeSettings;
+        set
+        {
+            _GamescopeSettings = value;
             Gamerun.SaveListing();
         }
     }

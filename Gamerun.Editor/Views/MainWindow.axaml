@@ -3,18 +3,151 @@
         xmlns:vm="using:Gamerun.Editor.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ic="using:FluentIcons.Avalonia"
+        xmlns:views="clr-namespace:Gamerun.Editor.Views"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Gamerun.Editor.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
+        ExtendClientAreaChromeHints="NoChrome"
+        SystemDecorations="None"
         Title="Gamerun.Editor">
 
     <Design.DataContext>
-        <!-- This only sets the DataContext for the previewer in an IDE,
-             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-        <vm:MainWindowViewModel/>
+        <vm:MainWindowViewModel />
     </Design.DataContext>
 
-    <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+    <DockPanel Margin="5">
+        <!-- TODO: Add resize borders here, also make this rounded with Border -->
+        <DockPanel DockPanel.Dock="Top" PointerPressed="MoveTitleBar" Background="#00000001"
+                   LastChildFill="True">
+            <StackPanel DockPanel.Dock="{CompiledBinding ActionMenuPos}" Orientation="Horizontal" Spacing="5">
+                <Button CornerRadius="10" Click="Minimize">_</Button>
+                <Button CornerRadius="10" Click="MaximizeNormal">
+                    <Panel>
+                        <ic:FluentIcon Icon="Square" Height="16" Width="16" />
+                    </Panel>
+                </Button>
+                <Button Click="Close" CornerRadius="10">
+                    <TextBlock Text="x" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                </Button>
+            </StackPanel>
+            <ToggleButton CornerRadius="10" Name="SidebarShowHide" DockPanel.Dock="Left">
+                <Panel>
+                    <ic:FluentIcon Width="16" Height="16" Icon="PanelLeftContract"
+                                   IsVisible="{CompiledBinding $parent[ToggleButton].IsChecked}" />
+                    <ic:FluentIcon Width="16" Height="16" Icon="PanelLeftExpand"
+                                   IsVisible="{CompiledBinding !$parent[ToggleButton].IsChecked}" />
+                </Panel>
+            </ToggleButton>
+            <ToggleButton CornerRadius="10" Name="SearchToggle" DockPanel.Dock="Left">
+                <ic:FluentIcon Width="16" Height="16" Icon="Search" />
+            </ToggleButton>
+            <TextBlock Text="Gamerun Editor" VerticalAlignment="Center" HorizontalAlignment="Center" />
+        </DockPanel>
+        <Grid ColumnDefinitions="Auto,*">
+            <Border Grid.Column="0" Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}"
+                    CornerRadius="20" Margin="5">
+                <DockPanel LastChildFill="False">
+                    <Button Click="SidebarButtonClicked" Tag="{CompiledBinding #AppList}" CornerRadius="10"
+                            DockPanel.Dock="Top" Margin="5"
+                            HorizontalAlignment="Stretch">
+                        <Button.Content>
+                            <StackPanel Orientation="Horizontal">
+                                <ic:FluentIcon Width="16" Height="16" Icon="Games" />
+                                <TextBlock VerticalAlignment="Center" Text="Applications"
+                                           IsVisible="{CompiledBinding #SidebarShowHide.IsChecked}" />
+                            </StackPanel>
+                        </Button.Content>
+                        <ToolTip.Tip>
+                            <TextBlock Text="Applications" />
+                        </ToolTip.Tip>
+                    </Button>
+                    <Button Click="SidebarButtonClicked" Tag="{CompiledBinding #ConfigMenu}" CornerRadius="10"
+                            DockPanel.Dock="Top" Margin="5"
+                            HorizontalAlignment="Stretch">
+                        <Button.Content>
+                            <StackPanel Orientation="Horizontal">
+                                <ic:FluentIcon Width="16" Height="16" Icon="Gauge" />
+                                <TextBlock VerticalAlignment="Center" Text="Configurations"
+                                           IsVisible="{CompiledBinding #SidebarShowHide.IsChecked}" />
+                            </StackPanel>
+                        </Button.Content>
+                        <ToolTip.Tip>
+                            <TextBlock Text="Configurations" />
+                        </ToolTip.Tip>
+                    </Button>
+                    <Button Click="SidebarButtonClicked" Tag="{CompiledBinding #MangoHudMenu}" CornerRadius="10"
+                            DockPanel.Dock="Top" Margin="5"
+                            HorizontalAlignment="Stretch">
+                        <Button.Content>
+                            <StackPanel Orientation="Horizontal">
+                                <ic:FluentIcon Width="16" Height="16" Icon="Fps960" />
+                                <TextBlock VerticalAlignment="Center" Text="MangoHUD"
+                                           IsVisible="{CompiledBinding #SidebarShowHide.IsChecked}" />
+                            </StackPanel>
+                        </Button.Content>
+                        <ToolTip.Tip>
+                            <TextBlock Text="MangoHUD" />
+                        </ToolTip.Tip>
+                    </Button>
+                    <Button Click="SidebarButtonClicked" Tag="{CompiledBinding #GamescopeMenu}" CornerRadius="10"
+                            DockPanel.Dock="Top" Margin="5"
+                            HorizontalAlignment="Stretch">
+                        <Button.Content>
+                            <StackPanel Orientation="Horizontal">
+                                <ic:FluentIcon Width="16" Height="16" Icon="Window" />
+                                <TextBlock VerticalAlignment="Center" Text="Gamescope"
+                                           IsVisible="{CompiledBinding #SidebarShowHide.IsChecked}" />
+                            </StackPanel>
+                        </Button.Content>
+                        <ToolTip.Tip>
+                            <TextBlock Text="Gamescope" />
+                        </ToolTip.Tip>
+                    </Button>
+                    <Button Click="SidebarButtonClicked" Tag="{CompiledBinding #About}" CornerRadius="10"
+                            DockPanel.Dock="Bottom" Margin="5"
+                            HorizontalAlignment="Stretch">
+                        <Button.Content>
+                            <StackPanel Orientation="Horizontal">
+                                <ic:FluentIcon Width="16" Height="16" Icon="Info" />
+                                <TextBlock VerticalAlignment="Center" Text="About"
+                                           IsVisible="{CompiledBinding #SidebarShowHide.IsChecked}" />
+                            </StackPanel>
+                        </Button.Content>
+                        <ToolTip.Tip>
+                            <TextBlock Text="About" />
+                        </ToolTip.Tip>
+                    </Button>
+                    <Button Click="SidebarButtonClicked" Tag="{CompiledBinding #Settings}" CornerRadius="10"
+                            DockPanel.Dock="Bottom" Margin="5"
+                            HorizontalAlignment="Stretch">
+                        <Button.Content>
+                            <StackPanel Orientation="Horizontal">
+                                <ic:FluentIcon Width="16" Height="16" Icon="Settings" />
+                                <TextBlock VerticalAlignment="Center" Text="Settings"
+                                           IsVisible="{CompiledBinding #SidebarShowHide.IsChecked}" />
+                            </StackPanel>
+                        </Button.Content>
+                        <ToolTip.Tip>
+                            <TextBlock Text="Settings" />
+                        </ToolTip.Tip>
+                    </Button>
+                </DockPanel>
+            </Border>
 
+            <Carousel Grid.Column="1" Name="ContentCarousel">
+                <Carousel.PageTransition>
+                    <CrossFade Duration="0:0:0.2" />
+                </Carousel.PageTransition>
+                <views:AppList MainWindow="{CompiledBinding $parent[views:MainWindow]}" Name="AppList" />
+                <views:ConfigsMenu MainWindow="{CompiledBinding $parent[views:MainWindow]}" Name="ConfigMenu" />
+                <views:MangoHUDMenu MainWindow="{CompiledBinding $parent[views:MainWindow]}" Name="MangoHudMenu" />
+                <views:StrangleMenu MainWindow="{CompiledBinding $parent[views:MainWindow]}" Name="StrangleMenu" />
+                <views:GamescopeMenu MainWindow="{CompiledBinding $parent[views:MainWindow]}" Name="GamescopeMenu" />
+                <views:Settings MainWindow="{CompiledBinding $parent[views:MainWindow]}" Name="Settings" />
+                <views:AboutMenu MainWindow="{CompiledBinding $parent[views:MainWindow]}" Name="About" />
+            </Carousel>
+        </Grid>
+    </DockPanel>
 </Window>

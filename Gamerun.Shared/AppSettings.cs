@@ -15,25 +15,12 @@ public class AppSettings : GamerunSettingsAbstract
 
     #endregion CONSTRUCTORS
 
-    #region OTHER SETTINGS
-
-    // ReSharper disable once InconsistentNaming
-    // ReSharper disable once MemberCanBePrivate.Global
-    public MangoHUDSettings MangoHUD { get; } = new();
-
-    // ReSharper disable once MemberCanBePrivate.Global
-    public StrangleSettings Strangle { get; } = new();
-
-    public GamescopeSettings Gamescope { get; } = new();
-
-    #endregion OTHER SETTINGS
-
     #region PROPERTIES
 
     // ReSharper disable once InconsistentNaming
     public bool UseGPU
     {
-        get => _useGPU ?? Gamerun.Default.UseGPU;
+        get => _useGPU ?? Gamerun.DefaultAppConfig.UseGPU;
         set
         {
             _useGPU = value;
@@ -43,7 +30,7 @@ public class AppSettings : GamerunSettingsAbstract
 
     public bool EnablePowerDaemon
     {
-        get => _enablePowerDaemon ?? Gamerun.Default.EnablePowerDaemon;
+        get => _enablePowerDaemon ?? Gamerun.DefaultAppConfig.EnablePowerDaemon;
         set
         {
             _enablePowerDaemon = value;
@@ -53,7 +40,7 @@ public class AppSettings : GamerunSettingsAbstract
 
     public bool EnableFanController
     {
-        get => _enableFanController ?? Gamerun.Default.EnableFanController;
+        get => _enableFanController ?? Gamerun.DefaultAppConfig.EnableFanController;
         set
         {
             _enableFanController = value;
@@ -63,7 +50,7 @@ public class AppSettings : GamerunSettingsAbstract
 
     public bool Prioritize
     {
-        get => _prioritize ?? Gamerun.Default.Prioritize;
+        get => _prioritize ?? Gamerun.DefaultAppConfig.Prioritize;
         set
         {
             _prioritize = value;
@@ -73,7 +60,7 @@ public class AppSettings : GamerunSettingsAbstract
 
     public bool PrioritizeIO
     {
-        get => _prioritizeIO ?? Gamerun.Default.PrioritizeIO;
+        get => _prioritizeIO ?? Gamerun.DefaultAppConfig.PrioritizeIO;
         set
         {
             _prioritizeIO = value;
@@ -83,7 +70,7 @@ public class AppSettings : GamerunSettingsAbstract
 
     public uint iGPUTreshold
     {
-        get => _igpuTreshold ?? Gamerun.Default.iGPUTreshold;
+        get => _igpuTreshold ?? Gamerun.DefaultAppConfig.iGPUTreshold;
         set
         {
             _igpuTreshold = value;
@@ -95,7 +82,7 @@ public class AppSettings : GamerunSettingsAbstract
 
     public string StartupScriptPath
     {
-        get => _startupScriptPath ?? Gamerun.Default.StartupScriptPath;
+        get => _startupScriptPath ?? Gamerun.DefaultAppConfig.StartupScriptPath;
         set
         {
             _startupScriptPath = value;
@@ -105,7 +92,7 @@ public class AppSettings : GamerunSettingsAbstract
 
     public string StopScriptPath
     {
-        get => _stopScriptPath ?? Gamerun.Default.StopScriptPath;
+        get => _stopScriptPath ?? Gamerun.DefaultAppConfig.StopScriptPath;
         set
         {
             _stopScriptPath = value;
@@ -115,7 +102,7 @@ public class AppSettings : GamerunSettingsAbstract
 
     public bool AMDPerfLevel
     {
-        get => _amdPerfLevel ?? Gamerun.Default.AMDPerfLevel;
+        get => _amdPerfLevel ?? Gamerun.DefaultAppConfig.AMDPerfLevel;
         set
         {
             _amdPerfLevel = value;
@@ -125,7 +112,7 @@ public class AppSettings : GamerunSettingsAbstract
 
     public bool BlockScreenSaver
     {
-        get => _blockScreenSaver ?? Gamerun.Default.BlockScreenSaver;
+        get => _blockScreenSaver ?? Gamerun.DefaultAppConfig.BlockScreenSaver;
         set
         {
             _blockScreenSaver = value;
@@ -135,7 +122,7 @@ public class AppSettings : GamerunSettingsAbstract
 
     public bool CPUGovernor
     {
-        get => _cpuGovernor ?? Gamerun.Default.CPUGovernor;
+        get => _cpuGovernor ?? Gamerun.DefaultAppConfig.CPUGovernor;
         set
         {
             _cpuGovernor = value;
@@ -145,7 +132,7 @@ public class AppSettings : GamerunSettingsAbstract
 
     public bool DisableSplitLockMitigation
     {
-        get => _disableSplitLockMitigation ?? Gamerun.Default.DisableSplitLockMitigation;
+        get => _disableSplitLockMitigation ?? Gamerun.DefaultAppConfig.DisableSplitLockMitigation;
         set
         {
             _disableSplitLockMitigation = value;
@@ -155,7 +142,7 @@ public class AppSettings : GamerunSettingsAbstract
 
     public bool iGPUGovernor
     {
-        get => _igpuGovernor ?? Gamerun.Default.iGPUGovernor;
+        get => _igpuGovernor ?? Gamerun.DefaultAppConfig.iGPUGovernor;
         set
         {
             _igpuGovernor = value;
@@ -165,7 +152,7 @@ public class AppSettings : GamerunSettingsAbstract
 
     public bool NvPowerMizer
     {
-        get => _nvPowerMizer ?? Gamerun.Default.NvPowerMizer;
+        get => _nvPowerMizer ?? Gamerun.DefaultAppConfig.NvPowerMizer;
         set
         {
             _nvPowerMizer = value;
@@ -175,7 +162,7 @@ public class AppSettings : GamerunSettingsAbstract
 
     public bool OptimizeGPU
     {
-        get => _optimizeGPU ?? Gamerun.Default.OptimizeGPU;
+        get => _optimizeGPU ?? Gamerun.DefaultAppConfig.OptimizeGPU;
         set
         {
             _optimizeGPU = value;
@@ -185,7 +172,7 @@ public class AppSettings : GamerunSettingsAbstract
 
     public bool ParkCores
     {
-        get => _parkCores ?? Gamerun.Default.ParkCores;
+        get => _parkCores ?? Gamerun.DefaultAppConfig.ParkCores;
         set
         {
             _parkCores = value;
@@ -195,7 +182,7 @@ public class AppSettings : GamerunSettingsAbstract
 
     public bool ParkCoresAuto
     {
-        get => _parkCoresAuto ?? Gamerun.Default.ParkCoresAuto;
+        get => _parkCoresAuto ?? Gamerun.DefaultAppConfig.ParkCoresAuto;
         set
         {
             _parkCoresAuto = value;
@@ -205,7 +192,7 @@ public class AppSettings : GamerunSettingsAbstract
 
     public bool PinCores
     {
-        get => _pinCores ?? Gamerun.Default.PinCores;
+        get => _pinCores ?? Gamerun.DefaultAppConfig.PinCores;
         set
         {
             _pinCores = value;
@@ -215,7 +202,7 @@ public class AppSettings : GamerunSettingsAbstract
 
     public bool PinCoresAuto
     {
-        get => _pinCoresAuto ?? Gamerun.Default.PinCoresAuto;
+        get => _pinCoresAuto ?? Gamerun.DefaultAppConfig.PinCoresAuto;
         set
         {
             _pinCoresAuto = value;
@@ -225,7 +212,7 @@ public class AppSettings : GamerunSettingsAbstract
 
     public bool PowerGovernor
     {
-        get => _powerGovernor ?? Gamerun.Default.PowerGovernor;
+        get => _powerGovernor ?? Gamerun.DefaultAppConfig.PowerGovernor;
         set
         {
             _powerGovernor = value;
@@ -236,7 +223,7 @@ public class AppSettings : GamerunSettingsAbstract
 
     public bool SoftRealTime
     {
-        get => _softrealtime ?? Gamerun.Default.SoftRealTime;
+        get => _softrealtime ?? Gamerun.DefaultAppConfig.SoftRealTime;
         set
         {
             _softrealtime = value;
@@ -246,7 +233,7 @@ public class AppSettings : GamerunSettingsAbstract
 
     public uint StopScriptTimeout
     {
-        get => _stopScriptTimeout ?? Gamerun.Default.StopScriptTimeout;
+        get => _stopScriptTimeout ?? Gamerun.DefaultAppConfig.StopScriptTimeout;
         set
         {
             _stopScriptTimeout = value;
@@ -256,7 +243,7 @@ public class AppSettings : GamerunSettingsAbstract
 
     public uint GPUID
     {
-        get => _gpuID ?? Gamerun.Default.GPUID;
+        get => _gpuID ?? Gamerun.DefaultAppConfig.GPUID;
         set
         {
             _gpuID = value;
@@ -266,7 +253,7 @@ public class AppSettings : GamerunSettingsAbstract
 
     public uint NvCoreClockOffset
     {
-        get => _nvCoreClockOffset ?? Gamerun.Default.NvCoreClockOffset;
+        get => _nvCoreClockOffset ?? Gamerun.DefaultAppConfig.NvCoreClockOffset;
         set
         {
             _nvCoreClockOffset = value;
@@ -276,7 +263,7 @@ public class AppSettings : GamerunSettingsAbstract
 
     public uint NvMemClockOffset
     {
-        get => _nvMemClockOffset ?? Gamerun.Default.NvMemClockOffset;
+        get => _nvMemClockOffset ?? Gamerun.DefaultAppConfig.NvMemClockOffset;
         set
         {
             _nvMemClockOffset = value;
@@ -286,7 +273,7 @@ public class AppSettings : GamerunSettingsAbstract
 
     public uint StartupScriptTimeout
     {
-        get => _startupScriptTimeout ?? Gamerun.Default.StartupScriptTimeout;
+        get => _startupScriptTimeout ?? Gamerun.DefaultAppConfig.StartupScriptTimeout;
         set
         {
             _startupScriptTimeout = value;
@@ -296,7 +283,7 @@ public class AppSettings : GamerunSettingsAbstract
 
     public bool DisableNotificationSystem
     {
-        get => _notifications ?? Gamerun.Default.DisableNotificationSystem;
+        get => _notifications ?? Gamerun.DefaultAppConfig.DisableNotificationSystem;
         set
         {
             _notifications = value;
@@ -306,7 +293,7 @@ public class AppSettings : GamerunSettingsAbstract
 
     public bool OptimizeCompositor
     {
-        get => _compositor ?? Gamerun.Default.OptimizeCompositor;
+        get => _compositor ?? Gamerun.DefaultAppConfig.OptimizeCompositor;
         set
         {
             _compositor = value;
@@ -314,19 +301,8 @@ public class AppSettings : GamerunSettingsAbstract
         }
     }
 
-    public bool RequireRootPermissions => Prioritize
-                                          || PrioritizeIO
-                                          || OptimizeGPU
-                                          || (EnablePowerDaemon && InitSystemHelper.IsServiceActiveAsync("tlp"))
-                                          || ParkCores
-                                          || PinCores
-                                          || (Tools.IsIntelCpu() && DisableSplitLockMitigation)
-                                          || SoftRealTime
-                                          || OptimizeGPU;
 
-    public override bool IsDefaults => Strangle.IsDefaults &&
-                                       MangoHUD.IsDefaults &&
-                                       _amdPerfLevel == null &&
+    public override bool IsDefaults => _amdPerfLevel == null &&
                                        _blockScreenSaver == null &&
                                        _cpuGovernor == null &&
                                        _disableSplitLockMitigation == null &&
@@ -366,9 +342,6 @@ public class AppSettings : GamerunSettingsAbstract
         _prioritize = Tools.IsBitSet(bufferByte, 0);
         _useGPU = Tools.IsBitSet(bufferByte, 1);
         // TODO
-        Strangle.ReadSettings(stream);
-        MangoHUD.ReadSettings(stream);
-        Gamescope.ReadSettings(stream);
     }
 
     public override void WriteSettings(Stream stream)
@@ -377,17 +350,11 @@ public class AppSettings : GamerunSettingsAbstract
         buffer += (byte)(UseGPU ? 2 : 0);
         // TODO
         stream.WriteByte(buffer);
-        Strangle.WriteSettings(stream);
-        MangoHUD.WriteSettings(stream);
-        Gamescope.WriteSettings(stream);
     }
 
     public override GamerunStartArguments GenerateArgs(GamerunStartArguments args)
     {
-        args = Strangle.GenerateArgs(args);
-        args = MangoHUD.GenerateArgs(args);
-        args = Gamescope.GenerateArgs(args);
-
+        args.RequireDaemonUse = RequireRootPermissions;
         if (InitSystemHelper.IsServiceActiveAsync("power-profiles-daemon"))
         {
             args.StartDBusCalls.Add(new GamerunDBusCalls
@@ -462,6 +429,7 @@ public class AppSettings : GamerunSettingsAbstract
         // TODO: Notification system settings
 
         // TODO: Compositor Settings
+
         var gpu = Gamerun.GPUs[GPUID];
         if (Gamerun.GPUs.Length > 1)
             switch (gpu.Driver.ToLower())
@@ -508,8 +476,6 @@ public class AppSettings : GamerunSettingsAbstract
 
     public override void SetAsDefault()
     {
-        Strangle.SetAsDefault();
-        MangoHUD.SetAsDefault();
         _notifications = true;
         _compositor = true;
         _amdPerfLevel = true;
@@ -545,6 +511,16 @@ public class AppSettings : GamerunSettingsAbstract
     #endregion OVERRIDES
 
     #region PRIVATES
+
+    private bool RequireRootPermissions => Prioritize
+                                           || PrioritizeIO
+                                           || OptimizeGPU
+                                           || (EnablePowerDaemon && InitSystemHelper.IsServiceActiveAsync("tlp"))
+                                           || ParkCores
+                                           || PinCores
+                                           || (Tools.IsIntelCpu() && DisableSplitLockMitigation)
+                                           || SoftRealTime
+                                           || OptimizeGPU;
 
     private bool? _notifications;
     private bool? _compositor;

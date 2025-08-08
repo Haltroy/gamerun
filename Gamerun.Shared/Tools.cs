@@ -14,6 +14,7 @@ public static class Tools
     // We need this for Gamescope, compositors, power management, fan control and notification daemons
     public static string GetCommand(string command)
     {
+        if (File.Exists(command)) return command; // Return same command if the path is already correct.
         var pathEnv = Environment.GetEnvironmentVariable("PATH");
         if (string.IsNullOrWhiteSpace(pathEnv))
             throw new Exception(

@@ -1,5 +1,4 @@
 using System;
-using System.Drawing;
 using System.IO;
 using System.Text;
 using Gamerun.Shared.Exceptions;
@@ -8,410 +7,6 @@ namespace Gamerun.Shared;
 
 public class GamescopeSettings : GamerunSettingsAbstract
 {
-    #region PRIVATES
-
-    private uint? _outputWidth;
-    private uint? _outputHeight;
-    private uint? _internalWidth;
-    private uint? _internalHeight;
-    private uint? _nestedWidth;
-    private uint? _nestedHeight;
-    private uint? _xwaylandCount;
-    private uint? _vulkanDevice;
-    private uint? _hideCursorDelay;
-    private string? _cursorPath;
-    private string? _additionalArgs;
-    private bool? _linearUpscaling;
-    private bool? _hdrEnabled;
-    private bool? _enabled;
-    private bool? _adaptiveSync;
-    private bool? _composite;
-    private bool? _forceGrabCursor;
-    private bool? _debug;
-    private bool? _stats;
-    private bool? _timewarp;
-    private bool? _vkDebugLayers;
-    private bool? _steam;
-    private UpscalerFilter? _filter;
-    private Backend? _backend;
-    private FullscreenMode? _fullscreenMode;
-
-    private bool[] Settings =>
-    [
-        LinearUpscaling,
-        EnableHDR,
-        Enabled,
-        AdaptiveSync,
-        Composite,
-        ForceGrabCursor,
-        Debug,
-        Stats,
-        Timewarp,
-        VKDebugLayers,
-        Steam,
-        OutputWidth == 0,
-        OutputHeight == 0,
-        InternalWidth == 0,
-        InternalHeight == 0,
-        NestedWidth == 0,
-        NestedHeight == 0,
-        XwaylandCount == 0,
-        VulkanDevice == 0,
-        HideCursorDelay == 0,
-        OutputWidth < Tools.VLEMaxSize,
-        OutputHeight < Tools.VLEMaxSize,
-        InternalWidth < Tools.VLEMaxSize,
-        InternalHeight < Tools.VLEMaxSize,
-        NestedWidth < Tools.VLEMaxSize,
-        NestedHeight < Tools.VLEMaxSize,
-        XwaylandCount < Tools.VLEMaxSize,
-        VulkanDevice < Tools.VLEMaxSize,
-        HideCursorDelay < Tools.VLEMaxSize,
-        CursorPath.Length > 0,
-        AdditionalArgs.Length > 0,
-        Encoding.UTF8.GetByteCount(CursorPath) < Tools.VLEMaxSize,
-        Encoding.UTF8.GetByteCount(AdditionalArgs) < Tools.VLEMaxSize,
-    ];
-
-    #endregion PRIVATES
-
-    #region PUBLIC PROPERTIES
-
-    public uint OutputWidth
-    {
-        get => _outputWidth ?? Gamerun.Default.Gamescope.OutputWidth;
-        set
-        {
-            _outputWidth = value;
-            OnSave?.Invoke();
-        }
-    }
-
-    public uint OutputHeight
-    {
-        get => _outputHeight ?? Gamerun.Default.Gamescope.OutputHeight;
-        set
-        {
-            _outputHeight = value;
-            OnSave?.Invoke();
-        }
-    }
-
-    public uint InternalWidth
-    {
-        get => _internalWidth ?? Gamerun.Default.Gamescope.InternalWidth;
-        set
-        {
-            _internalWidth = value;
-            OnSave?.Invoke();
-        }
-    }
-
-    public uint InternalHeight
-    {
-        get => _internalHeight ?? Gamerun.Default.Gamescope.InternalHeight;
-        set
-        {
-            _internalHeight = value;
-            OnSave?.Invoke();
-        }
-    }
-
-    public uint NestedWidth
-    {
-        get => _nestedWidth ?? Gamerun.Default.Gamescope.NestedWidth;
-        set
-        {
-            _nestedWidth = value;
-            OnSave?.Invoke();
-        }
-    }
-
-    public uint NestedHeight
-    {
-        get => _nestedHeight ?? Gamerun.Default.Gamescope.NestedHeight;
-        set
-        {
-            _nestedHeight = value;
-            OnSave?.Invoke();
-        }
-    }
-
-    public uint XwaylandCount
-    {
-        get => _xwaylandCount ?? Gamerun.Default.Gamescope.XwaylandCount;
-        set
-        {
-            _xwaylandCount = value;
-            OnSave?.Invoke();
-        }
-    }
-
-    public uint VulkanDevice
-    {
-        get => _vulkanDevice ?? Gamerun.Default.Gamescope.VulkanDevice;
-        set
-        {
-            _vulkanDevice = value;
-            OnSave?.Invoke();
-        }
-    }
-
-    public uint HideCursorDelay
-    {
-        get => _hideCursorDelay ?? Gamerun.Default.Gamescope.HideCursorDelay;
-        set
-        {
-            _hideCursorDelay = value;
-            OnSave?.Invoke();
-        }
-    }
-
-
-    public UpscalerFilter Filter
-    {
-        get => _filter ?? Gamerun.Default.Gamescope.Filter;
-        set
-        {
-            _filter = value;
-            OnSave?.Invoke();
-        }
-    }
-
-    public Backend UseBackend
-    {
-        get => _backend ?? Gamerun.Default.Gamescope.UseBackend;
-        set
-        {
-            _backend = value;
-            OnSave?.Invoke();
-        }
-    }
-
-    public FullscreenMode UseFullscreenMode
-    {
-        get => _fullscreenMode ?? Gamerun.Default.Gamescope.UseFullscreenMode;
-        set
-        {
-            _fullscreenMode = value;
-            OnSave?.Invoke();
-        }
-    }
-
-    public string CursorPath
-    {
-        get => _cursorPath ?? Gamerun.Default.Gamescope.CursorPath;
-        set
-        {
-            _cursorPath = value;
-            OnSave?.Invoke();
-        }
-    }
-
-    public string AdditionalArgs
-    {
-        get => _additionalArgs ?? Gamerun.Default.Gamescope.AdditionalArgs;
-        set
-        {
-            _additionalArgs = value;
-            OnSave?.Invoke();
-        }
-    }
-
-    public bool LinearUpscaling
-    {
-        get => _linearUpscaling ?? Gamerun.Default.Gamescope.LinearUpscaling;
-        set
-        {
-            _linearUpscaling = value;
-            OnSave?.Invoke();
-        }
-    }
-
-    public bool EnableHDR
-    {
-        get => _hdrEnabled ?? Gamerun.Default.Gamescope.EnableHDR;
-        set
-        {
-            _hdrEnabled = value;
-            OnSave?.Invoke();
-        }
-    }
-
-    public bool Enabled
-    {
-        get => _enabled ?? Gamerun.Default.Gamescope.Enabled;
-        set
-        {
-            _enabled = value;
-            OnSave?.Invoke();
-        }
-    }
-
-    public bool AdaptiveSync
-    {
-        get => _adaptiveSync ?? Gamerun.Default.Gamescope.AdaptiveSync;
-        set
-        {
-            _adaptiveSync = value;
-            OnSave?.Invoke();
-        }
-    }
-
-    public bool Composite
-    {
-        get => _composite ?? Gamerun.Default.Gamescope.Composite;
-        set
-        {
-            _composite = value;
-            OnSave?.Invoke();
-        }
-    }
-
-    public bool ForceGrabCursor
-    {
-        get => _forceGrabCursor ?? Gamerun.Default.Gamescope.ForceGrabCursor;
-        set
-        {
-            _forceGrabCursor = value;
-            OnSave?.Invoke();
-        }
-    }
-
-    public bool Debug
-    {
-        get => _debug ?? Gamerun.Default.Gamescope.Debug;
-        set
-        {
-            _debug = value;
-            OnSave?.Invoke();
-        }
-    }
-
-    public bool Stats
-    {
-        get => _stats ?? Gamerun.Default.Gamescope.Stats;
-        set
-        {
-            _stats = value;
-            OnSave?.Invoke();
-        }
-    }
-
-    public bool Timewarp
-    {
-        get => _timewarp ?? Gamerun.Default.Gamescope.Timewarp;
-        set
-        {
-            _timewarp = value;
-            OnSave?.Invoke();
-        }
-    }
-
-    public bool VKDebugLayers
-    {
-        get => _vkDebugLayers ?? Gamerun.Default.Gamescope.VKDebugLayers;
-        set
-        {
-            _vkDebugLayers = value;
-            OnSave?.Invoke();
-        }
-    }
-
-    public bool Steam
-    {
-        get => _steam ?? Gamerun.Default.Gamescope.Steam;
-        set
-        {
-            _steam = value;
-            OnSave?.Invoke();
-        }
-    }
-
-    #endregion PUBLIC PROPERTIES
-
-    #region ENUMS
-
-    /// <summary>
-    /// Upscale filters to use.
-    /// </summary>
-    public enum UpscalerFilter
-    {
-        /// <summary>
-        /// Don't upscale.
-        /// </summary>
-        None,
-
-        /// <summary>
-        /// Uses AMD FidelityFX Super Resolution.
-        /// </summary>
-        FSR,
-
-        /// <summary>
-        /// Uses Nvidia Image Gen (not DLSS).
-        /// </summary>
-        NIS
-    }
-
-    /// <summary>
-    /// Backends to use.
-    /// </summary>
-    public enum Backend
-    {
-        /// <summary>
-        /// Let Gamescope auto-detect the backend to use.
-        /// </summary>
-        Auto,
-
-        /// <summary>
-        /// Uses Direct Rendering Mode.
-        /// </summary>
-        DRM,
-
-        /// <summary>
-        /// Uses Simple DirectMedia Layer.
-        /// </summary>
-        SDL,
-
-        /// <summary>
-        /// Uses OpenVR.
-        /// </summary>
-        OpenVR,
-
-        /// <summary>
-        /// Make a headless session with no display. 
-        /// </summary>
-        Headless,
-
-        /// <summary>
-        /// Uses Wayland.
-        /// </summary>
-        Wayland
-    }
-
-    /// <summary>
-    /// Fullscreen modes to use.
-    /// </summary>
-    public enum FullscreenMode
-    {
-        /// <summary>
-        /// Doesn't uses fullscreen mode. Windowed.
-        /// </summary>
-        None,
-
-        /// <summary>
-        /// Uses fullscreen mode.
-        /// </summary>
-        Fullscreen,
-
-        /// <summary>
-        /// Uses borderless fullscreen mode. Makes a window but set it as borderless to imitate a fullscreen.
-        /// </summary>
-        BorderlessFullscreen
-    }
-
-    #endregion ENUMS
-
     public override bool IsDefaults => _outputWidth == null &&
                                        _outputHeight == null &&
                                        _internalWidth == null &&
@@ -779,13 +374,9 @@ public class GamescopeSettings : GamerunSettingsAbstract
         {
             var length = Encoding.UTF8.GetByteCount(CursorPath);
             if (length < Tools.VLEMaxSize)
-            {
                 Tools.WriteVarUInt(stream, (uint)length);
-            }
             else
-            {
                 stream.Write(BitConverter.GetBytes((uint)length));
-            }
 
             buffer = Encoding.UTF8.GetBytes(CursorPath);
             stream.Write(buffer);
@@ -795,13 +386,9 @@ public class GamescopeSettings : GamerunSettingsAbstract
 
         var additionalLength = Encoding.UTF8.GetByteCount(AdditionalArgs);
         if (additionalLength < Tools.VLEMaxSize)
-        {
             Tools.WriteVarUInt(stream, (uint)additionalLength);
-        }
         else
-        {
             stream.Write(BitConverter.GetBytes((uint)additionalLength));
-        }
 
         buffer = Encoding.UTF8.GetBytes(AdditionalArgs);
         stream.Write(buffer);
@@ -900,6 +487,7 @@ public class GamescopeSettings : GamerunSettingsAbstract
             _outputWidth = 0;
             _outputHeight = 0;
         }
+
         _internalWidth = 0;
         _internalHeight = 0;
         _nestedWidth = 0;
@@ -925,4 +513,408 @@ public class GamescopeSettings : GamerunSettingsAbstract
     }
 
     public override event GamerunSettingSaveDelegate? OnSave;
+
+    #region PRIVATES
+
+    private uint? _outputWidth;
+    private uint? _outputHeight;
+    private uint? _internalWidth;
+    private uint? _internalHeight;
+    private uint? _nestedWidth;
+    private uint? _nestedHeight;
+    private uint? _xwaylandCount;
+    private uint? _vulkanDevice;
+    private uint? _hideCursorDelay;
+    private string? _cursorPath;
+    private string? _additionalArgs;
+    private bool? _linearUpscaling;
+    private bool? _hdrEnabled;
+    private bool? _enabled;
+    private bool? _adaptiveSync;
+    private bool? _composite;
+    private bool? _forceGrabCursor;
+    private bool? _debug;
+    private bool? _stats;
+    private bool? _timewarp;
+    private bool? _vkDebugLayers;
+    private bool? _steam;
+    private UpscalerFilter? _filter;
+    private Backend? _backend;
+    private FullscreenMode? _fullscreenMode;
+
+    private bool[] Settings =>
+    [
+        LinearUpscaling,
+        EnableHDR,
+        Enabled,
+        AdaptiveSync,
+        Composite,
+        ForceGrabCursor,
+        Debug,
+        Stats,
+        Timewarp,
+        VKDebugLayers,
+        Steam,
+        OutputWidth == 0,
+        OutputHeight == 0,
+        InternalWidth == 0,
+        InternalHeight == 0,
+        NestedWidth == 0,
+        NestedHeight == 0,
+        XwaylandCount == 0,
+        VulkanDevice == 0,
+        HideCursorDelay == 0,
+        OutputWidth < Tools.VLEMaxSize,
+        OutputHeight < Tools.VLEMaxSize,
+        InternalWidth < Tools.VLEMaxSize,
+        InternalHeight < Tools.VLEMaxSize,
+        NestedWidth < Tools.VLEMaxSize,
+        NestedHeight < Tools.VLEMaxSize,
+        XwaylandCount < Tools.VLEMaxSize,
+        VulkanDevice < Tools.VLEMaxSize,
+        HideCursorDelay < Tools.VLEMaxSize,
+        CursorPath.Length > 0,
+        AdditionalArgs.Length > 0,
+        Encoding.UTF8.GetByteCount(CursorPath) < Tools.VLEMaxSize,
+        Encoding.UTF8.GetByteCount(AdditionalArgs) < Tools.VLEMaxSize
+    ];
+
+    #endregion PRIVATES
+
+    #region PUBLIC PROPERTIES
+
+    public uint OutputWidth
+    {
+        get => _outputWidth ?? Gamerun.DefaultGamescopeConfig.OutputWidth;
+        set
+        {
+            _outputWidth = value;
+            OnSave?.Invoke();
+        }
+    }
+
+    public uint OutputHeight
+    {
+        get => _outputHeight ?? Gamerun.DefaultGamescopeConfig.OutputHeight;
+        set
+        {
+            _outputHeight = value;
+            OnSave?.Invoke();
+        }
+    }
+
+    public uint InternalWidth
+    {
+        get => _internalWidth ?? Gamerun.DefaultGamescopeConfig.InternalWidth;
+        set
+        {
+            _internalWidth = value;
+            OnSave?.Invoke();
+        }
+    }
+
+    public uint InternalHeight
+    {
+        get => _internalHeight ?? Gamerun.DefaultGamescopeConfig.InternalHeight;
+        set
+        {
+            _internalHeight = value;
+            OnSave?.Invoke();
+        }
+    }
+
+    public uint NestedWidth
+    {
+        get => _nestedWidth ?? Gamerun.DefaultGamescopeConfig.NestedWidth;
+        set
+        {
+            _nestedWidth = value;
+            OnSave?.Invoke();
+        }
+    }
+
+    public uint NestedHeight
+    {
+        get => _nestedHeight ?? Gamerun.DefaultGamescopeConfig.NestedHeight;
+        set
+        {
+            _nestedHeight = value;
+            OnSave?.Invoke();
+        }
+    }
+
+    public uint XwaylandCount
+    {
+        get => _xwaylandCount ?? Gamerun.DefaultGamescopeConfig.XwaylandCount;
+        set
+        {
+            _xwaylandCount = value;
+            OnSave?.Invoke();
+        }
+    }
+
+    public uint VulkanDevice
+    {
+        get => _vulkanDevice ?? Gamerun.DefaultGamescopeConfig.VulkanDevice;
+        set
+        {
+            _vulkanDevice = value;
+            OnSave?.Invoke();
+        }
+    }
+
+    public uint HideCursorDelay
+    {
+        get => _hideCursorDelay ?? Gamerun.DefaultGamescopeConfig.HideCursorDelay;
+        set
+        {
+            _hideCursorDelay = value;
+            OnSave?.Invoke();
+        }
+    }
+
+
+    public UpscalerFilter Filter
+    {
+        get => _filter ?? Gamerun.DefaultGamescopeConfig.Filter;
+        set
+        {
+            _filter = value;
+            OnSave?.Invoke();
+        }
+    }
+
+    public Backend UseBackend
+    {
+        get => _backend ?? Gamerun.DefaultGamescopeConfig.UseBackend;
+        set
+        {
+            _backend = value;
+            OnSave?.Invoke();
+        }
+    }
+
+    public FullscreenMode UseFullscreenMode
+    {
+        get => _fullscreenMode ?? Gamerun.DefaultGamescopeConfig.UseFullscreenMode;
+        set
+        {
+            _fullscreenMode = value;
+            OnSave?.Invoke();
+        }
+    }
+
+    public string CursorPath
+    {
+        get => _cursorPath ?? Gamerun.DefaultGamescopeConfig.CursorPath;
+        set
+        {
+            _cursorPath = value;
+            OnSave?.Invoke();
+        }
+    }
+
+    public string AdditionalArgs
+    {
+        get => _additionalArgs ?? Gamerun.DefaultGamescopeConfig.AdditionalArgs;
+        set
+        {
+            _additionalArgs = value;
+            OnSave?.Invoke();
+        }
+    }
+
+    public bool LinearUpscaling
+    {
+        get => _linearUpscaling ?? Gamerun.DefaultGamescopeConfig.LinearUpscaling;
+        set
+        {
+            _linearUpscaling = value;
+            OnSave?.Invoke();
+        }
+    }
+
+    public bool EnableHDR
+    {
+        get => _hdrEnabled ?? Gamerun.DefaultGamescopeConfig.EnableHDR;
+        set
+        {
+            _hdrEnabled = value;
+            OnSave?.Invoke();
+        }
+    }
+
+    public bool Enabled
+    {
+        get => _enabled ?? Gamerun.DefaultGamescopeConfig.Enabled;
+        set
+        {
+            _enabled = value;
+            OnSave?.Invoke();
+        }
+    }
+
+    public bool AdaptiveSync
+    {
+        get => _adaptiveSync ?? Gamerun.DefaultGamescopeConfig.AdaptiveSync;
+        set
+        {
+            _adaptiveSync = value;
+            OnSave?.Invoke();
+        }
+    }
+
+    public bool Composite
+    {
+        get => _composite ?? Gamerun.DefaultGamescopeConfig.Composite;
+        set
+        {
+            _composite = value;
+            OnSave?.Invoke();
+        }
+    }
+
+    public bool ForceGrabCursor
+    {
+        get => _forceGrabCursor ?? Gamerun.DefaultGamescopeConfig.ForceGrabCursor;
+        set
+        {
+            _forceGrabCursor = value;
+            OnSave?.Invoke();
+        }
+    }
+
+    public bool Debug
+    {
+        get => _debug ?? Gamerun.DefaultGamescopeConfig.Debug;
+        set
+        {
+            _debug = value;
+            OnSave?.Invoke();
+        }
+    }
+
+    public bool Stats
+    {
+        get => _stats ?? Gamerun.DefaultGamescopeConfig.Stats;
+        set
+        {
+            _stats = value;
+            OnSave?.Invoke();
+        }
+    }
+
+    public bool Timewarp
+    {
+        get => _timewarp ?? Gamerun.DefaultGamescopeConfig.Timewarp;
+        set
+        {
+            _timewarp = value;
+            OnSave?.Invoke();
+        }
+    }
+
+    public bool VKDebugLayers
+    {
+        get => _vkDebugLayers ?? Gamerun.DefaultGamescopeConfig.VKDebugLayers;
+        set
+        {
+            _vkDebugLayers = value;
+            OnSave?.Invoke();
+        }
+    }
+
+    public bool Steam
+    {
+        get => _steam ?? Gamerun.DefaultGamescopeConfig.Steam;
+        set
+        {
+            _steam = value;
+            OnSave?.Invoke();
+        }
+    }
+
+    #endregion PUBLIC PROPERTIES
+
+    #region ENUMS
+
+    /// <summary>
+    ///     Upscale filters to use.
+    /// </summary>
+    public enum UpscalerFilter
+    {
+        /// <summary>
+        ///     Don't upscale.
+        /// </summary>
+        None,
+
+        /// <summary>
+        ///     Uses AMD FidelityFX Super Resolution.
+        /// </summary>
+        FSR,
+
+        /// <summary>
+        ///     Uses Nvidia Image Gen (not DLSS).
+        /// </summary>
+        NIS
+    }
+
+    /// <summary>
+    ///     Backends to use.
+    /// </summary>
+    public enum Backend
+    {
+        /// <summary>
+        ///     Let Gamescope auto-detect the backend to use.
+        /// </summary>
+        Auto,
+
+        /// <summary>
+        ///     Uses Direct Rendering Mode.
+        /// </summary>
+        DRM,
+
+        /// <summary>
+        ///     Uses Simple DirectMedia Layer.
+        /// </summary>
+        SDL,
+
+        /// <summary>
+        ///     Uses OpenVR.
+        /// </summary>
+        OpenVR,
+
+        /// <summary>
+        ///     Make a headless session with no display.
+        /// </summary>
+        Headless,
+
+        /// <summary>
+        ///     Uses Wayland.
+        /// </summary>
+        Wayland
+    }
+
+    /// <summary>
+    ///     Fullscreen modes to use.
+    /// </summary>
+    public enum FullscreenMode
+    {
+        /// <summary>
+        ///     Doesn't uses fullscreen mode. Windowed.
+        /// </summary>
+        None,
+
+        /// <summary>
+        ///     Uses fullscreen mode.
+        /// </summary>
+        Fullscreen,
+
+        /// <summary>
+        ///     Uses borderless fullscreen mode. Makes a window but set it as borderless to imitate a fullscreen.
+        /// </summary>
+        BorderlessFullscreen
+    }
+
+    #endregion ENUMS
 }
