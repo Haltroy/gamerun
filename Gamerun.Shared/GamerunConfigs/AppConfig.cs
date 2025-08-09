@@ -3,7 +3,7 @@ using Gamerun.Shared.Exceptions;
 
 namespace Gamerun.Shared;
 
-public class AppConfig : GamerunSettingsAbstract
+public class AppConfig : GamerunConfigAbstract
 {
     #region CONSTRUCTORS
 

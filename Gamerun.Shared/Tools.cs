@@ -68,24 +68,35 @@ public static class Tools
             if (!File.Exists(classPath)) continue;
 
             var classCode = File.ReadAllText(classPath).Trim();
-            if (!classCode.StartsWith("0x03")) continue; 
+            if (!classCode.StartsWith("0x03")) continue;
 
-            var vendor = File.ReadAllText(Path.Combine(devPath, "vendor")).Trim(); 
-            var device = File.ReadAllText(Path.Combine(devPath, "device")).Trim(); 
-            var pciId = Path.GetFileName(devPath); 
+            var vendor = File.ReadAllText(Path.Combine(devPath, "vendor")).Trim();
+            var device = File.ReadAllText(Path.Combine(devPath, "device")).Trim();
+            var pciId = Path.GetFileName(devPath);
 
             var driver = "";
             var driverLink = Path.Combine(devPath, "driver");
             if (Directory.Exists(driverLink))
-                driver = Path.GetFileName(Path.GetFullPath(driverLink)); 
-            
+                driver = Path.GetFileName(Path.GetFullPath(driverLink));
+
             var defaultMode = TryGetDrmDefaultMode(pciId);
 
-            gpus.Add(new GpuInfo(devPath, defaultMode.name, pciId, driver, vendor, device, defaultMode.mode, defaultMode.drm));
+            gpus.Add(new GpuInfo(devPath, defaultMode.name, pciId, driver, vendor, device, defaultMode.mode,
+                defaultMode.drm));
         }
 
         return gpus.OrderByDescending(gpu => GetGpuPriority(gpu.Driver)).ToArray();
-        ;
+    }
+
+
+    public static string GenerateUniqueFileName(string directory)
+    {
+        while (true)
+        {
+            var path = Path.Combine(directory, GenerateRandomText());
+            if (!File.Exists(path))
+                return path;
+        }
     }
 
     private static int GetGpuPriority(string driver)
@@ -120,8 +131,9 @@ public static class Tools
                 var status = File.ReadAllText(statusPath).Trim();
                 if (status != "connected") continue;
             }
+
             var name = string.Empty;
-            if (File.Exists(Path.Combine(cardPath, "label"))) 
+            if (File.Exists(Path.Combine(cardPath, "label")))
                 name = File.ReadAllText(Path.Combine(cardPath, "label")).Trim();
 
             var modesPath = Path.Combine(cardPath, "modes");
@@ -131,7 +143,7 @@ public static class Tools
                 return (modes[0], cardPath, name); // first mode is typically current
         }
 
-        return (string.Empty, string.Empty,string.Empty);
+        return (string.Empty, string.Empty, string.Empty);
     }
 
     private static string Run(string command, string args)

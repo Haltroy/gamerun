@@ -102,7 +102,7 @@ internal static class Program
                 return;
             }
 
-            var app = Shared.Gamerun.GetApp(appCommandLine, true, true);
+            var app = Shared.Gamerun.GetApp(appCommandLine, true);
             UnixDomainSocketEndPoint? endPoint = null;
             Socket? client = null;
             var appArgs = app.GenerateStartArgs();

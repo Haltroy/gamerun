@@ -5,7 +5,7 @@ namespace Gamerun.Shared;
 /// <summary>
 ///     Abstract class for different settings classes for Gamerun.
 /// </summary>
-public abstract class GamerunSettingsAbstract
+public abstract class GamerunConfigAbstract
 {
     /// <summary>
     ///     Delegate for the save event.
@@ -43,6 +43,7 @@ public abstract class GamerunSettingsAbstract
         get => _fileName.SanitizeFilename();
         set
         {
+            if (IsDefaultConfig) return;
             var save = !string.IsNullOrWhiteSpace(_fileName);
             _fileName = value.SanitizeFilename();
             if (save) OnSave?.Invoke();

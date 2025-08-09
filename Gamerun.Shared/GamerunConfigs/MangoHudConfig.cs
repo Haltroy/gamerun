@@ -8,7 +8,7 @@ namespace Gamerun.Shared;
 /// <summary>
 ///     MangoHUD is a layer that shows system information on apps.
 /// </summary>
-public class MangoHudConfig : GamerunSettingsAbstract
+public class MangoHudConfig : GamerunConfigAbstract
 {
     #region PUBLIC PROPERTIES
 

@@ -96,6 +96,21 @@
                             <TextBlock Text="{x:Static trans:Translations.SidebarMangoHUD}" />
                         </ToolTip.Tip>
                     </Button>
+                    <Button Click="SidebarButtonClicked" Tag="{CompiledBinding #StrangleMenu}" CornerRadius="10"
+                            DockPanel.Dock="Top" Margin="5"
+                            HorizontalAlignment="Stretch">
+                        <Button.Content>
+                            <StackPanel Orientation="Horizontal">
+                                <ic:FluentIcon Width="16" Height="16" Icon="Gavel" />
+                                <TextBlock Margin="5" VerticalAlignment="Center"
+                                           Text="{x:Static trans:Translations.SidebarStrangle}"
+                                           IsVisible="{CompiledBinding #SidebarShowHide.IsChecked}" />
+                            </StackPanel>
+                        </Button.Content>
+                        <ToolTip.Tip>
+                            <TextBlock Text="{x:Static trans:Translations.SidebarStrangle}" />
+                        </ToolTip.Tip>
+                    </Button>
                     <Button Click="SidebarButtonClicked" Tag="{CompiledBinding #GamescopeMenu}" CornerRadius="10"
                             DockPanel.Dock="Top" Margin="5"
                             HorizontalAlignment="Stretch">

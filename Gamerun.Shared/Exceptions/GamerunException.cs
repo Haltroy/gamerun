@@ -41,7 +41,7 @@ public class GamerunAppNotFoundException : GamerunException
     /// </summary>
     /// <param name="commandLine">Command line of app that couldn't be found.</param>
     public GamerunAppNotFoundException(string commandLine) : base(
-        Translations.Translations.AppIsRunning.Replace("%cmd%", commandLine))
+        Translations.Translations.AppNotFound.Replace("%cmd%", commandLine))
     {
     }
 }

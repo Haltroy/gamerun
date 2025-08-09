@@ -5,7 +5,7 @@ using Gamerun.Shared.Exceptions;
 
 namespace Gamerun.Shared;
 
-public class GamescopeConfig : GamerunSettingsAbstract
+public class GamescopeConfig : GamerunConfigAbstract
 {
     public override bool IsDefaults => _outputWidth == null &&
                                        _outputHeight == null &&

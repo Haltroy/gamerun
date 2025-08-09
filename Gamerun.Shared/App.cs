@@ -12,10 +12,8 @@ public class App
     /// <summary>
     ///     Creats a new App.
     /// </summary>
-    /// <param name="commandLine">Command line of this app.</param>
-    public App(string commandLine)
+    public App()
     {
-        CommandLine = commandLine;
     }
 
     #endregion CONSTRUCTORS
@@ -34,7 +32,7 @@ public class App
         args = (Strangle ?? Gamerun.DefaultStrangleConfig).GenerateArgs(args);
         args = (MangoHUD ?? Gamerun.DefaultMangoHUDConfig).GenerateArgs(args);
         args = (Gamescope ?? Gamerun.DefaultGamescopeConfig).GenerateArgs(args);
-        args = (Settings ?? Gamerun.DefaultAppConfig).GenerateArgs(args);
+        args = (Config ?? Gamerun.DefaultAppConfig).GenerateArgs(args);
         return args;
     }
 
@@ -43,11 +41,12 @@ public class App
     #region PRIVATES
 
     private string? _CommandLine;
-    private AppConfig? _Settings;
+    private AppConfig? _config;
     private MangoHudConfig? _MangoHUDSettings;
     private StrangleConfig? _StrangleSettings;
     private GamescopeConfig? _GamescopeSettings;
     private DateTime _LastAccess = DateTime.Now;
+    private string _fileName;
 
     #endregion PRIVATES
 
@@ -67,7 +66,20 @@ public class App
     }
 
     /// <summary>
-    /// Determines the last access of this app.
+    ///     Filename of this app.
+    /// </summary>
+    public required string FileName
+    {
+        get => _fileName.SanitizeFilename();
+        set
+        {
+            _fileName = value.SanitizeFilename();
+            Gamerun.SaveListing();
+        }
+    }
+
+    /// <summary>
+    ///     Determines the last access of this app.
     /// </summary>
     public DateTime LastAccess
     {
@@ -82,12 +94,12 @@ public class App
     /// <summary>
     ///     Configuration of this app. If it is null, use <see cref="Gamerun.DefaultAppConfig" /> instead.
     /// </summary>
-    public AppConfig? Settings
+    public AppConfig? Config
     {
-        get => _Settings;
+        get => _config;
         set
         {
-            _Settings = value;
+            _config = value;
             Gamerun.SaveListing();
         }
     }
