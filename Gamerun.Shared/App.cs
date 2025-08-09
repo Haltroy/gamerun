@@ -46,7 +46,7 @@ public class App
     private StrangleConfig? _StrangleSettings;
     private GamescopeConfig? _GamescopeSettings;
     private DateTime _LastAccess = DateTime.Now;
-    private string _fileName;
+    private string _fileName = string.Empty;
 
     #endregion PRIVATES
 

@@ -88,6 +88,24 @@ public static class Tools
         return gpus.OrderByDescending(gpu => GetGpuPriority(gpu.Driver)).ToArray();
     }
 
+    public static bool ProcessExists(string name)
+    {
+        return Directory.EnumerateDirectories("/proc")
+            .Select(Path.GetFileName)
+            .Where(d => int.TryParse(d, out _))
+            .Any(pid =>
+            {
+                try
+                {
+                    var comm = File.ReadAllText($"/proc/{pid}/comm").Trim();
+                    return comm.Equals(name, StringComparison.OrdinalIgnoreCase);
+                }
+                catch
+                {
+                    return false;
+                }
+            });
+    }
 
     public static string GenerateUniqueFileName(string directory)
     {
