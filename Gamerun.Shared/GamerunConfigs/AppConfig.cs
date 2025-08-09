@@ -877,10 +877,7 @@ public class AppConfig : GamerunConfigAbstract
 
         if (DisableNotificationSystem) args = DoNotDisturbManager.GenerateArgs(args);
 
-        if (OptimizeCompositor)
-        {
-            // TODO: Compositor Settings
-        }
+        if (OptimizeCompositor) args = CompositorManager.GenerateArgs(args);
 
         var gpu = Gamerun.GPUs[GPUID];
         if (Gamerun.GPUs.Length > 1)
