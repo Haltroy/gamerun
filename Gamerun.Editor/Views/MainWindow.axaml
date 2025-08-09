@@ -7,19 +7,34 @@
         xmlns:views="clr-namespace:Gamerun.Editor.Views"
         xmlns:trans="using:Gamerun.Shared.Translations"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        Width="500" Height="450"
         x:Class="Gamerun.Editor.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
         ExtendClientAreaChromeHints="NoChrome"
         SystemDecorations="None"
-        Title="Gamerun.Editor">
+        Background="Transparent"
+        TransparencyLevelHint="AcrylicBlur,Blur,Transparent,None"
+        Title="{x:Static trans:Translations.GamerunEditorTitle}">
 
     <Design.DataContext>
         <vm:MainWindowViewModel />
     </Design.DataContext>
 
-    <DockPanel Margin="5">
-        <!-- TODO: Add resize borders here, also make this rounded with Border -->
+    <Border Background="{DynamicResource SystemControlBackgroundAltMediumBrush}" CornerRadius="20">
+        <DockPanel Margin="5">
+        <DockPanel DockPanel.Dock="Top">
+            <Panel PointerPressed="TopLeftPointerPressed" DockPanel.Dock="Left" Background="#00000001" Height="5" Width="5" Cursor="TopLeftCorner" />
+            <Panel PointerPressed="TopRightPointerPressed" DockPanel.Dock="Right" Background="#00000001" Height="5" Width="5" Cursor="TopRightCorner"/>
+            <Panel PointerPressed="TopPointerPressed" Background="#00000001" Height="5" Cursor="SizeNorthSouth" />
+        </DockPanel>
+        <DockPanel DockPanel.Dock="Bottom">
+            <Panel PointerPressed="BottomLeftPointerPressed" DockPanel.Dock="Left" Background="#00000001" Height="5" Width="5" Cursor="BottomLeftCorner" />
+            <Panel PointerPressed="BottomRightPointerPressed" DockPanel.Dock="Right" Background="#00000001" Height="5" Width="5" Cursor="BottomRightCorner"/>
+            <Panel PointerPressed="BottomPointerPressed" Background="#00000001" Height="5" Cursor="SizeNorthSouth" />
+        </DockPanel>
+        <Panel PointerPressed="LeftPointerPressed" DockPanel.Dock="Left" Width="5" Background="#00000001" Cursor="SizeWestEast"/>
+        <Panel PointerPressed="RightPointerPressed" DockPanel.Dock="Right" Width="5" Background="#00000001" Cursor="SizeWestEast"/>
         <DockPanel DockPanel.Dock="Top" PointerPressed="MoveTitleBar" Background="#00000001"
                    LastChildFill="True">
             <StackPanel DockPanel.Dock="{CompiledBinding ActionMenuPos}" Orientation="Horizontal" Spacing="5">
@@ -173,4 +188,5 @@
             </Carousel>
         </Grid>
     </DockPanel>
+    </Border>
 </Window>
