@@ -23,6 +23,11 @@ public abstract class GamerunConfigAbstract
     public bool IsDefaultConfig { get; private set; }
 
     /// <summary>
+    ///     Current version of this config.
+    /// </summary>
+    public abstract byte CurrentVersion { get; }
+
+    /// <summary>
     ///     Gets the visible name of this configuration.
     /// </summary>
     public string? Name

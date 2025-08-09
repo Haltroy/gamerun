@@ -422,6 +422,8 @@ public class AppConfig : GamerunConfigAbstract
 
     #region OVERRIDES
 
+    public override byte CurrentVersion => 0;
+
     public override bool IsDefaults => _amdPerfLevel == null &&
                                        _blockScreenSaver == null &&
                                        _cpuGovernor == null &&
@@ -455,6 +457,10 @@ public class AppConfig : GamerunConfigAbstract
 
     public override void ReadSettings(Stream stream)
     {
+        var bufferByte = stream.ReadByte();
+        if (bufferByte == -1) throw new GamerunEndOfStreamException(stream.Position);
+        if (bufferByte > CurrentVersion)
+            throw new GamerunVersionNotSupportedException(bufferByte, CurrentVersion, nameof(AppConfig));
         var settingsLength = Settings.Length;
         var buffer = new byte[(int)Math.Ceiling((double)settingsLength / 8)];
         var bufferRead = stream.Read(buffer);
@@ -661,6 +667,7 @@ public class AppConfig : GamerunConfigAbstract
 
     public override void WriteSettings(Stream stream)
     {
+        stream.WriteByte(CurrentVersion);
         var buffer = Tools.PackBoolsToBytes(Settings);
         stream.Write(buffer);
 

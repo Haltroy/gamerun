@@ -78,6 +78,8 @@ public class StrangleConfig : GamerunConfigAbstract
         _retro = false;
     }
 
+    public override byte CurrentVersion => 0;
+
     public override bool IsDefaults => _vulkanOnly == null && _enabled == null && _trilinear == null &&
                                        _noDlsym == null && _picmip == null && _anisotropicFiltering == null &&
                                        _vSync == null && _fps == null && _batteryFps == null && _glfinish == null &&
@@ -85,6 +87,10 @@ public class StrangleConfig : GamerunConfigAbstract
 
     public override void ReadSettings(Stream stream)
     {
+        var bufferByte = stream.ReadByte();
+        if (bufferByte == -1) throw new GamerunEndOfStreamException(stream.Position);
+        if (bufferByte > CurrentVersion)
+            throw new GamerunVersionNotSupportedException(bufferByte, CurrentVersion, nameof(StrangleConfig));
         var settingLength = Settings.Length;
         var buffer = new byte[(int)Math.Ceiling((double)settingLength / 8)];
         var bufferRead = stream.Read(buffer);
@@ -185,6 +191,7 @@ public class StrangleConfig : GamerunConfigAbstract
 
     public override void WriteSettings(Stream stream)
     {
+        stream.WriteByte(CurrentVersion);
         var buffer = Tools.PackBoolsToBytes(Settings);
         stream.Write(buffer);
 

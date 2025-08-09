@@ -32,8 +32,14 @@ public class GamescopeConfig : GamerunConfigAbstract
                                        _backend == null &&
                                        _fullscreenMode == null;
 
+    public override byte CurrentVersion => 0;
+
     public override void ReadSettings(Stream stream)
     {
+        var bufferByte = stream.ReadByte();
+        if (bufferByte == -1) throw new GamerunEndOfStreamException(stream.Position);
+        if (bufferByte > CurrentVersion)
+            throw new GamerunVersionNotSupportedException(bufferByte, CurrentVersion, nameof(GamescopeConfig));
         var buffer = new byte[(int)Math.Ceiling((double)Settings.Length / 8)];
         var bufferRead = stream.Read(buffer);
         if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
@@ -250,6 +256,7 @@ public class GamescopeConfig : GamerunConfigAbstract
 
     public override void WriteSettings(Stream stream)
     {
+        stream.WriteByte(CurrentVersion);
         var buffer = Tools.PackBoolsToBytes(Settings);
         stream.Write(buffer);
 
