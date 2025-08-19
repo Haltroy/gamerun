@@ -81,7 +81,7 @@ jobs:
       - name: Publish
         run: |
           if [[ ${{ matrix.runtime }} = "linux-arm64" || ${{ matrix.runtime }} = "linux-musl-arm64" ]]; then
-             ADDITONAL_LINKER_ARGS="-p:LinkerFlavor=lld -p:ObjCopyName=\$OBJCOPY"
+             ADDITONAL_LINKER_ARGS="-p:LinkerFlavor=lld -p:ObjCopyName=aarch64-linux-gnu-objcopy"
           fi
           dotnet publish -c Release -r $ADDITONAL_LINKER_ARGS ${{ matrix.runtime }} -o ./publish/${{ matrix.runtime }}/ ./Gamerun/Gamerun.csproj
           dotnet publish -c Release -r $ADDITONAL_LINKER_ARGS ${{ matrix.runtime }} -o ./publish/${{ matrix.runtime }}/ ./Gamerun.Editor/Gamerun.Editor.csproj
