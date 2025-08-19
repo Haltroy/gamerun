@@ -1,0 +1,11 @@
+<linker>
+    <!-- Keep -->
+    <assembly fullname="Avalonia" preserve="all"/>
+    <assembly fullname="Avalonia.X11" preserve="all"/>
+    <assembly fullname="Avalonia.Themes.Simple" preserve="all"/>
+    <!-- Remove -->
+    <assembly fullname="Avalonia.Win32" action="delete"/>
+    <assembly fullname="Avalonia.Native" action="delete"/>
+    <assembly fullname="Avalonia.Android" action="delete"/>
+    <assembly fullname="Avalonia.iOS" action="delete"/>
+</linker>

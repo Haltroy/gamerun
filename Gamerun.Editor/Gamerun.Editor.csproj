@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net8.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+        <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+        <AssemblyName>gamerun-editor</AssemblyName>
+        <OptimizationPreference>Size</OptimizationPreference>
+        <PublishAot>true</PublishAot>
+        <DebugSymbols>false</DebugSymbols>
+        <DebugType>None</DebugType>
+        <StripSymbols>true</StripSymbols>
+        <DebuggerSupport>false</DebuggerSupport>
+        <TrimMode>link</TrimMode>
+        <TrimmerRemoveSymbols>true</TrimmerRemoveSymbols>
+        <RunAOTCompilation>True</RunAOTCompilation>
+        <PublishTrimmed>true</PublishTrimmed>
+        <TrimmerRootDescriptor>ILLink.Descriptors.xml</TrimmerRootDescriptor>
+    </PropertyGroup>
+    <ItemGroup>
+        <AvaloniaResource Include="Assets\**"/>
+        <PackageReference Include="PublishAotCompressed" Version="1.0.5"/>
+        <ProjectReference Include="..\Gamerun.Shared\Gamerun.Shared.csproj"/>
+        <PackageReference Include="Avalonia" Version="11.3.4"/>
+        <PackageReference Include="Avalonia.X11" Version="11.3.4"/>
+        <PackageReference Include="Avalonia.Themes.Simple" Version="11.3.4"/>
+        <PackageReference Include="Avalonia.Diagnostics" Version="11.3.4">
+            <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
+            <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
+        </PackageReference>
+    </ItemGroup>
+</Project>
