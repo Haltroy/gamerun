@@ -45,7 +45,7 @@ jobs:
                 [
                     {
                         "workflowFile": "gamerun.yml",
-                        "jobName": "analyze"
+                        "jobName": "Analyze"
                     }
                 ]
       - name: Checkout code
@@ -60,6 +60,7 @@ jobs:
           sarif_file: devskim-results.sarif
   build:
     if: ${{ success() }}
+    name: Build
     runs-on: ubuntu-latest
     steps:
       - uses: kachick/wait-other-jobs@v3.8.1
@@ -69,7 +70,7 @@ jobs:
                 [
                     {
                         "workflowFile": "gamerun.yml",
-                        "jobName": "lint"
+                        "jobName": "DevSkim"
                     }
                 ]
       - uses: actions/checkout@v4
@@ -84,6 +85,7 @@ jobs:
       - name: Build (Editor)
         run: dotnet build --no-restore ./Gamerun.Editor/Gamerun.Editor.csproj
   publish:
+    name: Publish
     if: ${{ success() }}
     #if: github.event_name == 'push' && github.ref == 'refs/heads/main' && success()
     runs-on: ubuntu-latest
@@ -98,7 +100,7 @@ jobs:
                 [
                     {
                         "workflowFile": "gamerun.yml",
-                        "jobName": "build"
+                        "jobName": "Build"
                     }
                 ]
       - uses: actions/checkout@v4
@@ -194,7 +196,7 @@ jobs:
                     {
                         "workflowFile": "gamerun.yml",
                         "jobMatchMode": "prefix",
-                        "jobName": "publish"
+                        "jobName": "Publish"
                     }
                 ]
       - name: Checkout repository
