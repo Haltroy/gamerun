@@ -1,6 +1,11 @@
 name: Package
 
 on:
+  push:
+    branches: ["main"]
+  # Temporary, to test if this workflow works.
+  pull_request:
+    branches: ["main"]
   workflow_run:
     workflows: [Publish]
     types: [Completed]
@@ -78,7 +83,7 @@ jobs:
       - name: Build .deb and .rpm
         run: |
           VERSION=1.0.0
-          ARCH=${{ matrix.runtime }}
+          ARCH=${{ steps.arch.outputs.deb_arch }}
           PKGNAME="Gamerun-${ARCH}"
 
           fpm -s dir -t deb -n "$PKGNAME" -v $VERSION -a ${{ steps.arch.outputs.deb_arch }} -C pkgroot .
