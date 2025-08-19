@@ -7,8 +7,8 @@ on:
   pull_request:
     branches: ["main"]
   workflow_run:
-    workflows: [Publish]
-    types: [Completed]
+    workflows: ['publish']
+    types: ['completed']
 
 jobs:
   package:

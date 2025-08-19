@@ -6,8 +6,8 @@ on:
   pull_request:
     branches: ["main"]
   workflow_run:
-    workflows: [DevSkim, Build]
-    types: [Completed]
+    workflows: ['build']
+    types: ['completed']
 jobs:
   publish:
     runs-on: ubuntu-latest
