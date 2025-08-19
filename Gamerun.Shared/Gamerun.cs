@@ -178,7 +178,7 @@ public static class Gamerun
                     using var stream = new FileStream(Path.Combine(ConfigsPath, lineSplit[1]), FileMode.Create,
                         FileAccess.Write);
                     app.Config = new AppConfig { FileName = lineSplit[1] };
-                    app.Config.ReadSettings(stream);
+                    app.Config.Read(stream);
                 }
 
                 if (lineSplit[2] != "default")
@@ -186,7 +186,7 @@ public static class Gamerun
                     using var stream = new FileStream(Path.Combine(StrangleConfigsPath, lineSplit[2]), FileMode.Create,
                         FileAccess.Write);
                     app.Strangle = new StrangleConfig { FileName = lineSplit[1] };
-                    app.Strangle.ReadSettings(stream);
+                    app.Strangle.Read(stream);
                 }
 
                 if (lineSplit[3] != "default")
@@ -194,7 +194,7 @@ public static class Gamerun
                     using var stream = new FileStream(Path.Combine(MangoHudConfigsPath, lineSplit[3]), FileMode.Create,
                         FileAccess.Write);
                     app.MangoHUD = new MangoHudConfig { FileName = lineSplit[1] };
-                    app.MangoHUD.ReadSettings(stream);
+                    app.MangoHUD.Read(stream);
                 }
 
                 if (lineSplit[4] != "default")
@@ -202,7 +202,7 @@ public static class Gamerun
                     using var stream = new FileStream(Path.Combine(GamescopeConfigsPath, lineSplit[4]), FileMode.Create,
                         FileAccess.Write);
                     app.Gamescope = new GamescopeConfig { FileName = lineSplit[1] };
-                    app.Gamescope.ReadSettings(stream);
+                    app.Gamescope.Read(stream);
                 }
 
                 DoSave = true;
@@ -281,7 +281,7 @@ public static class Gamerun
             using var configStream =
                 new FileStream(file, FileMode.Open, FileAccess.Read,
                     FileShare.ReadWrite);
-            folder.Value.ReadSettings(configStream);
+            folder.Value.Read(configStream);
         }
 
         if (full) Refresh();
@@ -356,7 +356,7 @@ public static class Gamerun
             var found = Configs.FindAll(x => x.FileName == fileName);
             if (found.Count > 0)
             {
-                found.ForEach(x => x.ReadSettings(fileStream));
+                found.ForEach(x => x.Read(fileStream));
                 continue;
             }
 
@@ -368,7 +368,7 @@ public static class Gamerun
                     FileAccess.Write, FileShare.ReadWrite);
                 newConfig.WriteSettings(stream);
             };
-            newConfig.ReadSettings(fileStream);
+            newConfig.Read(fileStream);
             Configs.Add(newConfig);
         }
     }
@@ -383,7 +383,7 @@ public static class Gamerun
             var found = MangoHudConfigs.FindAll(x => x.FileName == fileName);
             if (found.Count > 0)
             {
-                found.ForEach(x => x.ReadSettings(fileStream));
+                found.ForEach(x => x.Read(fileStream));
                 continue;
             }
 
@@ -395,7 +395,7 @@ public static class Gamerun
                     FileAccess.Write, FileShare.ReadWrite);
                 newConfig.WriteSettings(stream);
             };
-            newConfig.ReadSettings(fileStream);
+            newConfig.Read(fileStream);
             MangoHudConfigs.Add(newConfig);
         }
     }
@@ -410,7 +410,7 @@ public static class Gamerun
             var found = StrangleConfigs.FindAll(x => x.FileName == fileName);
             if (found.Count > 0)
             {
-                found.ForEach(x => x.ReadSettings(fileStream));
+                found.ForEach(x => x.Read(fileStream));
                 continue;
             }
 
@@ -422,7 +422,7 @@ public static class Gamerun
                     FileAccess.Write, FileShare.ReadWrite);
                 newConfig.WriteSettings(stream);
             };
-            newConfig.ReadSettings(fileStream);
+            newConfig.Read(fileStream);
             StrangleConfigs.Add(newConfig);
         }
     }
@@ -437,7 +437,7 @@ public static class Gamerun
             var found = GamescopeConfigs.FindAll(x => x.FileName == fileName);
             if (found.Count > 0)
             {
-                found.ForEach(x => x.ReadSettings(fileStream));
+                found.ForEach(x => x.Read(fileStream));
                 continue;
             }
 
@@ -449,7 +449,7 @@ public static class Gamerun
                     FileAccess.Write, FileShare.ReadWrite);
                 newConfig.WriteSettings(stream);
             };
-            newConfig.ReadSettings(fileStream);
+            newConfig.Read(fileStream);
             GamescopeConfigs.Add(newConfig);
         }
     }

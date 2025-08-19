@@ -183,7 +183,7 @@ public class AppConfig : GamerunConfigAbstract
     }
 
     /// <summary>
-    ///     Sets the governor ofr the integrated GPU to lower values to re-route all the power to the main GPU.
+    ///     Sets the governor for the integrated GPU to lower values to re-route all the power to the main GPU.
     /// </summary>
     public bool iGPUGovernor
     {
@@ -424,6 +424,218 @@ public class AppConfig : GamerunConfigAbstract
 
     public override byte CurrentVersion => 0;
 
+    public override GamerunConfigVersionPair[] Pairs =>
+    [
+        new(version =>
+        {
+            return version switch
+            {
+                0 => true,
+                _ => false
+            };
+        }, (settings, stream) =>
+        {
+            _notifications = settings[0];
+            _compositor = settings[1];
+            _amdPerfLevel = settings[2];
+            _blockScreenSaver = settings[3];
+            _cpuGovernor = settings[4];
+            _disableSplitLockMitigation = settings[5];
+            _enableFanController = settings[6];
+            _enablePowerDaemon = settings[7];
+            _useGPU = settings[8];
+            _igpuGovernor = settings[9];
+            _nvPowerMizer = settings[10];
+            _optimizeGPU = settings[11];
+            _parkCores = settings[12];
+            _pinCores = settings[13];
+            _parkCoresAuto = settings[14];
+            _pinCoresAuto = settings[15];
+            _powerGovernor = settings[16];
+            _prioritize = settings[17];
+            _prioritizeIO = settings[18];
+            _softrealtime = settings[19];
+            _startScriptWait = settings[20];
+            _stopScriptWait = settings[21];
+            var gpuid_HasValue = settings[22];
+            var GPUID_IsVLE = settings[23];
+            var iGPUTreshold_HasValue = settings[24];
+            var iGPUTreshold_IsVLE = settings[25];
+            var NvCoreClockOffset_HasValue = settings[26];
+            var NvCoreClockOffset_IsVLE = settings[27];
+            var NvMemClockOffset_HasValue = settings[28];
+            var NvMemClockOffset_IsVLE = settings[29];
+            var StartupScriptTimeout_HasValue = settings[30];
+            var StartupScriptTimeout_IsVLE = settings[31];
+            var StopScriptTimeout_HasValue = settings[32];
+            var StopScriptTimeout_IsVLE = settings[33];
+            var StartupScriptPath_HasValue = settings[34];
+            var StopScriptPath_HasValue = settings[35];
+            var StartupScriptPath_IsVLE = settings[36];
+            var StopScriptPath_IsVLE = settings[37];
+            var core_HasValue = settings[38];
+            var core_IsVLE = settings[39];
+            byte[] buffer;
+            int bufferRead;
+            if (gpuid_HasValue)
+            {
+                if (GPUID_IsVLE)
+                {
+                    _gpuID = Tools.DecodeVarUInt(stream);
+                }
+                else
+                {
+                    buffer = new byte[sizeof(uint)];
+                    bufferRead = stream.Read(buffer);
+                    if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
+                    _gpuID = BitConverter.ToUInt32(buffer);
+                }
+            }
+
+            if (iGPUTreshold_HasValue)
+            {
+                if (iGPUTreshold_IsVLE)
+                {
+                    _igpuTreshold = Tools.DecodeVarUInt(stream);
+                }
+                else
+                {
+                    buffer = new byte[sizeof(uint)];
+                    bufferRead = stream.Read(buffer);
+                    if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
+                    _igpuTreshold = BitConverter.ToUInt32(buffer);
+                }
+            }
+
+            if (NvCoreClockOffset_HasValue)
+            {
+                if (NvCoreClockOffset_IsVLE)
+                {
+                    _nvCoreClockOffset = Tools.DecodeVarUInt(stream);
+                }
+                else
+                {
+                    buffer = new byte[sizeof(uint)];
+                    bufferRead = stream.Read(buffer);
+                    if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
+                    _nvCoreClockOffset = BitConverter.ToUInt32(buffer);
+                }
+            }
+
+            if (NvMemClockOffset_HasValue)
+            {
+                if (NvMemClockOffset_IsVLE)
+                {
+                    _nvMemClockOffset = Tools.DecodeVarUInt(stream);
+                }
+                else
+                {
+                    buffer = new byte[sizeof(uint)];
+                    bufferRead = stream.Read(buffer);
+                    if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
+                    _nvMemClockOffset = BitConverter.ToUInt32(buffer);
+                }
+            }
+
+            if (StartupScriptTimeout_HasValue)
+            {
+                if (StartupScriptTimeout_IsVLE)
+                {
+                    _startupScriptTimeout = Tools.DecodeVarUInt(stream);
+                }
+                else
+                {
+                    buffer = new byte[sizeof(uint)];
+                    bufferRead = stream.Read(buffer);
+                    if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
+                    _startupScriptTimeout = BitConverter.ToUInt32(buffer);
+                }
+            }
+
+            if (StopScriptTimeout_HasValue)
+            {
+                if (StopScriptTimeout_IsVLE)
+                {
+                    _stopScriptTimeout = Tools.DecodeVarUInt(stream);
+                }
+                else
+                {
+                    buffer = new byte[sizeof(uint)];
+                    bufferRead = stream.Read(buffer);
+                    if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
+                    _stopScriptTimeout = BitConverter.ToUInt32(buffer);
+                }
+            }
+
+            if (core_HasValue)
+            {
+                int length;
+                if (core_IsVLE)
+                {
+                    length = (int)Tools.DecodeVarUInt(stream);
+                }
+                else
+                {
+                    buffer = new byte[sizeof(uint)];
+                    bufferRead = stream.Read(buffer);
+                    if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
+                    length = (int)BitConverter.ToUInt32(buffer);
+                }
+
+                buffer = new byte[length * 2];
+                bufferRead = stream.Read(buffer);
+                if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
+                var decoded = Tools.UnpackBytesToBools(buffer, length * 2);
+                for (var i = 0; i < decoded.Length; i += 2)
+                {
+                    Cores[i].IsParked = decoded[i];
+                    Cores[i].IsPinned = decoded[i + 1];
+                }
+            }
+
+            if (StartupScriptPath_HasValue)
+            {
+                int length;
+                if (StartupScriptPath_IsVLE)
+                {
+                    length = (int)Tools.DecodeVarUInt(stream);
+                }
+                else
+                {
+                    buffer = new byte[sizeof(uint)];
+                    bufferRead = stream.Read(buffer);
+                    if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
+                    length = (int)BitConverter.ToUInt32(buffer);
+                }
+
+                buffer = new byte[length];
+                bufferRead = stream.Read(buffer);
+                if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
+                _startupScriptPath = Encoding.UTF8.GetString(buffer);
+            }
+
+            if (!StopScriptPath_HasValue) return;
+
+            int stopLength;
+            if (StopScriptPath_IsVLE)
+            {
+                stopLength = (int)Tools.DecodeVarUInt(stream);
+            }
+            else
+            {
+                buffer = new byte[sizeof(uint)];
+                bufferRead = stream.Read(buffer);
+                if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
+                stopLength = (int)BitConverter.ToUInt32(buffer);
+            }
+
+            buffer = new byte[stopLength];
+            bufferRead = stream.Read(buffer);
+            if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
+            _stopScriptPath = Encoding.UTF8.GetString(buffer);
+        })
+    ];
+
     public override bool IsDefaults => _amdPerfLevel == null &&
                                        _blockScreenSaver == null &&
                                        _cpuGovernor == null &&
@@ -455,221 +667,10 @@ public class AppConfig : GamerunConfigAbstract
                                        _startScriptWait == null &&
                                        _stopScriptWait == null;
 
-    public override void ReadSettings(Stream stream)
-    {
-        var bufferByte = stream.ReadByte();
-        if (bufferByte == -1) throw new GamerunEndOfStreamException(stream.Position);
-        if (bufferByte > CurrentVersion)
-            throw new GamerunVersionNotSupportedException(bufferByte, CurrentVersion, nameof(AppConfig));
-        var settingsLength = Settings.Length;
-        var buffer = new byte[(int)Math.Ceiling((double)settingsLength / 8)];
-        var bufferRead = stream.Read(buffer);
-        if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
-        var decoded = Tools.UnpackBytesToBools(buffer, settingsLength);
-        _notifications = decoded[0];
-        _compositor = decoded[1];
-        _amdPerfLevel = decoded[2];
-        _blockScreenSaver = decoded[3];
-        _cpuGovernor = decoded[4];
-        _disableSplitLockMitigation = decoded[5];
-        _enableFanController = decoded[6];
-        _enablePowerDaemon = decoded[7];
-        _useGPU = decoded[8];
-        _igpuGovernor = decoded[9];
-        _nvPowerMizer = decoded[10];
-        _optimizeGPU = decoded[11];
-        _parkCores = decoded[12];
-        _pinCores = decoded[13];
-        _parkCoresAuto = decoded[14];
-        _pinCoresAuto = decoded[15];
-        _powerGovernor = decoded[16];
-        _prioritize = decoded[17];
-        _prioritizeIO = decoded[18];
-        _softrealtime = decoded[19];
-        _startScriptWait = decoded[20];
-        _stopScriptWait = decoded[21];
-        var gpuid_HasValue = decoded[22];
-        var GPUID_IsVLE = decoded[23];
-        var iGPUTreshold_HasValue = decoded[24];
-        var iGPUTreshold_IsVLE = decoded[25];
-        var NvCoreClockOffset_HasValue = decoded[26];
-        var NvCoreClockOffset_IsVLE = decoded[27];
-        var NvMemClockOffset_HasValue = decoded[28];
-        var NvMemClockOffset_IsVLE = decoded[29];
-        var StartupScriptTimeout_HasValue = decoded[30];
-        var StartupScriptTimeout_IsVLE = decoded[31];
-        var StopScriptTimeout_HasValue = decoded[32];
-        var StopScriptTimeout_IsVLE = decoded[33];
-        var StartupScriptPath_HasValue = decoded[34];
-        var StopScriptPath_HasValue = decoded[35];
-        var StartupScriptPath_IsVLE = decoded[36];
-        var StopScriptPath_IsVLE = decoded[37];
-        var core_HasValue = decoded[38];
-        var core_IsVLE = decoded[39];
-
-        if (gpuid_HasValue)
-        {
-            if (GPUID_IsVLE)
-            {
-                _gpuID = Tools.DecodeVarUInt(stream);
-            }
-            else
-            {
-                buffer = new byte[sizeof(uint)];
-                bufferRead = stream.Read(buffer);
-                if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
-                _gpuID = BitConverter.ToUInt32(buffer);
-            }
-        }
-
-        if (iGPUTreshold_HasValue)
-        {
-            if (iGPUTreshold_IsVLE)
-            {
-                _igpuTreshold = Tools.DecodeVarUInt(stream);
-            }
-            else
-            {
-                buffer = new byte[sizeof(uint)];
-                bufferRead = stream.Read(buffer);
-                if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
-                _igpuTreshold = BitConverter.ToUInt32(buffer);
-            }
-        }
-
-        if (NvCoreClockOffset_HasValue)
-        {
-            if (NvCoreClockOffset_IsVLE)
-            {
-                _nvCoreClockOffset = Tools.DecodeVarUInt(stream);
-            }
-            else
-            {
-                buffer = new byte[sizeof(uint)];
-                bufferRead = stream.Read(buffer);
-                if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
-                _nvCoreClockOffset = BitConverter.ToUInt32(buffer);
-            }
-        }
-
-        if (NvMemClockOffset_HasValue)
-        {
-            if (NvMemClockOffset_IsVLE)
-            {
-                _nvMemClockOffset = Tools.DecodeVarUInt(stream);
-            }
-            else
-            {
-                buffer = new byte[sizeof(uint)];
-                bufferRead = stream.Read(buffer);
-                if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
-                _nvMemClockOffset = BitConverter.ToUInt32(buffer);
-            }
-        }
-
-        if (StartupScriptTimeout_HasValue)
-        {
-            if (StartupScriptTimeout_IsVLE)
-            {
-                _startupScriptTimeout = Tools.DecodeVarUInt(stream);
-            }
-            else
-            {
-                buffer = new byte[sizeof(uint)];
-                bufferRead = stream.Read(buffer);
-                if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
-                _startupScriptTimeout = BitConverter.ToUInt32(buffer);
-            }
-        }
-
-        if (StopScriptTimeout_HasValue)
-        {
-            if (StopScriptTimeout_IsVLE)
-            {
-                _stopScriptTimeout = Tools.DecodeVarUInt(stream);
-            }
-            else
-            {
-                buffer = new byte[sizeof(uint)];
-                bufferRead = stream.Read(buffer);
-                if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
-                _stopScriptTimeout = BitConverter.ToUInt32(buffer);
-            }
-        }
-
-        if (core_HasValue)
-        {
-            var length = 0;
-            if (core_IsVLE)
-            {
-                length = (int)Tools.DecodeVarUInt(stream);
-            }
-            else
-            {
-                buffer = new byte[sizeof(uint)];
-                bufferRead = stream.Read(buffer);
-                if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
-                length = (int)BitConverter.ToUInt32(buffer);
-            }
-
-            buffer = new byte[length * 2];
-            bufferRead = stream.Read(buffer);
-            if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
-            decoded = Tools.UnpackBytesToBools(buffer, length * 2);
-            for (var i = 0; i < decoded.Length; i += 2)
-            {
-                Cores[i].IsParked = decoded[i];
-                Cores[i].IsPinned = decoded[i + 1];
-            }
-        }
-
-        if (StartupScriptPath_HasValue)
-        {
-            var length = 0;
-            if (StartupScriptPath_IsVLE)
-            {
-                length = (int)Tools.DecodeVarUInt(stream);
-            }
-            else
-            {
-                buffer = new byte[sizeof(uint)];
-                bufferRead = stream.Read(buffer);
-                if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
-                length = (int)BitConverter.ToUInt32(buffer);
-            }
-
-            buffer = new byte[length];
-            bufferRead = stream.Read(buffer);
-            if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
-            _startupScriptPath = Encoding.UTF8.GetString(buffer);
-        }
-
-        if (!StopScriptPath_HasValue) return;
-
-        var stopLength = 0;
-        if (StopScriptPath_IsVLE)
-        {
-            stopLength = (int)Tools.DecodeVarUInt(stream);
-        }
-        else
-        {
-            buffer = new byte[sizeof(uint)];
-            bufferRead = stream.Read(buffer);
-            if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
-            stopLength = (int)BitConverter.ToUInt32(buffer);
-        }
-
-        buffer = new byte[stopLength];
-        bufferRead = stream.Read(buffer);
-        if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
-        _stopScriptPath = Encoding.UTF8.GetString(buffer);
-    }
-
     public override void WriteSettings(Stream stream)
     {
-        stream.WriteByte(CurrentVersion);
-        var buffer = Tools.PackBoolsToBytes(Settings);
-        stream.Write(buffer);
+        base.WriteSettings(stream);
+        byte[] buffer;
 
         if (GPUID > 0)
         {
@@ -803,6 +804,50 @@ public class AppConfig : GamerunConfigAbstract
         buffer = Encoding.UTF8.GetBytes(StopScriptPath);
         stream.Write(buffer);
     }
+
+    public override bool[] Settings =>
+    [
+        DisableNotificationSystem,
+        OptimizeCompositor,
+        AMDPerfLevel,
+        BlockScreenSaver,
+        CPUGovernor,
+        DisableSplitLockMitigation,
+        EnableFanController,
+        EnablePowerDaemon,
+        UseGPU,
+        iGPUGovernor,
+        NvPowerMizer,
+        OptimizeGPU,
+        ParkCores,
+        PinCores,
+        ParkCoresAuto,
+        PinCoresAuto,
+        PowerGovernor,
+        Prioritize,
+        PrioritizeIO,
+        SoftRealTime,
+        StartScriptWait,
+        StopScriptWait,
+        GPUID == 0,
+        GPUID < Tools.VLEMaxSize,
+        iGPUTreshold == 0,
+        iGPUTreshold < Tools.VLEMaxSize,
+        NvCoreClockOffset == 0,
+        NvCoreClockOffset < Tools.VLEMaxSize,
+        NvMemClockOffset == 0,
+        NvMemClockOffset < Tools.VLEMaxSize,
+        StartupScriptTimeout == 0,
+        StartupScriptTimeout < Tools.VLEMaxSize,
+        StopScriptTimeout == 0,
+        StopScriptTimeout < Tools.VLEMaxSize,
+        StartupScriptPath.Length == 0,
+        StopScriptPath.Length == 0,
+        Encoding.UTF8.GetByteCount(StartupScriptPath) < Tools.VLEMaxSize,
+        Encoding.UTF8.GetByteCount(StopScriptPath) < Tools.VLEMaxSize,
+        Cores.Length == 0,
+        Cores.Length < Tools.VLEMaxSize
+    ];
 
     public override GamerunStartArguments GenerateArgs(GamerunStartArguments args)
     {
@@ -977,50 +1022,6 @@ public class AppConfig : GamerunConfigAbstract
                                            || (Tools.IsIntelCpu() && DisableSplitLockMitigation)
                                            || SoftRealTime
                                            || OptimizeGPU;
-
-    private bool[] Settings =>
-    [
-        DisableNotificationSystem,
-        OptimizeCompositor,
-        AMDPerfLevel,
-        BlockScreenSaver,
-        CPUGovernor,
-        DisableSplitLockMitigation,
-        EnableFanController,
-        EnablePowerDaemon,
-        UseGPU,
-        iGPUGovernor,
-        NvPowerMizer,
-        OptimizeGPU,
-        ParkCores,
-        PinCores,
-        ParkCoresAuto,
-        PinCoresAuto,
-        PowerGovernor,
-        Prioritize,
-        PrioritizeIO,
-        SoftRealTime,
-        StartScriptWait,
-        StopScriptWait,
-        GPUID == 0,
-        GPUID < Tools.VLEMaxSize,
-        iGPUTreshold == 0,
-        iGPUTreshold < Tools.VLEMaxSize,
-        NvCoreClockOffset == 0,
-        NvCoreClockOffset < Tools.VLEMaxSize,
-        NvMemClockOffset == 0,
-        NvMemClockOffset < Tools.VLEMaxSize,
-        StartupScriptTimeout == 0,
-        StartupScriptTimeout < Tools.VLEMaxSize,
-        StopScriptTimeout == 0,
-        StopScriptTimeout < Tools.VLEMaxSize,
-        StartupScriptPath.Length == 0,
-        StopScriptPath.Length == 0,
-        Encoding.UTF8.GetByteCount(StartupScriptPath) < Tools.VLEMaxSize,
-        Encoding.UTF8.GetByteCount(StopScriptPath) < Tools.VLEMaxSize,
-        Cores.Length == 0,
-        Cores.Length < Tools.VLEMaxSize
-    ];
 
 
     // ReSharper disable once InconsistentNaming

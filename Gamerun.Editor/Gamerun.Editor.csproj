@@ -7,13 +7,6 @@
         <ApplicationManifest>app.manifest</ApplicationManifest>
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
         <AssemblyName>gamerun-editor</AssemblyName>
-    </PropertyGroup>
-
-    <ItemGroup>
-        <AvaloniaResource Include="Assets\**"/>
-    </ItemGroup>
-
-    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
         <OptimizationPreference>Size</OptimizationPreference>
         <PublishAot>true</PublishAot>
         <DebugSymbols>false</DebugSymbols>
@@ -24,31 +17,18 @@
         <TrimmerRemoveSymbols>true</TrimmerRemoveSymbols>
         <RunAOTCompilation>True</RunAOTCompilation>
         <PublishTrimmed>true</PublishTrimmed>
-        <InvariantGlobalization>true</InvariantGlobalization>
+        <TrimmerRootDescriptor>ILLink.Descriptors.xml</TrimmerRootDescriptor>
     </PropertyGroup>
-
     <ItemGroup>
-        <!-- Preserve Avalonia types for reflection -->
-        <TrimmerRootAssembly Include="Avalonia.Themes.Fluent"/>
-        <TrimmerRootAssembly Include="Avalonia.Controls"/>
-    </ItemGroup>
-
-    <ItemGroup>
-        <PackageReference Include="Avalonia" Version="11.3.2"/>
-        <PackageReference Include="Avalonia.Controls.ItemsRepeater" Version="11.1.5"/>
-        <PackageReference Include="Avalonia.Desktop" Version="11.3.2"/>
-        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.2"/>
-        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.2"/>
-        <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-        <PackageReference Include="Avalonia.Diagnostics" Version="11.3.2">
+        <AvaloniaResource Include="Assets\**"/>
+        <PackageReference Include="PublishAotCompressed" Version="1.0.5"/>
+        <ProjectReference Include="..\Gamerun.Shared\Gamerun.Shared.csproj"/>
+        <PackageReference Include="Avalonia" Version="11.3.4"/>
+        <PackageReference Include="Avalonia.X11" Version="11.3.4"/>
+        <PackageReference Include="Avalonia.Themes.Simple" Version="11.3.4"/>
+        <PackageReference Include="Avalonia.Diagnostics" Version="11.3.4">
             <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
             <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="Avalonia.ReactiveUI" Version="11.3.2"/>
-        <PackageReference Include="FluentIcons.Avalonia" Version="1.1.303"/>
-    </ItemGroup>
-
-    <ItemGroup>
-        <ProjectReference Include="..\Gamerun.Shared\Gamerun.Shared.csproj"/>
     </ItemGroup>
 </Project>

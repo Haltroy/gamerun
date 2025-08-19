@@ -1,192 +1,223 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:vm="using:Gamerun.Editor.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:ic="using:FluentIcons.Avalonia"
         xmlns:views="clr-namespace:Gamerun.Editor.Views"
         xmlns:trans="using:Gamerun.Shared.Translations"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         Width="500" Height="450"
         x:Class="Gamerun.Editor.Views.MainWindow"
-        x:DataType="vm:MainWindowViewModel"
-        Icon="/Assets/avalonia-logo.ico"
+        Icon="/Assets/avalonia-logo.png"
         ExtendClientAreaChromeHints="NoChrome"
         SystemDecorations="None"
         Background="Transparent"
         TransparencyLevelHint="AcrylicBlur,Blur,Transparent,None"
         Title="{x:Static trans:Translations.GamerunEditorTitle}">
 
-    <Design.DataContext>
-        <vm:MainWindowViewModel />
-    </Design.DataContext>
+    <Window.Resources>
+
+
+        <StreamGeometry x:Key="fps_960_regular">M11.75,15 C12.9926407,15 14,16.0073593 14,17.25 C14,18.440864 13.0748384,19.4156449 11.9040488,19.4948092 L11.75,19.5 L11,19.5 L11,21.25 C11,21.6296958 10.7178461,21.943491 10.3517706,21.9931534 L10.25,22 C9.87030423,22 9.55650904,21.7178461 9.50684662,21.3517706 L9.5,21.25 L9.5,15.75 C9.5,15.3703042 9.78215388,15.056509 10.1482294,15.0068466 L10.25,15 L11.75,15 Z M18,15 C19.1045695,15 20,15.8954305 20,17 C20,17.4142136 19.6642136,17.75 19.25,17.75 C18.8703042,17.75 18.556509,17.4678461 18.5068466,17.1017706 L18.5,17 C18.5,16.7545401 18.3231248,16.5503916 18.0898756,16.5080557 L18,16.5 L17.375,16.5 C17.029822,16.5 16.75,16.779822 16.75,17.125 C16.75,17.4387982 16.9812579,17.6985831 17.2826421,17.7432234 L17.375,17.75 L17.875,17.75 C19.0486051,17.75 20,18.7013949 20,19.875 C20,20.9975788 19.1295366,21.91685 18.0267588,21.9946645 L17.875,22 L17.25,22 C16.1454305,22 15.25,21.1045695 15.25,20 C15.25,19.5857864 15.5857864,19.25 16,19.25 C16.3796958,19.25 16.693491,19.5321539 16.7431534,19.8982294 L16.75,20 C16.75,20.2454599 16.9268752,20.4496084 17.1601244,20.4919443 L17.25,20.5 L17.875,20.5 C18.220178,20.5 18.5,20.220178 18.5,19.875 C18.5,19.5612018 18.2687421,19.3014169 17.9673579,19.2567766 L17.875,19.25 L17.375,19.25 C16.2013949,19.25 15.25,18.2986051 15.25,17.125 C15.25,16.0024212 16.1204634,15.08315 17.2232412,15.0053355 L17.375,15 L18,15 Z M7.75,15 C8.16421356,15 8.5,15.3357864 8.5,15.75 C8.5,16.1296958 8.21784612,16.443491 7.85177056,16.4931534 L7.75,16.5 L5.5,16.4990964 L5.5,18.0020964 L7.25,18.002809 C7.66421356,18.002809 8,18.3385954 8,18.752809 C8,19.1325047 7.71784612,19.4462999 7.35177056,19.4959623 L7.25,19.502809 L5.5,19.5020964 L5.5,21.2312276 C5.5,21.6109234 5.21784612,21.9247186 4.85177056,21.974381 L4.75,21.9812276 C4.37030423,21.9812276 4.05650904,21.6990738 4.00684662,21.3329982 L4,21.2312276 L4,15.75 C4,15.3703042 4.28215388,15.056509 4.64822944,15.0068466 L4.75,15 L7.75,15 Z M11.75,16.5 L11,16.5 L11,18 L11.75,18 C12.1642136,18 12.5,17.6642136 12.5,17.25 C12.5,16.8703042 12.2178461,16.556509 11.8517706,16.5068466 L11.75,16.5 Z M12.0005071,3.00079697 C13.598175,3.0002314 14.9045868,4.24867858 14.9963903,5.82344068 L15.0015456,5.99971023 L15.0015456,6.17185862 C15.0015456,6.58607218 14.6657591,6.92185862 14.2515456,6.92185862 C13.8718498,6.92185862 13.5580546,6.63970474 13.5083922,6.27362918 L13.5015456,6.17185862 L13.5015455,6.00050725 L13.4946278,5.85578635 C13.4216748,5.09517253 12.7807219,4.50052106 12.0010385,4.50079697 C11.2207216,4.50107367 10.5795969,5.09652457 10.5068705,5.85779163 L10.5,6.00236753 L10.4999017,7.40051058 C10.9412103,7.14529271 11.4535474,6.99922722 12,6.99922722 C13.657281,6.99922722 15.0007728,8.34271895 15.0007728,10 C15.0007728,11.657281 13.657281,13.0007728 12,13.0007728 C10.4019076,13.0007728 9.09559115,11.7515311 9.00432122,10.1763182 L8.99922722,10 L9,6.00236753 C9,4.34506121 10.3432009,3.00138443 12.0005071,3.00079697 Z M5,3.00082182 C6.59809244,3.00082182 7.90440885,4.2500635 7.99567878,5.82527641 L8.00077278,6.00159461 L8,9.99922722 C8,11.6565083 6.65650826,13 4.99922722,13 C3.40113478,13 2.09481837,11.7507583 2.00354844,10.1755454 L1.99845443,9.99922722 L1.99845443,9.82973599 C1.99845443,9.41552243 2.33424087,9.07973599 2.74845443,9.07973599 C3.1281502,9.07973599 3.44194539,9.36188987 3.49160781,9.72796543 L3.49845443,9.82973599 L3.49845443,9.99922722 C3.49845443,10.8280811 4.17037329,11.5 4.99922722,11.5 C5.77932502,11.5 6.42040769,10.9048054 6.49312988,10.1437616 L6.5,9.99922722 L6.50009835,8.60108402 C6.05878973,8.8563019 5.54645258,9.00236739 5,9.00236739 C3.34271895,9.00236739 1.99922722,7.65887565 1.99922722,6.00159461 C1.99922722,4.34431356 3.34271895,3.00082182 5,3.00082182 Z M19.0056616,3.00159461 C20.6003273,3.00159461 21.9038427,4.2481576 21.9949169,5.81999286 L22,5.99593299 L22,10.0056616 C22,11.6003273 20.753437,12.9038427 19.1816017,12.9949169 L19.0056616,13 L18.8183983,12.9949169 C17.3047791,12.9072158 16.0927842,11.6952209 16.0050831,10.1816017 L16,10.0056616 L16,5.99593299 C16,4.40126726 17.246563,3.09775192 18.8183983,3.00667769 L19.0056616,3.00159461 Z M12,8.49922722 C11.2199022,8.49922722 10.5788195,9.09442178 10.5060973,9.85546557 L10.5,10 C10.5041699,10.8337854 11.1741933,11.5007728 12,11.5007728 C12.8288539,11.5007728 13.5007728,10.8288539 13.5007728,10 C13.5007728,9.17114608 12.8288539,8.49922722 12,8.49922722 Z M19.0056616,4.50159461 L18.9943384,4.50159461 C18.2175852,4.50159461 17.5792511,5.09423734 17.5068407,5.85201823 L17.5,5.99593299 L17.5,10.0056616 C17.5,10.7824148 18.0926427,11.4207489 18.8504236,11.4931593 L18.9943384,11.5 L19.1495764,11.4931593 C19.859996,11.4252746 20.4252746,10.859996 20.4931593,10.1495764 L20.5,10.0056616 L20.5,5.99593299 C20.5,5.17063269 19.8309619,4.50159461 19.0056616,4.50159461 Z M5,4.50082182 C4.17114608,4.50082182 3.49922722,5.17274068 3.49922722,6.00159461 C3.49922722,6.83044853 4.17114608,7.50236739 5,7.50236739 C5.78009781,7.50236739 6.42118048,6.90717283 6.49390267,6.14612904 L6.5,6.00159461 C6.49583008,5.16780919 5.82580666,4.50082182 5,4.50082182 Z</StreamGeometry>
+
+
+        <StreamGeometry x:Key="home_regular">M21.6062 5.85517C23.0048 4.71494 24.9952 4.71494 26.3938 5.85517L39.5688 16.5966C40.4736 17.3342 41 18.4492 41 19.628V39.1134C41 41.2599 39.2875 43 37.175 43H32.075C29.9625 43 28.25 41.2599 28.25 39.1134V29.7492C28.25 29.0337 27.6792 28.4536 26.975 28.4536H21.025C20.3208 28.4536 19.75 29.0337 19.75 29.7492V39.1134C19.75 41.2599 18.0375 43 15.925 43H10.825C8.71251 43 7 41.2599 7 39.1134V19.628C7 18.4493 7.52645 17.3342 8.43124 16.5966L21.6062 5.85517ZM24.7979 7.87612C24.3317 7.49604 23.6683 7.49604 23.2021 7.87612L10.0271 18.6175C9.72548 18.8634 9.55 19.2351 9.55 19.628V39.1134C9.55 39.8289 10.1208 40.4089 10.825 40.4089H15.925C16.6292 40.4089 17.2 39.8289 17.2 39.1134V29.7492C17.2 27.6027 18.9125 25.8626 21.025 25.8626H26.975C29.0875 25.8626 30.8 27.6027 30.8 29.7492V39.1134C30.8 39.8289 31.3708 40.4089 32.075 40.4089H37.175C37.8792 40.4089 38.45 39.8289 38.45 39.1134V19.628C38.45 19.2351 38.2745 18.8634 37.9729 18.6175L24.7979 7.87612Z</StreamGeometry>
+
+
+        <StreamGeometry x:Key="settings_regular">M14 9.50006C11.5147 9.50006 9.5 11.5148 9.5 14.0001C9.5 16.4853 11.5147 18.5001 14 18.5001C15.3488 18.5001 16.559 17.9066 17.3838 16.9666C18.0787 16.1746 18.5 15.1365 18.5 14.0001C18.5 13.5401 18.431 13.0963 18.3028 12.6784C17.7382 10.8381 16.0253 9.50006 14 9.50006ZM11 14.0001C11 12.3432 12.3431 11.0001 14 11.0001C15.6569 11.0001 17 12.3432 17 14.0001C17 15.6569 15.6569 17.0001 14 17.0001C12.3431 17.0001 11 15.6569 11 14.0001Z M21.7093 22.3948L19.9818 21.6364C19.4876 21.4197 18.9071 21.4515 18.44 21.7219C17.9729 21.9924 17.675 22.4693 17.6157 23.0066L17.408 24.8855C17.3651 25.273 17.084 25.5917 16.7055 25.682C14.9263 26.1061 13.0725 26.1061 11.2933 25.682C10.9148 25.5917 10.6336 25.273 10.5908 24.8855L10.3834 23.0093C10.3225 22.4731 10.0112 21.9976 9.54452 21.7281C9.07783 21.4586 8.51117 21.4269 8.01859 21.6424L6.29071 22.4009C5.93281 22.558 5.51493 22.4718 5.24806 22.1859C4.00474 20.8536 3.07924 19.2561 2.54122 17.5137C2.42533 17.1384 2.55922 16.7307 2.8749 16.4977L4.40219 15.3703C4.83721 15.0501 5.09414 14.5415 5.09414 14.0007C5.09414 13.4598 4.83721 12.9512 4.40162 12.6306L2.87529 11.5051C2.55914 11.272 2.42513 10.8638 2.54142 10.4882C3.08038 8.74734 4.00637 7.15163 5.24971 5.82114C5.51684 5.53528 5.93492 5.44941 6.29276 5.60691L8.01296 6.36404C8.50793 6.58168 9.07696 6.54881 9.54617 6.27415C10.0133 6.00264 10.3244 5.52527 10.3844 4.98794L10.5933 3.11017C10.637 2.71803 10.9245 2.39704 11.3089 2.31138C12.19 2.11504 13.0891 2.01071 14.0131 2.00006C14.9147 2.01047 15.8128 2.11485 16.6928 2.31149C17.077 2.39734 17.3643 2.71823 17.4079 3.11017L17.617 4.98937C17.7116 5.85221 18.4387 6.50572 19.3055 6.50663C19.5385 6.507 19.769 6.45838 19.9843 6.36294L21.7048 5.60568C22.0626 5.44818 22.4807 5.53405 22.7478 5.81991C23.9912 7.1504 24.9172 8.74611 25.4561 10.487C25.5723 10.8623 25.4386 11.2703 25.1228 11.5035L23.5978 12.6297C23.1628 12.95 22.9 13.4586 22.9 13.9994C22.9 14.5403 23.1628 15.0489 23.5988 15.3698L25.1251 16.4965C25.441 16.7296 25.5748 17.1376 25.4586 17.5131C24.9198 19.2536 23.9944 20.8492 22.7517 22.1799C22.4849 22.4657 22.0671 22.5518 21.7093 22.3948ZM16.263 22.1966C16.4982 21.4685 16.9889 20.8288 17.6884 20.4238C18.5702 19.9132 19.6536 19.8547 20.5841 20.2627L21.9281 20.8526C22.791 19.8538 23.4593 18.7013 23.8981 17.4552L22.7095 16.5778L22.7086 16.5771C21.898 15.98 21.4 15.0277 21.4 13.9994C21.4 12.9719 21.8974 12.0195 22.7073 11.4227L22.7085 11.4218L23.8957 10.545C23.4567 9.2988 22.7881 8.14636 21.9248 7.1477L20.5922 7.73425L20.5899 7.73527C20.1844 7.91463 19.7472 8.00722 19.3039 8.00663C17.6715 8.00453 16.3046 6.77431 16.1261 5.15465L16.1259 5.15291L15.9635 3.69304C15.3202 3.57328 14.6677 3.50872 14.013 3.50017C13.3389 3.50891 12.6821 3.57367 12.0377 3.69328L11.8751 5.15452C11.7625 6.16272 11.1793 7.05909 10.3019 7.56986C9.41937 8.0856 8.34453 8.14844 7.40869 7.73694L6.07273 7.14893C5.20949 8.14751 4.54092 9.29983 4.10196 10.5459L5.29181 11.4233C6.11115 12.0269 6.59414 12.9837 6.59414 14.0007C6.59414 15.0173 6.11142 15.9742 5.29237 16.5776L4.10161 17.4566C4.54002 18.7044 5.2085 19.8585 6.07205 20.8587L7.41742 20.2682C8.34745 19.8613 9.41573 19.9215 10.2947 20.4292C11.174 20.937 11.7593 21.832 11.8738 22.84L11.8744 22.8445L12.0362 24.3088C13.3326 24.5638 14.6662 24.5638 15.9626 24.3088L16.1247 22.8418C16.1491 22.6217 16.1955 22.4055 16.263 22.1966Z</StreamGeometry>
+
+
+        <StreamGeometry x:Key="pane_close_regular">M19.25,3.99813 C20.7125481,3.99813 21.9084055,5.13983743 21.9949813,6.58060798 L22,6.74813 L22,17.2518 C22,18.7143481 20.8583111,19.9102055 19.4175241,19.9967813 L19.25,20.0018 L4.75,20.0018 C3.28747111,20.0018 2.09159594,18.8601111 2.00501881,17.4193241 L2,17.2518 L2,6.74813 C2,5.28559148 3.14170743,4.08972523 4.58247798,4.00314877 L4.75,3.99813 L19.25,3.99813 Z M19.25,5.49813 L15.9959,5.49813 L15.9958,18.5018 L19.25,18.5018 C19.89725,18.5018 20.4295391,18.0099641 20.4935469,17.3796125 L20.5,17.2518 L20.5,6.74813 C20.5,6.1009175 20.0081641,5.56859563 19.3778125,5.50458356 L19.25,5.49813 Z M14.4959,5.49813 L4.75,5.49813 C4.10279688,5.49813 3.5704668,5.99000109 3.50645367,6.62032409 L3.5,6.74813 L3.5,17.2518 C3.5,17.89905 3.99187109,18.4313391 4.62219409,18.4953469 L4.75,18.5018 L14.4959,18.5018 L14.4959,5.49813 Z M10.3508,9.14531 L12.85,11.6446 C13.0453,11.8398 13.0453,12.1564 12.85,12.3517 L10.3508,14.8509 C10.1555,15.0462 9.83891,15.0462 9.64365,14.8509 C9.44839,14.6557 9.44839,14.3391 9.64365,14.1438 L11.2892,12.4982 L6.50492,12.5 C6.22877,12.5001 6.00483,12.2763 6.00472993,12.0002 C6.00463,11.724 6.22841,11.5001 6.50455,11.5 L11.2895,11.4982 L9.64365,9.85241 C9.44839,9.65715 9.44839,9.34057 9.64365,9.14531 C9.83891,8.95004 10.1555,8.95004 10.3508,9.14531 Z</StreamGeometry>
+
+
+        <StreamGeometry x:Key="info_regular">M14,2 C20.6274,2 26,7.37258 26,14 C26,20.6274 20.6274,26 14,26 C7.37258,26 2,20.6274 2,14 C2,7.37258 7.37258,2 14,2 Z M14,3.5 C8.20101,3.5 3.5,8.20101 3.5,14 C3.5,19.799 8.20101,24.5 14,24.5 C19.799,24.5 24.5,19.799 24.5,14 C24.5,8.20101 19.799,3.5 14,3.5 Z M14,11 C14.3796833,11 14.6934889,11.2821653 14.7431531,11.6482323 L14.75,11.75 L14.75,19.25 C14.75,19.6642 14.4142,20 14,20 C13.6203167,20 13.3065111,19.7178347 13.2568469,19.3517677 L13.25,19.25 L13.25,11.75 C13.25,11.3358 13.5858,11 14,11 Z M14,7 C14.5523,7 15,7.44772 15,8 C15,8.55228 14.5523,9 14,9 C13.4477,9 13,8.55228 13,8 C13,7.44772 13.4477,7 14,7 Z</StreamGeometry>
+
+
+        <StreamGeometry x:Key="pane_open_regular">M19.25,3.9982 C20.7688,3.9982 22,5.22942 22,6.7482 L22,17.2519 C22,18.7707 20.7688,20.0019 19.25,20.0019 L4.75,20.0019 C3.23122,20.0019 2,18.7707 2,17.2519 L2,6.74819 C2,5.22941 3.23122,3.9982 4.75,3.9982 L19.25,3.9982 Z M8.004,5.4972 L4.75,5.4982 C4.05965,5.4982 3.5,6.05784 3.5,6.74819 L3.5,17.2519 C3.5,17.9422 4.05964,18.5019 4.75,18.5019 L8.004,18.5012 L8.004,5.4972 Z M19.25,5.4982 L9.504,5.4972 L9.504,18.5012 L19.25,18.5019 C19.9404,18.5019 20.5,17.9422 20.5,17.2519 L20.5,6.7482 C20.5,6.05784 19.9404,5.4982 19.25,5.4982 Z M14.3564,9.14904 C14.5516,9.3443 14.5516,9.66088 14.3564,9.85614 L12.71,11.5012 L17.4951,11.5 C17.7712,11.4999 17.9952,11.7237 17.9953001,11.9998 C17.9954,12.276 17.7716,12.4999 17.4955,12.5 L12.71,12.5012 L14.3564,14.1476 C14.5516,14.3428 14.5516,14.6594 14.3564,14.8547 C14.1611,15.0499 13.8445,15.0499 13.6492,14.8547 L11.15,12.3554 C10.9547,12.1601 10.9547,11.8436 11.15,11.6483 L13.6492,9.14904 C13.8445,8.95378 14.1611,8.95378 14.3564,9.14904 Z</StreamGeometry>
+
+
+        <StreamGeometry x:Key="gavel_regular">M18.7782 3.62788C17.5321 1.84008 14.9728 1.61336 13.4319 3.15428L9.30742 7.27877C7.69734 8.88885 8.02905 11.5834 9.98156 12.7549L12.9367 14.528L2.9901 24.2943C1.66281 25.5975 1.65314 27.7331 2.96858 29.0483C4.27542 30.3549 6.39399 30.3548 7.70067 29.048L17.5519 19.1962L19.296 22.103C20.4451 24.0181 23.0696 24.3816 24.696 22.8509L28.7819 19.0053C30.3592 17.5209 30.2231 14.9747 28.4967 13.6668L22.8565 9.39394C22.7729 9.33065 22.6998 9.25463 22.6399 9.16864L18.7782 3.62788ZM14.8461 4.5685C15.5065 3.9081 16.6034 4.00527 17.1374 4.77147L17.8263 5.7599L11.9704 11.6158L11.0106 11.0399C10.1738 10.5378 10.0316 9.38301 10.7216 8.69298L14.8461 4.5685ZM13.7382 12.6764L18.988 7.42666L20.9991 10.3122C21.1789 10.5702 21.3981 10.7983 21.6487 10.9881L24.18 12.9057L19.1363 17.9494L17.6152 15.4142C17.3618 14.992 17.0084 14.6386 16.5862 14.3852L13.7382 12.6764ZM20.1969 19.7172L25.7893 14.1249L27.2889 15.261C28.0288 15.8215 28.0872 16.9128 27.4112 17.5489L23.3253 21.3945C22.6283 22.0505 21.5035 21.8947 21.011 21.074L20.1969 19.7172ZM16.4913 17.4284L6.28642 27.6338C5.76073 28.1596 4.90841 28.1596 4.38266 27.634C3.85345 27.1048 3.85734 26.2457 4.39132 25.7214L14.7086 15.5911L15.5572 16.1002C15.6979 16.1847 15.8157 16.3025 15.9002 16.4432L16.4913 17.4284Z M19 26C18.4477 26 18 26.4477 18 27C18 27.5523 18.4477 28 19 28H17C16.4477 28 16 28.4477 16 29C16 29.5523 16.4477 30 17 30H28.3333C28.8856 30 29.3333 29.5523 29.3333 29C29.3333 28.4477 28.8856 28 28.3333 28H26C26.5523 28 27 27.5523 27 27C27 26.4477 26.5523 26 26 26H19Z</StreamGeometry>
+
+
+        <StreamGeometry x:Key="games_regular">M14.9978834,5 C18.8638767,5 21.9978834,8.13400675 21.9978834,12 C21.9978834,15.7854517 18.9931001,18.8690987 15.2385332,18.995941 L14.9978834,19 L9.00211656,19 C5.13612331,19 2.00211656,15.8659932 2.00211656,12 C2.00211656,8.21454828 5.00689994,5.13090132 8.76146681,5.00405902 L9.00211656,5 L14.9978834,5 Z M14.9978834,6.5 L9.00211656,6.5 C5.96455044,6.5 3.50211656,8.96243388 3.50211656,12 C3.50211656,14.9634791 5.84589657,17.3795391 8.78090942,17.4956328 L9.00211656,17.5 L14.9978834,17.5 C18.0354496,17.5 20.4978834,15.0375661 20.4978834,12 C20.4978834,9.03652085 18.1541034,6.62046086 15.2190906,6.5043672 L14.9978834,6.5 Z M8,9 C8.41421356,9 8.75,9.33578644 8.75,9.75 L8.74911656,11.248 L10.25,11.2487458 C10.6642136,11.2487458 11,11.5845322 11,11.9987458 C11,12.4129593 10.6642136,12.7487458 10.25,12.7487458 L8.74911656,12.748 L8.75,14.25 C8.75,14.6642136 8.41421356,15 8,15 C7.58578644,15 7.25,14.6642136 7.25,14.25 L7.24911656,12.748 L5.75,12.7487458 C5.33578644,12.7487458 5,12.4129593 5,11.9987458 C5,11.5845322 5.33578644,11.2487458 5.75,11.2487458 L7.24911656,11.248 L7.25,9.75 C7.25,9.33578644 7.58578644,9 8,9 Z M14.75,12.5 C15.4403559,12.5 16,13.0596441 16,13.75 C16,14.4403559 15.4403559,15 14.75,15 C14.0596441,15 13.5,14.4403559 13.5,13.75 C13.5,13.0596441 14.0596441,12.5 14.75,12.5 Z M16.75,9 C17.4403559,9 18,9.55964406 18,10.25 C18,10.9403559 17.4403559,11.5 16.75,11.5 C16.0596441,11.5 15.5,10.9403559 15.5,10.25 C15.5,9.55964406 16.0596441,9 16.75,9 Z</StreamGeometry>
+
+
+        <StreamGeometry x:Key="window_multiple_regular">M4.5 2C3.11929 2 2 3.11929 2 4.5V12.5C2 13.8807 3.11929 15 4.5 15H12.5C13.8807 15 15 13.8807 15 12.5V4.5C15 3.11929 13.8807 2 12.5 2H4.5ZM3 12.5V6H14V12.5C14 13.3284 13.3284 14 12.5 14H4.5C3.67157 14 3 13.3284 3 12.5ZM3 5V4.5C3 3.67157 3.67157 3 4.5 3H12.5C13.3284 3 14 3.67157 14 4.5V5H3Z M7.4998 18C6.29032 18 5.28144 17.1411 5.0498 16H6.08515C6.29107 16.5826 6.84669 17 7.4998 17H13.9998C15.6566 17 16.9998 15.6569 16.9998 14V7.50001C16.9998 6.8469 16.5824 6.29128 15.9998 6.08536V5.05002C17.1409 5.28165 17.9998 6.29053 17.9998 7.50001V14C17.9998 16.2091 16.2089 18 13.9998 18H7.4998Z</StreamGeometry>
+
+
+        <StreamGeometry x:Key="maximize_regular">M4.5 3C3.67157 3 3 3.67157 3 4.5V11.5C3 12.3284 3.67157 13 4.5 13H11.5C12.3284 13 13 12.3284 13 11.5V4.5C13 3.67157 12.3284 3 11.5 3H4.5ZM4.5 4H11.5C11.7761 4 12 4.22386 12 4.5V11.5C12 11.7761 11.7761 12 11.5 12H4.5C4.22386 12 4 11.7761 4 11.5V4.5C4 4.22386 4.22386 4 4.5 4Z</StreamGeometry>
+
+
+    </Window.Resources>
 
     <Border Background="{DynamicResource SystemControlBackgroundAltMediumBrush}" CornerRadius="20">
         <DockPanel Margin="5">
-        <DockPanel DockPanel.Dock="Top">
-            <Panel PointerPressed="TopLeftPointerPressed" DockPanel.Dock="Left" Background="#00000001" Height="5" Width="5" Cursor="TopLeftCorner" />
-            <Panel PointerPressed="TopRightPointerPressed" DockPanel.Dock="Right" Background="#00000001" Height="5" Width="5" Cursor="TopRightCorner"/>
-            <Panel PointerPressed="TopPointerPressed" Background="#00000001" Height="5" Cursor="SizeNorthSouth" />
-        </DockPanel>
-        <DockPanel DockPanel.Dock="Bottom">
-            <Panel PointerPressed="BottomLeftPointerPressed" DockPanel.Dock="Left" Background="#00000001" Height="5" Width="5" Cursor="BottomLeftCorner" />
-            <Panel PointerPressed="BottomRightPointerPressed" DockPanel.Dock="Right" Background="#00000001" Height="5" Width="5" Cursor="BottomRightCorner"/>
-            <Panel PointerPressed="BottomPointerPressed" Background="#00000001" Height="5" Cursor="SizeNorthSouth" />
-        </DockPanel>
-        <Panel PointerPressed="LeftPointerPressed" DockPanel.Dock="Left" Width="5" Background="#00000001" Cursor="SizeWestEast"/>
-        <Panel PointerPressed="RightPointerPressed" DockPanel.Dock="Right" Width="5" Background="#00000001" Cursor="SizeWestEast"/>
-        <DockPanel DockPanel.Dock="Top" PointerPressed="MoveTitleBar" Background="#00000001"
-                   LastChildFill="True">
-            <StackPanel DockPanel.Dock="{CompiledBinding ActionMenuPos}" Orientation="Horizontal" Spacing="5">
-                <Button CornerRadius="10" Click="Minimize">_</Button>
-                <Button CornerRadius="10" Click="MaximizeNormal">
+            <DockPanel DockPanel.Dock="Top">
+                <Panel PointerPressed="TopLeftPointerPressed" DockPanel.Dock="Left" Background="#00000001" Height="5"
+                       Width="5" Cursor="TopLeftCorner" />
+                <Panel PointerPressed="TopRightPointerPressed" DockPanel.Dock="Right" Background="#00000001" Height="5"
+                       Width="5" Cursor="TopRightCorner" />
+                <Panel PointerPressed="TopPointerPressed" Background="#00000001" Height="5" Cursor="SizeNorthSouth" />
+            </DockPanel>
+            <DockPanel DockPanel.Dock="Bottom">
+                <Panel PointerPressed="BottomLeftPointerPressed" DockPanel.Dock="Left" Background="#00000001"
+                       Height="5" Width="5" Cursor="BottomLeftCorner" />
+                <Panel PointerPressed="BottomRightPointerPressed" DockPanel.Dock="Right" Background="#00000001"
+                       Height="5" Width="5" Cursor="BottomRightCorner" />
+                <Panel PointerPressed="BottomPointerPressed" Background="#00000001" Height="5" Cursor="SizeNorthSouth" />
+            </DockPanel>
+            <Panel PointerPressed="LeftPointerPressed" DockPanel.Dock="Left" Width="5" Background="#00000001"
+                   Cursor="SizeWestEast" />
+            <Panel PointerPressed="RightPointerPressed" DockPanel.Dock="Right" Width="5" Background="#00000001"
+                   Cursor="SizeWestEast" />
+            <DockPanel DockPanel.Dock="Top" PointerPressed="MoveTitleBar" Background="#00000001"
+                       LastChildFill="True">
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="5">
+                    <Button CornerRadius="10" Click="Minimize">_</Button>
+                    <Button CornerRadius="10" Click="MaximizeNormal">
+                        <Panel>
+                            <PathIcon Data="{StaticResource maximize_regular}" Width="16" Height="16" />
+                        </Panel>
+                    </Button>
+                    <Button Click="Close" CornerRadius="10">
+                        <TextBlock Text="x" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                    </Button>
+                </StackPanel>
+                <ToggleButton CornerRadius="10" Name="SidebarShowHide" DockPanel.Dock="Left">
                     <Panel>
-                        <ic:FluentIcon Icon="Square" Height="16" Width="16" />
+                        <PathIcon Data="{StaticResource pane_close_regular}"
+                                  IsVisible="{CompiledBinding $parent[ToggleButton].IsChecked}" />
+                        <PathIcon Data="{StaticResource pane_open_regular}"
+                                  IsVisible="{CompiledBinding !$parent[ToggleButton].IsChecked}" />
                     </Panel>
-                </Button>
-                <Button Click="Close" CornerRadius="10">
-                    <TextBlock Text="x" VerticalAlignment="Center" HorizontalAlignment="Center" />
-                </Button>
-            </StackPanel>
-            <ToggleButton CornerRadius="10" Name="SidebarShowHide" DockPanel.Dock="Left">
-                <Panel>
-                    <ic:FluentIcon Width="16" Height="16" Icon="PanelLeftContract"
-                                   IsVisible="{CompiledBinding $parent[ToggleButton].IsChecked}" />
-                    <ic:FluentIcon Width="16" Height="16" Icon="PanelLeftExpand"
-                                   IsVisible="{CompiledBinding !$parent[ToggleButton].IsChecked}" />
-                </Panel>
-            </ToggleButton>
-            <ToggleButton CornerRadius="10" Name="SearchToggle" DockPanel.Dock="Left">
-                <ic:FluentIcon Width="16" Height="16" Icon="Search" />
-            </ToggleButton>
-            <TextBlock Text="{x:Static trans:Translations.GamerunEditorTitle}" VerticalAlignment="Center"
-                       HorizontalAlignment="Center" />
-        </DockPanel>
-        <Grid ColumnDefinitions="Auto,*">
-            <Border Grid.Column="0" Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}"
-                    CornerRadius="20" Margin="5">
-                <DockPanel LastChildFill="False">
-                    <Button Click="SidebarButtonClicked" Tag="{CompiledBinding #AppList}" CornerRadius="10"
-                            DockPanel.Dock="Top" Margin="5"
-                            HorizontalAlignment="Stretch">
-                        <Button.Content>
-                            <StackPanel Orientation="Horizontal">
-                                <ic:FluentIcon Width="16" Height="16" Icon="Games" />
-                                <TextBlock Margin="5" VerticalAlignment="Center"
-                                           Text="{x:Static trans:Translations.SidebarApps}"
-                                           IsVisible="{CompiledBinding #SidebarShowHide.IsChecked}" />
-                            </StackPanel>
-                        </Button.Content>
-                        <ToolTip.Tip>
-                            <TextBlock Text="{x:Static trans:Translations.SidebarApps}" />
-                        </ToolTip.Tip>
-                    </Button>
-                    <Button Click="SidebarButtonClicked" Tag="{CompiledBinding #ConfigMenu}" CornerRadius="10"
-                            DockPanel.Dock="Top" Margin="5"
-                            HorizontalAlignment="Stretch">
-                        <Button.Content>
-                            <StackPanel Orientation="Horizontal">
-                                <ic:FluentIcon Width="16" Height="16" Icon="Gauge" />
-                                <TextBlock Margin="5" VerticalAlignment="Center"
-                                           Text="{x:Static trans:Translations.SidebarConfigs}"
-                                           IsVisible="{CompiledBinding #SidebarShowHide.IsChecked}" />
-                            </StackPanel>
-                        </Button.Content>
-                        <ToolTip.Tip>
-                            <TextBlock Text="{x:Static trans:Translations.SidebarConfigs}" />
-                        </ToolTip.Tip>
-                    </Button>
-                    <Button Click="SidebarButtonClicked" Tag="{CompiledBinding #MangoHudMenu}" CornerRadius="10"
-                            DockPanel.Dock="Top" Margin="5"
-                            HorizontalAlignment="Stretch">
-                        <Button.Content>
-                            <StackPanel Orientation="Horizontal">
-                                <ic:FluentIcon Width="16" Height="16" Icon="Fps960" />
-                                <TextBlock Margin="5" VerticalAlignment="Center"
-                                           Text="{x:Static trans:Translations.SidebarMangoHUD}"
-                                           IsVisible="{CompiledBinding #SidebarShowHide.IsChecked}" />
-                            </StackPanel>
-                        </Button.Content>
-                        <ToolTip.Tip>
-                            <TextBlock Text="{x:Static trans:Translations.SidebarMangoHUD}" />
-                        </ToolTip.Tip>
-                    </Button>
-                    <Button Click="SidebarButtonClicked" Tag="{CompiledBinding #StrangleMenu}" CornerRadius="10"
-                            DockPanel.Dock="Top" Margin="5"
-                            HorizontalAlignment="Stretch">
-                        <Button.Content>
-                            <StackPanel Orientation="Horizontal">
-                                <ic:FluentIcon Width="16" Height="16" Icon="Gavel" />
-                                <TextBlock Margin="5" VerticalAlignment="Center"
-                                           Text="{x:Static trans:Translations.SidebarStrangle}"
-                                           IsVisible="{CompiledBinding #SidebarShowHide.IsChecked}" />
-                            </StackPanel>
-                        </Button.Content>
-                        <ToolTip.Tip>
-                            <TextBlock Text="{x:Static trans:Translations.SidebarStrangle}" />
-                        </ToolTip.Tip>
-                    </Button>
-                    <Button Click="SidebarButtonClicked" Tag="{CompiledBinding #GamescopeMenu}" CornerRadius="10"
-                            DockPanel.Dock="Top" Margin="5"
-                            HorizontalAlignment="Stretch">
-                        <Button.Content>
-                            <StackPanel Orientation="Horizontal">
-                                <ic:FluentIcon Width="16" Height="16" Icon="Window" />
-                                <TextBlock Margin="5" VerticalAlignment="Center"
-                                           Text="{x:Static trans:Translations.SidebarGamescope}"
-                                           IsVisible="{CompiledBinding #SidebarShowHide.IsChecked}" />
-                            </StackPanel>
-                        </Button.Content>
-                        <ToolTip.Tip>
-                            <TextBlock Text="{x:Static trans:Translations.SidebarGamescope}" />
-                        </ToolTip.Tip>
-                    </Button>
-                    <Button Click="SidebarButtonClicked" Tag="{CompiledBinding #About}" CornerRadius="10"
-                            DockPanel.Dock="Bottom" Margin="5"
-                            HorizontalAlignment="Stretch">
-                        <Button.Content>
-                            <StackPanel Orientation="Horizontal">
-                                <ic:FluentIcon Width="16" Height="16" Icon="Info" />
-                                <TextBlock Margin="5" VerticalAlignment="Center"
-                                           Text="{x:Static trans:Translations.SidebarAbout}"
-                                           IsVisible="{CompiledBinding #SidebarShowHide.IsChecked}" />
-                            </StackPanel>
-                        </Button.Content>
-                        <ToolTip.Tip>
-                            <TextBlock Text="{x:Static trans:Translations.SidebarAbout}" />
-                        </ToolTip.Tip>
-                    </Button>
-                    <Button Click="SidebarButtonClicked" Tag="{CompiledBinding #Settings}" CornerRadius="10"
-                            DockPanel.Dock="Bottom" Margin="5"
-                            HorizontalAlignment="Stretch">
-                        <Button.Content>
-                            <StackPanel Orientation="Horizontal">
-                                <ic:FluentIcon Width="16" Height="16" Icon="Settings" />
-                                <TextBlock Margin="5" VerticalAlignment="Center"
-                                           Text="{x:Static trans:Translations.SidebarSettings}"
-                                           IsVisible="{CompiledBinding #SidebarShowHide.IsChecked}" />
-                            </StackPanel>
-                        </Button.Content>
-                        <ToolTip.Tip>
-                            <TextBlock Text="{x:Static trans:Translations.SidebarSettings}" />
-                        </ToolTip.Tip>
-                    </Button>
-                </DockPanel>
-            </Border>
+                </ToggleButton>
+                <TextBlock Text="{x:Static trans:Translations.GamerunEditorTitle}" VerticalAlignment="Center"
+                           HorizontalAlignment="Center" />
+            </DockPanel>
+            <Grid ColumnDefinitions="Auto,*">
+                <Border Grid.Column="0" Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}"
+                        CornerRadius="20" Margin="5">
+                    <DockPanel LastChildFill="False">
+                        <Button Click="SidebarButtonClicked" Tag="{CompiledBinding #AppList}" CornerRadius="10"
+                                DockPanel.Dock="Top" Margin="5"
+                                HorizontalAlignment="Stretch">
+                            <Button.Content>
+                                <StackPanel Orientation="Horizontal">
+                                    <PathIcon Data="{StaticResource home_regular}" />
+                                    <TextBlock Margin="5" VerticalAlignment="Center"
+                                               Text="{x:Static trans:Translations.SidebarApps}"
+                                               IsVisible="{CompiledBinding #SidebarShowHide.IsChecked}" />
+                                </StackPanel>
+                            </Button.Content>
+                            <ToolTip.Tip>
+                                <TextBlock Text="{x:Static trans:Translations.SidebarApps}" />
+                            </ToolTip.Tip>
+                        </Button>
+                        <Button Click="SidebarButtonClicked" Tag="{CompiledBinding #ConfigMenu}" CornerRadius="10"
+                                DockPanel.Dock="Top" Margin="5"
+                                HorizontalAlignment="Stretch">
+                            <Button.Content>
+                                <StackPanel Orientation="Horizontal">
+                                    <PathIcon Data="{StaticResource games_regular}" />
+                                    <TextBlock Margin="5" VerticalAlignment="Center"
+                                               Text="{x:Static trans:Translations.SidebarConfigs}"
+                                               IsVisible="{CompiledBinding #SidebarShowHide.IsChecked}" />
+                                </StackPanel>
+                            </Button.Content>
+                            <ToolTip.Tip>
+                                <TextBlock Text="{x:Static trans:Translations.SidebarConfigs}" />
+                            </ToolTip.Tip>
+                        </Button>
+                        <Button Click="SidebarButtonClicked" Tag="{CompiledBinding #MangoHudMenu}" CornerRadius="10"
+                                DockPanel.Dock="Top" Margin="5"
+                                HorizontalAlignment="Stretch">
+                            <Button.Content>
+                                <StackPanel Orientation="Horizontal">
+                                    <PathIcon Data="{StaticResource fps_960_regular}" />
+                                    <TextBlock Margin="5" VerticalAlignment="Center"
+                                               Text="{x:Static trans:Translations.SidebarMangoHUD}"
+                                               IsVisible="{CompiledBinding #SidebarShowHide.IsChecked}" />
+                                </StackPanel>
+                            </Button.Content>
+                            <ToolTip.Tip>
+                                <TextBlock Text="{x:Static trans:Translations.SidebarMangoHUD}" />
+                            </ToolTip.Tip>
+                        </Button>
+                        <Button Click="SidebarButtonClicked" Tag="{CompiledBinding #StrangleMenu}" CornerRadius="10"
+                                DockPanel.Dock="Top" Margin="5"
+                                HorizontalAlignment="Stretch">
+                            <Button.Content>
+                                <StackPanel Orientation="Horizontal">
+                                    <PathIcon Data="{StaticResource gavel_regular}" />
+                                    <TextBlock Margin="5" VerticalAlignment="Center"
+                                               Text="{x:Static trans:Translations.SidebarStrangle}"
+                                               IsVisible="{CompiledBinding #SidebarShowHide.IsChecked}" />
+                                </StackPanel>
+                            </Button.Content>
+                            <ToolTip.Tip>
+                                <TextBlock Text="{x:Static trans:Translations.SidebarStrangle}" />
+                            </ToolTip.Tip>
+                        </Button>
+                        <Button Click="SidebarButtonClicked" Tag="{CompiledBinding #GamescopeMenu}" CornerRadius="10"
+                                DockPanel.Dock="Top" Margin="5"
+                                HorizontalAlignment="Stretch">
+                            <Button.Content>
+                                <StackPanel Orientation="Horizontal">
+                                    <PathIcon Data="{StaticResource window_multiple_regular}" />
+                                    <TextBlock Margin="5" VerticalAlignment="Center"
+                                               Text="{x:Static trans:Translations.SidebarGamescope}"
+                                               IsVisible="{CompiledBinding #SidebarShowHide.IsChecked}" />
+                                </StackPanel>
+                            </Button.Content>
+                            <ToolTip.Tip>
+                                <TextBlock Text="{x:Static trans:Translations.SidebarGamescope}" />
+                            </ToolTip.Tip>
+                        </Button>
+                        <Button Click="SidebarButtonClicked" Tag="{CompiledBinding #About}" CornerRadius="10"
+                                DockPanel.Dock="Bottom" Margin="5"
+                                HorizontalAlignment="Stretch">
+                            <Button.Content>
+                                <StackPanel Orientation="Horizontal">
+                                    <PathIcon Data="{StaticResource info_regular}" />
+                                    <TextBlock Margin="5" VerticalAlignment="Center"
+                                               Text="{x:Static trans:Translations.SidebarAbout}"
+                                               IsVisible="{CompiledBinding #SidebarShowHide.IsChecked}" />
+                                </StackPanel>
+                            </Button.Content>
+                            <ToolTip.Tip>
+                                <TextBlock Text="{x:Static trans:Translations.SidebarAbout}" />
+                            </ToolTip.Tip>
+                        </Button>
+                        <Button Click="SidebarButtonClicked" Tag="{CompiledBinding #Settings}" CornerRadius="10"
+                                DockPanel.Dock="Bottom" Margin="5"
+                                HorizontalAlignment="Stretch">
+                            <Button.Content>
+                                <StackPanel Orientation="Horizontal">
+                                    <PathIcon Data="{StaticResource settings_regular}" />
+                                    <TextBlock Margin="5" VerticalAlignment="Center"
+                                               Text="{x:Static trans:Translations.SidebarSettings}"
+                                               IsVisible="{CompiledBinding #SidebarShowHide.IsChecked}" />
+                                </StackPanel>
+                            </Button.Content>
+                            <ToolTip.Tip>
+                                <TextBlock Text="{x:Static trans:Translations.SidebarSettings}" />
+                            </ToolTip.Tip>
+                        </Button>
+                    </DockPanel>
+                </Border>
 
-            <Carousel Grid.Column="1" Name="ContentCarousel">
-                <Carousel.PageTransition>
-                    <CrossFade Duration="0:0:0.2" />
-                </Carousel.PageTransition>
-                <views:AppList MainWindow="{CompiledBinding $parent[views:MainWindow]}" Name="AppList" />
-                <views:ConfigsMenu MainWindow="{CompiledBinding $parent[views:MainWindow]}" Name="ConfigMenu" />
-                <views:MangoHUDMenu MainWindow="{CompiledBinding $parent[views:MainWindow]}" Name="MangoHudMenu" />
-                <views:StrangleMenu MainWindow="{CompiledBinding $parent[views:MainWindow]}" Name="StrangleMenu" />
-                <views:GamescopeMenu MainWindow="{CompiledBinding $parent[views:MainWindow]}" Name="GamescopeMenu" />
-                <views:Settings MainWindow="{CompiledBinding $parent[views:MainWindow]}" Name="Settings" />
-                <views:AboutMenu MainWindow="{CompiledBinding $parent[views:MainWindow]}" Name="About" />
-            </Carousel>
-        </Grid>
-    </DockPanel>
+                <Carousel Grid.Column="1" Name="ContentCarousel">
+                    <Carousel.PageTransition>
+                        <CrossFade Duration="0:0:0.2" />
+                    </Carousel.PageTransition>
+                    <views:AppList MainWindow="{CompiledBinding $parent[views:MainWindow]}" Name="AppList" />
+                    <views:ConfigsMenu MainWindow="{CompiledBinding $parent[views:MainWindow]}" Name="ConfigMenu" />
+                    <views:MangoHUDMenu MainWindow="{CompiledBinding $parent[views:MainWindow]}" Name="MangoHudMenu" />
+                    <views:StrangleMenu MainWindow="{CompiledBinding $parent[views:MainWindow]}" Name="StrangleMenu" />
+                    <views:GamescopeMenu MainWindow="{CompiledBinding $parent[views:MainWindow]}" Name="GamescopeMenu" />
+                    <views:Settings MainWindow="{CompiledBinding $parent[views:MainWindow]}" Name="Settings" />
+                    <views:AboutMenu MainWindow="{CompiledBinding $parent[views:MainWindow]}" Name="About" />
+                </Carousel>
+            </Grid>
+        </DockPanel>
     </Border>
 </Window>

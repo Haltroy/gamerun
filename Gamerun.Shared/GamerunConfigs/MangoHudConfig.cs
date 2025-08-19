@@ -58,47 +58,61 @@ public class MangoHudConfig : GamerunConfigAbstract
     public override bool IsDefaults => _enabled == null && _configIsFile == null && _configuration == null;
     public override byte CurrentVersion => 0;
 
-    public override void ReadSettings(Stream stream)
-    {
-        var bufferByte = stream.ReadByte();
-        if (bufferByte == -1) throw new GamerunEndOfStreamException(stream.Position);
-        if (bufferByte > CurrentVersion)
-            throw new GamerunVersionNotSupportedException(bufferByte, CurrentVersion, nameof(MangoHudConfig));
-        var settingsLength = Settings.Length;
-        var buffer = new byte[(int)Math.Ceiling((double)settingsLength / 8)];
-        var bufferRead = stream.Read(buffer);
-        if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
-        var decoded = Tools.UnpackBytesToBools(buffer, settingsLength);
-        _enabled = decoded[0];
-        _configIsFile = decoded[1];
-        var configIsEmpty = decoded[2];
-        var configIsVLE = decoded[2];
+    public override bool[] Settings =>
+    [
+        true,
+        Enabled,
+        ConfigIsFile,
+        string.IsNullOrWhiteSpace(Configuration),
+        Encoding.UTF8.GetByteCount(Configuration) < Tools.VLEMaxSize
+    ];
 
-        if (configIsEmpty) return;
+    public override GamerunConfigVersionPair[] Pairs =>
+    [
+        new(b =>
+            {
+                return b switch
+                {
+                    0 => true,
+                    _ => false
+                };
+            },
+            (decoded, stream) =>
+            {
+                byte[] buffer;
+                int bufferRead;
+                _enabled = decoded[0];
+                _configIsFile = decoded[1];
+                var configIsEmpty = decoded[2];
+                var configIsVLE = decoded[3];
 
-        var configLength = 0;
+                if (configIsEmpty) return;
 
-        if (configIsVLE)
-        {
-            configLength = (int)Tools.DecodeVarUInt(stream);
-        }
-        else
-        {
-            buffer = new byte[sizeof(int)];
-            bufferRead = stream.Read(buffer, 0, buffer.Length);
-            if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
-            configLength = BitConverter.ToInt32(buffer, 0);
-        }
+                var configLength = 0;
 
-        if (configLength == 0) return;
-        buffer = new byte[configLength];
-        bufferRead = stream.Read(buffer, 0, buffer.Length);
-        if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
-        _configuration = Encoding.UTF8.GetString(buffer, 0, configLength);
-    }
+                if (configIsVLE)
+                {
+                    configLength = (int)Tools.DecodeVarUInt(stream);
+                }
+                else
+                {
+                    buffer = new byte[sizeof(int)];
+                    bufferRead = stream.Read(buffer, 0, buffer.Length);
+                    if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
+                    configLength = BitConverter.ToInt32(buffer, 0);
+                }
+
+                if (configLength == 0) return;
+                buffer = new byte[configLength];
+                bufferRead = stream.Read(buffer, 0, buffer.Length);
+                if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
+                _configuration = Encoding.UTF8.GetString(buffer, 0, configLength);
+            })
+    ];
 
     public override void WriteSettings(Stream stream)
     {
+        base.WriteSettings(stream);
         stream.WriteByte(CurrentVersion);
         var length = Encoding.UTF8.GetByteCount(Configuration);
         var buffer = Tools.PackBoolsToBytes(Settings);
@@ -140,15 +154,6 @@ public class MangoHudConfig : GamerunConfigAbstract
     #endregion OVERRIDES
 
     #region PRIVATE
-
-    private bool[] Settings =>
-    [
-        true,
-        Enabled,
-        ConfigIsFile,
-        string.IsNullOrWhiteSpace(Configuration),
-        Encoding.UTF8.GetByteCount(Configuration) < Tools.VLEMaxSize
-    ];
 
     private bool? _configIsFile;
     private string? _configuration = string.Empty;

@@ -10,32 +10,6 @@ namespace Gamerun.Shared;
 /// </summary>
 public class StrangleConfig : GamerunConfigAbstract
 {
-    #region PRIVATE PROPERTIES
-
-    private bool[] Settings =>
-    [
-        Enabled,
-        VulkanOnly,
-        NoDlsym,
-        Trilinear,
-        AnisotropicFiltering > 0,
-        BatteryFPS > 0,
-        FPS > 0,
-        VSync > 0,
-        AnisotropicFiltering < Tools.VLEMaxSize,
-        BatteryFPS < Tools.VLEMaxSize,
-        FPS < Tools.VLEMaxSize,
-        VSync < Tools.VLEMaxSize,
-        PICMIP != 0,
-        Math.Abs(PICMIP) < Tools.VLEMaxSize,
-        PICMIP < 0,
-        GLFinish,
-        Bicubic,
-        Retro
-    ];
-
-    #endregion PRIVATE PROPERTIES
-
     #region Functions and Events
 
     public override GamerunStartArguments GenerateArgs(GamerunStartArguments args)
@@ -85,112 +59,118 @@ public class StrangleConfig : GamerunConfigAbstract
                                        _vSync == null && _fps == null && _batteryFps == null && _glfinish == null &&
                                        _bicubic == null && _retro == null;
 
-    public override void ReadSettings(Stream stream)
-    {
-        var bufferByte = stream.ReadByte();
-        if (bufferByte == -1) throw new GamerunEndOfStreamException(stream.Position);
-        if (bufferByte > CurrentVersion)
-            throw new GamerunVersionNotSupportedException(bufferByte, CurrentVersion, nameof(StrangleConfig));
-        var settingLength = Settings.Length;
-        var buffer = new byte[(int)Math.Ceiling((double)settingLength / 8)];
-        var bufferRead = stream.Read(buffer);
-        if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
-        var decoded = Tools.UnpackBytesToBools(buffer, settingLength);
-        _enabled = decoded[0];
-        _vulkanOnly = decoded[1];
-        _noDlsym = decoded[2];
-        _trilinear = decoded[3];
-        var afHasValue = decoded[4];
-        var battFpsHasValue = decoded[5];
-        var fpsHasValue = decoded[6];
-        var vsyncHasValue = decoded[7];
-        var afVLE = decoded[8];
-        var battfpsVLE = decoded[9];
-        var fpsVLE = decoded[10];
-        var vsyncVLE = decoded[11];
-        var picmipHasValue = decoded[12];
-        var picmipVLE = decoded[13];
-        var picmipNegative = decoded[14];
-        _glfinish = decoded[15];
-        _bicubic = decoded[16];
-        _retro = decoded[17];
-
-        if (afHasValue)
+    public override GamerunConfigVersionPair[] Pairs =>
+    [
+        new(b =>
         {
-            if (afVLE)
+            return b switch
             {
-                _anisotropicFiltering = Tools.DecodeVarUInt(stream);
+                0 => true,
+                _ => false
+            };
+        }, (decoded, stream) =>
+        {
+            byte[] buffer;
+            int bufferRead;
+
+            _enabled = decoded[0];
+            _vulkanOnly = decoded[1];
+            _noDlsym = decoded[2];
+            _trilinear = decoded[3];
+            var afHasValue = decoded[4];
+            var battFpsHasValue = decoded[5];
+            var fpsHasValue = decoded[6];
+            var vsyncHasValue = decoded[7];
+            var afVLE = decoded[8];
+            var battfpsVLE = decoded[9];
+            var fpsVLE = decoded[10];
+            var vsyncVLE = decoded[11];
+            var picmipHasValue = decoded[12];
+            var picmipVLE = decoded[13];
+            var picmipNegative = decoded[14];
+            _glfinish = decoded[15];
+            _bicubic = decoded[16];
+            _retro = decoded[17];
+
+            if (afHasValue)
+            {
+                if (afVLE)
+                {
+                    _anisotropicFiltering = Tools.DecodeVarUInt(stream);
+                }
+                else
+                {
+                    buffer = new byte[sizeof(uint)];
+                    bufferRead = stream.Read(buffer, 0, buffer.Length);
+                    if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
+                    _anisotropicFiltering = BitConverter.ToUInt32(buffer);
+                }
+            }
+
+            if (battFpsHasValue)
+            {
+                if (battfpsVLE)
+                {
+                    _batteryFps = Tools.DecodeVarUInt(stream);
+                }
+                else
+                {
+                    buffer = new byte[sizeof(uint)];
+                    bufferRead = stream.Read(buffer, 0, buffer.Length);
+                    if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
+                    _batteryFps = BitConverter.ToUInt32(buffer);
+                }
+            }
+
+            if (fpsHasValue)
+            {
+                if (fpsVLE)
+                {
+                    _fps = Tools.DecodeVarUInt(stream);
+                }
+                else
+                {
+                    buffer = new byte[sizeof(uint)];
+                    bufferRead = stream.Read(buffer, 0, buffer.Length);
+                    if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
+                    _fps = BitConverter.ToUInt32(buffer);
+                }
+            }
+
+            if (vsyncHasValue)
+            {
+                if (vsyncVLE)
+                {
+                    _vSync = Tools.DecodeVarUInt(stream);
+                }
+                else
+                {
+                    buffer = new byte[sizeof(uint)];
+                    bufferRead = stream.Read(buffer, 0, buffer.Length);
+                    if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
+                    _vSync = BitConverter.ToUInt32(buffer);
+                }
+            }
+
+            if (!picmipHasValue) return;
+            if (picmipVLE)
+            {
+                _picmip = (int)((picmipNegative ? -1 : 1) * Tools.DecodeVarUInt(stream));
             }
             else
             {
-                buffer = new byte[sizeof(uint)];
+                buffer = new byte[sizeof(int)];
                 bufferRead = stream.Read(buffer, 0, buffer.Length);
                 if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
-                _anisotropicFiltering = BitConverter.ToUInt32(buffer);
+                _picmip = BitConverter.ToInt32(buffer);
             }
-        }
+        })
+    ];
 
-        if (battFpsHasValue)
-        {
-            if (battfpsVLE)
-            {
-                _batteryFps = Tools.DecodeVarUInt(stream);
-            }
-            else
-            {
-                buffer = new byte[sizeof(uint)];
-                bufferRead = stream.Read(buffer, 0, buffer.Length);
-                if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
-                _batteryFps = BitConverter.ToUInt32(buffer);
-            }
-        }
-
-        if (fpsHasValue)
-        {
-            if (fpsVLE)
-            {
-                _fps = Tools.DecodeVarUInt(stream);
-            }
-            else
-            {
-                buffer = new byte[sizeof(uint)];
-                bufferRead = stream.Read(buffer, 0, buffer.Length);
-                if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
-                _fps = BitConverter.ToUInt32(buffer);
-            }
-        }
-
-        if (vsyncHasValue)
-        {
-            if (vsyncVLE)
-            {
-                _vSync = Tools.DecodeVarUInt(stream);
-            }
-            else
-            {
-                buffer = new byte[sizeof(uint)];
-                bufferRead = stream.Read(buffer, 0, buffer.Length);
-                if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
-                _vSync = BitConverter.ToUInt32(buffer);
-            }
-        }
-
-        if (!picmipHasValue) return;
-        if (picmipVLE)
-        {
-            _picmip = (int)((picmipNegative ? -1 : 1) * Tools.DecodeVarUInt(stream));
-        }
-        else
-        {
-            buffer = new byte[sizeof(int)];
-            bufferRead = stream.Read(buffer, 0, buffer.Length);
-            if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
-            _picmip = BitConverter.ToInt32(buffer);
-        }
-    }
 
     public override void WriteSettings(Stream stream)
     {
+        base.WriteSettings(stream);
         stream.WriteByte(CurrentVersion);
         var buffer = Tools.PackBoolsToBytes(Settings);
         stream.Write(buffer);
@@ -260,6 +240,28 @@ public class StrangleConfig : GamerunConfigAbstract
             stream.Write(buffer);
         }
     }
+
+    public override bool[] Settings =>
+    [
+        Enabled,
+        VulkanOnly,
+        NoDlsym,
+        Trilinear,
+        AnisotropicFiltering > 0,
+        BatteryFPS > 0,
+        FPS > 0,
+        VSync > 0,
+        AnisotropicFiltering < Tools.VLEMaxSize,
+        BatteryFPS < Tools.VLEMaxSize,
+        FPS < Tools.VLEMaxSize,
+        VSync < Tools.VLEMaxSize,
+        PICMIP != 0,
+        Math.Abs(PICMIP) < Tools.VLEMaxSize,
+        PICMIP < 0,
+        GLFinish,
+        Bicubic,
+        Retro
+    ];
 
     public override event GamerunSettingSaveDelegate? OnSave;
 

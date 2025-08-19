@@ -34,228 +34,271 @@ public class GamescopeConfig : GamerunConfigAbstract
 
     public override byte CurrentVersion => 0;
 
-    public override void ReadSettings(Stream stream)
-    {
-        var bufferByte = stream.ReadByte();
-        if (bufferByte == -1) throw new GamerunEndOfStreamException(stream.Position);
-        if (bufferByte > CurrentVersion)
-            throw new GamerunVersionNotSupportedException(bufferByte, CurrentVersion, nameof(GamescopeConfig));
-        var buffer = new byte[(int)Math.Ceiling((double)Settings.Length / 8)];
-        var bufferRead = stream.Read(buffer);
-        if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
-        var decoded = Tools.UnpackBytesToBools(buffer, Settings.Length);
-        LinearUpscaling = decoded[0];
-        EnableHDR = decoded[1];
-        Enabled = decoded[2];
-        AdaptiveSync = decoded[3];
-        Composite = decoded[4];
-        ForceGrabCursor = decoded[5];
-        Debug = decoded[6];
-        Stats = decoded[7];
-        Timewarp = decoded[8];
-        VKDebugLayers = decoded[9];
-        Steam = decoded[10];
-        var OutputWidth_HasValue = decoded[11];
-        var OutputHeight_HasValue = decoded[12];
-        var InternalWidth_HasValue = decoded[13];
-        var InternalHeight_HasValue = decoded[14];
-        var NestedWidth_HasValue = decoded[15];
-        var NestedHeight_HasValue = decoded[16];
-        var XwaylandCount_HasValue = decoded[17];
-        var VulkanDevice_HasValue = decoded[18];
-        var HideCursorDelay_HasValue = decoded[19];
-        var OutputWidth_IsVLE = decoded[20];
-        var OutputHeight_IsVLE = decoded[21];
-        var InternalWidth_IsVLE = decoded[22];
-        var InternalHeight_IsVLE = decoded[23];
-        var NestedWidth_IsVLE = decoded[24];
-        var NestedHeight_IsVLE = decoded[25];
-        var XwaylandCount_IsVLE = decoded[26];
-        var VulkanDevice_IsVLE = decoded[27];
-        var HideCursorDelay_IsVLE = decoded[28];
-        var CursorPath_HasValue = decoded[29];
-        var AdditionalArgs_HasValue = decoded[30];
-        var CursorPath_IsVLE = decoded[31];
-        var AdditionalArgs_IsVLE = decoded[32];
+    public override GamerunConfigVersionPair[] Pairs =>
+    [
+        new(b =>
+            {
+                return b switch
+                {
+                    0 => true,
+                    _ => false
+                };
+            },
+            (decoded, stream) =>
+            {
+                byte[] buffer;
+                int bufferRead;
+                _linearUpscaling = decoded[0];
+                _hdrEnabled = decoded[1];
+                _enabled = decoded[2];
+                _adaptiveSync = decoded[3];
+                _composite = decoded[4];
+                _forceGrabCursor = decoded[5];
+                _debug = decoded[6];
+                _stats = decoded[7];
+                _timewarp = decoded[8];
+                _vkDebugLayers = decoded[9];
+                _steam = decoded[10];
+                var OutputWidth_HasValue = decoded[11];
+                var OutputHeight_HasValue = decoded[12];
+                var InternalWidth_HasValue = decoded[13];
+                var InternalHeight_HasValue = decoded[14];
+                var NestedWidth_HasValue = decoded[15];
+                var NestedHeight_HasValue = decoded[16];
+                var XwaylandCount_HasValue = decoded[17];
+                var VulkanDevice_HasValue = decoded[18];
+                var HideCursorDelay_HasValue = decoded[19];
+                var OutputWidth_IsVLE = decoded[20];
+                var OutputHeight_IsVLE = decoded[21];
+                var InternalWidth_IsVLE = decoded[22];
+                var InternalHeight_IsVLE = decoded[23];
+                var NestedWidth_IsVLE = decoded[24];
+                var NestedHeight_IsVLE = decoded[25];
+                var XwaylandCount_IsVLE = decoded[26];
+                var VulkanDevice_IsVLE = decoded[27];
+                var HideCursorDelay_IsVLE = decoded[28];
+                var CursorPath_HasValue = decoded[29];
+                var AdditionalArgs_HasValue = decoded[30];
+                var CursorPath_IsVLE = decoded[31];
+                var AdditionalArgs_IsVLE = decoded[32];
 
-        if (OutputWidth_HasValue)
-        {
-            if (OutputWidth_IsVLE)
-            {
-                _outputWidth = Tools.DecodeVarUInt(stream);
-            }
-            else
-            {
-                buffer = new byte[sizeof(uint)];
-                bufferRead = stream.Read(buffer, 0, buffer.Length);
-                if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
-                _outputWidth = BitConverter.ToUInt32(buffer);
-            }
-        }
+                if (OutputWidth_HasValue)
+                {
+                    if (OutputWidth_IsVLE)
+                    {
+                        _outputWidth = Tools.DecodeVarUInt(stream);
+                    }
+                    else
+                    {
+                        buffer = new byte[sizeof(uint)];
+                        bufferRead = stream.Read(buffer, 0, buffer.Length);
+                        if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
+                        _outputWidth = BitConverter.ToUInt32(buffer);
+                    }
+                }
 
-        if (OutputHeight_HasValue)
-        {
-            if (OutputHeight_IsVLE)
-            {
-                _outputHeight = Tools.DecodeVarUInt(stream);
-            }
-            else
-            {
-                buffer = new byte[sizeof(uint)];
-                bufferRead = stream.Read(buffer, 0, buffer.Length);
-                if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
-                _outputHeight = BitConverter.ToUInt32(buffer);
-            }
-        }
+                if (OutputHeight_HasValue)
+                {
+                    if (OutputHeight_IsVLE)
+                    {
+                        _outputHeight = Tools.DecodeVarUInt(stream);
+                    }
+                    else
+                    {
+                        buffer = new byte[sizeof(uint)];
+                        bufferRead = stream.Read(buffer, 0, buffer.Length);
+                        if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
+                        _outputHeight = BitConverter.ToUInt32(buffer);
+                    }
+                }
 
-        if (InternalWidth_HasValue)
-        {
-            if (InternalWidth_IsVLE)
-            {
-                _internalWidth = Tools.DecodeVarUInt(stream);
-            }
-            else
-            {
-                buffer = new byte[sizeof(uint)];
-                bufferRead = stream.Read(buffer, 0, buffer.Length);
-                if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
-                _internalWidth = BitConverter.ToUInt32(buffer);
-            }
-        }
+                if (InternalWidth_HasValue)
+                {
+                    if (InternalWidth_IsVLE)
+                    {
+                        _internalWidth = Tools.DecodeVarUInt(stream);
+                    }
+                    else
+                    {
+                        buffer = new byte[sizeof(uint)];
+                        bufferRead = stream.Read(buffer, 0, buffer.Length);
+                        if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
+                        _internalWidth = BitConverter.ToUInt32(buffer);
+                    }
+                }
 
-        if (InternalHeight_HasValue)
-        {
-            if (InternalHeight_IsVLE)
-            {
-                _internalHeight = Tools.DecodeVarUInt(stream);
-            }
-            else
-            {
-                buffer = new byte[sizeof(uint)];
-                bufferRead = stream.Read(buffer, 0, buffer.Length);
-                if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
-                _internalHeight = BitConverter.ToUInt32(buffer);
-            }
-        }
+                if (InternalHeight_HasValue)
+                {
+                    if (InternalHeight_IsVLE)
+                    {
+                        _internalHeight = Tools.DecodeVarUInt(stream);
+                    }
+                    else
+                    {
+                        buffer = new byte[sizeof(uint)];
+                        bufferRead = stream.Read(buffer, 0, buffer.Length);
+                        if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
+                        _internalHeight = BitConverter.ToUInt32(buffer);
+                    }
+                }
 
-        if (NestedWidth_HasValue)
-        {
-            if (NestedWidth_IsVLE)
-            {
-                _nestedWidth = Tools.DecodeVarUInt(stream);
-            }
-            else
-            {
-                buffer = new byte[sizeof(uint)];
-                bufferRead = stream.Read(buffer, 0, buffer.Length);
-                if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
-                _nestedWidth = BitConverter.ToUInt32(buffer);
-            }
-        }
+                if (NestedWidth_HasValue)
+                {
+                    if (NestedWidth_IsVLE)
+                    {
+                        _nestedWidth = Tools.DecodeVarUInt(stream);
+                    }
+                    else
+                    {
+                        buffer = new byte[sizeof(uint)];
+                        bufferRead = stream.Read(buffer, 0, buffer.Length);
+                        if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
+                        _nestedWidth = BitConverter.ToUInt32(buffer);
+                    }
+                }
 
-        if (NestedHeight_HasValue)
-        {
-            if (NestedHeight_IsVLE)
-            {
-                _nestedHeight = Tools.DecodeVarUInt(stream);
-            }
-            else
-            {
-                buffer = new byte[sizeof(uint)];
-                bufferRead = stream.Read(buffer, 0, buffer.Length);
-                if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
-                _nestedHeight = BitConverter.ToUInt32(buffer);
-            }
-        }
+                if (NestedHeight_HasValue)
+                {
+                    if (NestedHeight_IsVLE)
+                    {
+                        _nestedHeight = Tools.DecodeVarUInt(stream);
+                    }
+                    else
+                    {
+                        buffer = new byte[sizeof(uint)];
+                        bufferRead = stream.Read(buffer, 0, buffer.Length);
+                        if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
+                        _nestedHeight = BitConverter.ToUInt32(buffer);
+                    }
+                }
 
-        if (XwaylandCount_HasValue)
-        {
-            if (XwaylandCount_IsVLE)
-            {
-                _xwaylandCount = Tools.DecodeVarUInt(stream);
-            }
-            else
-            {
-                buffer = new byte[sizeof(uint)];
-                bufferRead = stream.Read(buffer, 0, buffer.Length);
-                if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
-                _xwaylandCount = BitConverter.ToUInt32(buffer);
-            }
-        }
+                if (XwaylandCount_HasValue)
+                {
+                    if (XwaylandCount_IsVLE)
+                    {
+                        _xwaylandCount = Tools.DecodeVarUInt(stream);
+                    }
+                    else
+                    {
+                        buffer = new byte[sizeof(uint)];
+                        bufferRead = stream.Read(buffer, 0, buffer.Length);
+                        if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
+                        _xwaylandCount = BitConverter.ToUInt32(buffer);
+                    }
+                }
 
-        if (VulkanDevice_HasValue)
-        {
-            if (VulkanDevice_IsVLE)
-            {
-                _vulkanDevice = Tools.DecodeVarUInt(stream);
-            }
-            else
-            {
-                buffer = new byte[sizeof(uint)];
-                bufferRead = stream.Read(buffer, 0, buffer.Length);
-                if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
-                _vulkanDevice = BitConverter.ToUInt32(buffer);
-            }
-        }
+                if (VulkanDevice_HasValue)
+                {
+                    if (VulkanDevice_IsVLE)
+                    {
+                        _vulkanDevice = Tools.DecodeVarUInt(stream);
+                    }
+                    else
+                    {
+                        buffer = new byte[sizeof(uint)];
+                        bufferRead = stream.Read(buffer, 0, buffer.Length);
+                        if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
+                        _vulkanDevice = BitConverter.ToUInt32(buffer);
+                    }
+                }
 
-        if (HideCursorDelay_HasValue)
-        {
-            if (HideCursorDelay_IsVLE)
-            {
-                _hideCursorDelay = Tools.DecodeVarUInt(stream);
-            }
-            else
-            {
-                buffer = new byte[sizeof(uint)];
-                bufferRead = stream.Read(buffer, 0, buffer.Length);
-                if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
-                _hideCursorDelay = BitConverter.ToUInt32(buffer);
-            }
-        }
+                if (HideCursorDelay_HasValue)
+                {
+                    if (HideCursorDelay_IsVLE)
+                    {
+                        _hideCursorDelay = Tools.DecodeVarUInt(stream);
+                    }
+                    else
+                    {
+                        buffer = new byte[sizeof(uint)];
+                        bufferRead = stream.Read(buffer, 0, buffer.Length);
+                        if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
+                        _hideCursorDelay = BitConverter.ToUInt32(buffer);
+                    }
+                }
 
-        if (CursorPath_HasValue)
-        {
-            int cursorPathSize;
-            if (CursorPath_IsVLE)
-            {
-                cursorPathSize = (int)Tools.DecodeVarUInt(stream);
-            }
-            else
-            {
-                buffer = new byte[sizeof(uint)];
+                if (CursorPath_HasValue)
+                {
+                    int cursorPathSize;
+                    if (CursorPath_IsVLE)
+                    {
+                        cursorPathSize = (int)Tools.DecodeVarUInt(stream);
+                    }
+                    else
+                    {
+                        buffer = new byte[sizeof(uint)];
+                        bufferRead = stream.Read(buffer);
+                        if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
+                        cursorPathSize = (int)BitConverter.ToUInt32(buffer);
+                    }
+
+                    buffer = new byte[cursorPathSize];
+                    bufferRead = stream.Read(buffer);
+                    if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
+                    _cursorPath = Encoding.UTF8.GetString(buffer);
+                }
+
+                if (!AdditionalArgs_HasValue) return;
+                int additionalArgsSize;
+                if (AdditionalArgs_IsVLE)
+                {
+                    additionalArgsSize = (int)Tools.DecodeVarUInt(stream);
+                }
+                else
+                {
+                    buffer = new byte[sizeof(uint)];
+                    bufferRead = stream.Read(buffer);
+                    if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
+                    additionalArgsSize = (int)BitConverter.ToUInt32(buffer);
+                }
+
+                buffer = new byte[additionalArgsSize];
                 bufferRead = stream.Read(buffer);
                 if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
-                cursorPathSize = (int)BitConverter.ToUInt32(buffer);
-            }
+                _additionalArgs = Encoding.UTF8.GetString(buffer);
+            })
+    ];
 
-            buffer = new byte[cursorPathSize];
-            bufferRead = stream.Read(buffer);
-            if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
-            _cursorPath = Encoding.UTF8.GetString(buffer);
-        }
-
-        if (!AdditionalArgs_HasValue) return;
-        int additionalArgsSize;
-        if (AdditionalArgs_IsVLE)
-        {
-            additionalArgsSize = (int)Tools.DecodeVarUInt(stream);
-        }
-        else
-        {
-            buffer = new byte[sizeof(uint)];
-            bufferRead = stream.Read(buffer);
-            if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
-            additionalArgsSize = (int)BitConverter.ToUInt32(buffer);
-        }
-
-        buffer = new byte[additionalArgsSize];
-        bufferRead = stream.Read(buffer);
-        if (bufferRead != buffer.Length) throw new GamerunEndOfStreamException(stream.Position);
-        _additionalArgs = Encoding.UTF8.GetString(buffer);
-    }
+    public override bool[] Settings =>
+    [
+        LinearUpscaling,
+        EnableHDR,
+        Enabled,
+        AdaptiveSync,
+        Composite,
+        ForceGrabCursor,
+        Debug,
+        Stats,
+        Timewarp,
+        VKDebugLayers,
+        Steam,
+        OutputWidth == 0,
+        OutputHeight == 0,
+        InternalWidth == 0,
+        InternalHeight == 0,
+        NestedWidth == 0,
+        NestedHeight == 0,
+        XwaylandCount == 0,
+        VulkanDevice == 0,
+        HideCursorDelay == 0,
+        OutputWidth < Tools.VLEMaxSize,
+        OutputHeight < Tools.VLEMaxSize,
+        InternalWidth < Tools.VLEMaxSize,
+        InternalHeight < Tools.VLEMaxSize,
+        NestedWidth < Tools.VLEMaxSize,
+        NestedHeight < Tools.VLEMaxSize,
+        XwaylandCount < Tools.VLEMaxSize,
+        VulkanDevice < Tools.VLEMaxSize,
+        HideCursorDelay < Tools.VLEMaxSize,
+        CursorPath.Length > 0,
+        AdditionalArgs.Length > 0,
+        Encoding.UTF8.GetByteCount(CursorPath) < Tools.VLEMaxSize,
+        Encoding.UTF8.GetByteCount(AdditionalArgs) < Tools.VLEMaxSize
+    ];
 
     public override void WriteSettings(Stream stream)
     {
+        base.WriteSettings(stream);
         stream.WriteByte(CurrentVersion);
         var buffer = Tools.PackBoolsToBytes(Settings);
         stream.Write(buffer);
@@ -549,43 +592,6 @@ public class GamescopeConfig : GamerunConfigAbstract
     private UpscalerFilter? _filter;
     private Backend? _backend;
     private FullscreenMode? _fullscreenMode;
-
-    private bool[] Settings =>
-    [
-        LinearUpscaling,
-        EnableHDR,
-        Enabled,
-        AdaptiveSync,
-        Composite,
-        ForceGrabCursor,
-        Debug,
-        Stats,
-        Timewarp,
-        VKDebugLayers,
-        Steam,
-        OutputWidth == 0,
-        OutputHeight == 0,
-        InternalWidth == 0,
-        InternalHeight == 0,
-        NestedWidth == 0,
-        NestedHeight == 0,
-        XwaylandCount == 0,
-        VulkanDevice == 0,
-        HideCursorDelay == 0,
-        OutputWidth < Tools.VLEMaxSize,
-        OutputHeight < Tools.VLEMaxSize,
-        InternalWidth < Tools.VLEMaxSize,
-        InternalHeight < Tools.VLEMaxSize,
-        NestedWidth < Tools.VLEMaxSize,
-        NestedHeight < Tools.VLEMaxSize,
-        XwaylandCount < Tools.VLEMaxSize,
-        VulkanDevice < Tools.VLEMaxSize,
-        HideCursorDelay < Tools.VLEMaxSize,
-        CursorPath.Length > 0,
-        AdditionalArgs.Length > 0,
-        Encoding.UTF8.GetByteCount(CursorPath) < Tools.VLEMaxSize,
-        Encoding.UTF8.GetByteCount(AdditionalArgs) < Tools.VLEMaxSize
-    ];
 
     #endregion PRIVATES
 

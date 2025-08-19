@@ -1,0 +1,82 @@
+name: Gamerun Publish
+on:
+  push:
+    branches:
+      - main
+  workflow_run:
+    workflows: [Build]
+    types: [completed]
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        runtime: [linux-x64, linux-musl-x64, linux-arm64, linux-musl-arm64]
+        projects: [./Gamerun/Gamerun.csproj, ./Gamerun.Editor/Gamerun.Editor.csproj]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4.1.0
+        with:
+          dotnet-version: 8.0.x
+      - name: Setup DEB822 Repos
+        run: |
+          if [[ $ImageOS == "ubuntu24" ]]; then
+            cat <<EOF > deb822sources
+          Types: deb
+          URIs: https://archive.ubuntu.com/ubuntu/
+          Suites: noble
+          Components: main restricted universe
+          Architectures: amd64
+
+          Types: deb
+          URIs: https://security.ubuntu.com/ubuntu/
+          Suites: noble-security
+          Components: main restricted universe
+          Architectures: amd64
+
+          Types: deb
+          URIs: https://archive.ubuntu.com/ubuntu/
+          Suites: noble-updates
+          Components: main restricted universe
+          Architectures: amd64
+
+          Types: deb
+          URIs: https://azure.ports.ubuntu.com/ubuntu-ports/
+          Suites: noble
+          Components: main restricted multiverse universe
+          Architectures: arm64
+
+          Types: deb
+          URIs: https://azure.ports.ubuntu.com/ubuntu-ports/
+          Suites: noble-updates
+          Components: main restricted multiverse universe
+          Architectures: arm64
+          EOF
+
+            sudo mv deb822sources /etc/apt/sources.list.d/ubuntu.sources
+          else
+            sudo mv config/crosscomp-sources.list /etc/apt/sources.list
+          fi
+
+      - name: Add ARM64
+        run: |
+          sudo dpkg --add-architecture arm64
+
+      - name: Update System
+        run: |
+          sudo apt update
+          sudo apt upgrade -y
+      - name: Install Dependencies
+        run: sudo apt install clang llvm zlib1g-dev:arm64 zlib1g-dev gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu -y
+      - name: Restore dependencies
+        run: dotnet restore
+      - name: Publish
+        run: |
+          dotnet publish -c Release -r ${{ matrix.runtime }} -o ./publish/${{ matrix.runtime }}/ ${{ matrix.projects }}
+          tar czf ./publish/gamerun-${{ matrix.runtime }}.tar.gz ./publish/${{ matrix.runtime }}/
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Gamerun-${{ matrix.runtime }}
+          path: ./publish/gamerun-${{ matrix.runtime }}.tar.gz
