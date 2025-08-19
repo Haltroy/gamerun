@@ -75,7 +75,7 @@ jobs:
                 echo "x64 detected. NO need to install these."
                 exit 0
             fi
-             zlib1g-dev:arm64 zlib1g-dev gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu -y
+             sudo apt install zlib1g-dev:arm64 zlib1g-dev gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu -y
       - name: Restore dependencies
         run: dotnet restore
       - name: Publish
