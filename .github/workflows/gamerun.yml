@@ -38,6 +38,8 @@ jobs:
       contents: read
       security-events: write
     steps:
+      - uses: kachick/wait-other-jobs@v3.8.1
+        timeout-minutes: 15
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -52,6 +54,8 @@ jobs:
     if: ${{ success() }}
     runs-on: ubuntu-latest
     steps:
+      - uses: kachick/wait-other-jobs@v3.8.1
+        timeout-minutes: 15
       - uses: actions/checkout@v4
       - name: Setup .NET
         uses: actions/setup-dotnet@v4.1.0
@@ -71,6 +75,8 @@ jobs:
       matrix:
         runtime: [linux-x64, linux-musl-x64, linux-arm64, linux-musl-arm64]
     steps:
+      - uses: kachick/wait-other-jobs@v3.8.1
+        timeout-minutes: 15
       - uses: actions/checkout@v4
       - name: Setup .NET
         uses: actions/setup-dotnet@v4.3.1
@@ -122,7 +128,7 @@ jobs:
       - name: Update System
         run: |
           sudo apt update
-          sudo apt upgrade -y
+          sudo apt upgrade -y --no-upgr
       - name: Install libs
         run:  sudo apt install clang llvm -y
       - name: Install Cross-compile libs
@@ -156,6 +162,8 @@ jobs:
         runtime: [linux-x64, linux-arm64]
 
     steps:
+      - uses: kachick/wait-other-jobs@v3.8.1
+        timeout-minutes: 15
       - name: Checkout repository
         uses: actions/checkout@v4
 
