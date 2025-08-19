@@ -7,7 +7,30 @@ on:
     branches: ["main"]
 
 jobs:
+  analyze:
+    name: Analyze
+    runs-on:  ubuntu-latest
+    permissions:
+      security-events: write
+      packages: read
+      actions: read
+      contents: read
+    strategy:
+      fail-fast: false
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3
+      with:
+        languages: csharp
+        build-mode: autobuild
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
+      with:
+        category: "/language:csharp"
   lint:
+    if: ${{ success() }}
     name: DevSkim
     runs-on: ubuntu-latest
     permissions:
@@ -41,7 +64,8 @@ jobs:
       - name: Build (Editor)
         run: dotnet build --no-restore ./Gamerun.Editor/Gamerun.Editor.csproj
   publish:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && success()
+    if: ${{ success() }}
+    #if: github.event_name == 'push' && github.ref == 'refs/heads/main' && success()
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -124,24 +148,14 @@ jobs:
           name: Gamerun-${{ matrix.runtime }}
           path: ./publish/gamerun-${{ matrix.runtime }}.tar.gz
   package:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && success()
+    if: ${{ success() }}
+    #if: github.event_name == 'push' && github.ref == 'refs/heads/main' && success()
     runs-on: ubuntu-latest
     strategy:
       matrix:
         runtime: [linux-x64, linux-arm64]
 
     steps:
-      - name: Wait for Workflow Action
-        uses: kamilchodola/wait-for-workflow-action@1.1.0
-        with:
-                GITHUB_TOKEN: ${{ secrets.REPOSITORY_DISPATCH_TOKEN }}
-                workflow_id: 'publish.yml'
-                max_wait_minutes: '10'
-                interval: '5'
-                timeout: '60'
-                org_name: 'haltroy'
-                repo_name: 'gamerun'
-                ref: '${{ github.ref }}'
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -171,10 +185,8 @@ jobs:
 
       - name: Extract tar.gz artifacts
         run: |
-          mkdir -p extracted/Gamerun
-          mkdir -p extracted/Gamerun.Editor
-          tar -xzf artifacts/Gamerun.tar.gz -C extracted/Gamerun
-          tar -xzf artifacts/Gamerun.Editor.tar.gz -C extracted/Gamerun.Editor
+          mkdir -p extracted/
+          tar -xzf artifacts/gamerun-${{ matrix.runtime }}.tar.gz -C extracted/
 
       - name: Install fpm
         run: |
@@ -188,12 +200,12 @@ jobs:
           mkdir -p pkgroot/usr/lib/gamerun
 
           # Copy Gamerun executable
-          cp extracted/Gamerun/Gamerun pkgroot/usr/bin/
+          cp extracted/gamerun pkgroot/usr/bin/
           chmod +x pkgroot/usr/bin/gamerun
 
           # Copy Gamerun-editor + dlls
-          cp extracted/Gamerun.Editor/gamerun-editor pkgroot/usr/lib/gamerun/
-          cp extracted/Gamerun.Editor/*.so pkgroot/usr/lib/gamerun/
+          cp extracted/gamerun-editor pkgroot/usr/lib/gamerun/
+          cp extracted/*.so pkgroot/usr/lib/gamerun/
           chmod +x pkgroot/usr/lib/gamerun/gamerun-editor
 
           # Wrapper script
