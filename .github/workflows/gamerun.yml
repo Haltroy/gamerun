@@ -154,7 +154,7 @@ jobs:
       - name: Update System
         run: |
           sudo apt update
-          sudo apt upgrade -y --no-upgr
+          sudo apt upgrade -y --no-upgrade firefox
       - name: Install libs
         run:  sudo apt install clang llvm -y
       - name: Install Cross-compile libs
