@@ -69,10 +69,6 @@ jobs:
                 [
                     {
                         "workflowFile": "gamerun.yml",
-                        "jobName": "analyze"
-                    },
-                    {
-                        "workflowFile": "gamerun.yml",
                         "jobName": "lint"
                     }
                 ]
@@ -100,14 +96,6 @@ jobs:
         with:
             wait-list: |
                 [
-                    {
-                        "workflowFile": "gamerun.yml",
-                        "jobName": "analyze"
-                    },
-                    {
-                        "workflowFile": "gamerun.yml",
-                        "jobName": "lint"
-                    },
                     {
                         "workflowFile": "gamerun.yml",
                         "jobName": "build"
@@ -205,18 +193,7 @@ jobs:
                 [
                     {
                         "workflowFile": "gamerun.yml",
-                        "jobName": "analyze"
-                    },
-                    {
-                        "workflowFile": "gamerun.yml",
-                        "jobName": "lint"
-                    },
-                    {
-                        "workflowFile": "gamerun.yml",
-                        "jobName": "build"
-                    },
-                    {
-                        "workflowFile": "gamerun.yml",
+                        "jobMatchMode": "prefix",
                         "jobName": "publish"
                     }
                 ]
