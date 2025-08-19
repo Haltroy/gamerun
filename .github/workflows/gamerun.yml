@@ -74,7 +74,7 @@ jobs:
                     {
                         "workflowFile": "gamerun.yml",
                         "jobName": "lint"
-                    },
+                    }
                 ]
       - uses: actions/checkout@v4
       - name: Setup .NET
