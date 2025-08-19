@@ -72,7 +72,7 @@ jobs:
       - name: Install Cross-compile libs
         run: |
             if [[ ${{ matrix.runtime }} = "linux-x64" || ${{ matrix.runtime }} = "linux-musl-x64" ]]; then
-                echo "x64 detected. NO need to install these."
+                echo "x64 detected. No need to install these."
                 exit 0
             fi
              sudo apt install zlib1g-dev:arm64 zlib1g-dev gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu -y
@@ -81,7 +81,7 @@ jobs:
       - name: Publish
         run: |
           if [[ ${{ matrix.runtime }} = "linux-arm64" || ${{ matrix.runtime }} = "linux-musl-arm64" ]]; then
-             ADDITONAL_LINKER_ARGS=-p:LinkerFlavor=lld -p:ObjCopyName=$OBJCOPY
+             ADDITONAL_LINKER_ARGS="-p:LinkerFlavor=lld -p:ObjCopyName=\$OBJCOPY"
           fi
           dotnet publish -c Release -r $ADDITONAL_LINKER_ARGS ${{ matrix.runtime }} -o ./publish/${{ matrix.runtime }}/ ./Gamerun/Gamerun.csproj
           dotnet publish -c Release -r $ADDITONAL_LINKER_ARGS ${{ matrix.runtime }} -o ./publish/${{ matrix.runtime }}/ ./Gamerun.Editor/Gamerun.Editor.csproj
