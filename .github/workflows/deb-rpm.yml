@@ -1,10 +1,9 @@
-name: Package Distributions
+name: Package
 
 on:
   workflow_run:
-    workflows: ["Publish"]
-    types:
-      - completed
+    workflows: [Publish]
+    types: [Completed]
 
 jobs:
   package:
@@ -58,23 +57,23 @@ jobs:
       - name: Prepare package layout
         run: |
           mkdir -p pkgroot/usr/bin
-          mkdir -p pkgroot/usr/lib/Gamerun
+          mkdir -p pkgroot/usr/lib/gamerun
 
           # Copy Gamerun executable
           cp extracted/Gamerun/Gamerun pkgroot/usr/bin/
-          chmod +x pkgroot/usr/bin/Gamerun
+          chmod +x pkgroot/usr/bin/gamerun
 
           # Copy Gamerun-editor + dlls
-          cp extracted/Gamerun.Editor/Gamerun-editor pkgroot/usr/lib/Gamerun/
-          cp extracted/Gamerun.Editor/*.dll pkgroot/usr/lib/Gamerun/
-          chmod +x pkgroot/usr/lib/Gamerun/Gamerun-editor
+          cp extracted/Gamerun.Editor/gamerun-editor pkgroot/usr/lib/gamerun/
+          cp extracted/Gamerun.Editor/*.so pkgroot/usr/lib/gamerun/
+          chmod +x pkgroot/usr/lib/gamerun/gamerun-editor
 
           # Wrapper script
-          cat <<'EOF' > pkgroot/usr/bin/Gamerun-editor
+          cat <<'EOF' > pkgroot/usr/bin/gamerun-editor
           #!/bin/sh
-          exec /usr/lib/Gamerun/Gamerun-editor "$@"
+          exec /usr/lib/gamerun/gamerun-editor "$@"
           EOF
-          chmod +x pkgroot/usr/bin/Gamerun-editor
+          chmod +x pkgroot/usr/bin/gamerun-editor
 
       - name: Build .deb and .rpm
         run: |
