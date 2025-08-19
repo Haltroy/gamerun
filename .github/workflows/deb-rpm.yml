@@ -12,13 +12,23 @@ on:
 
 jobs:
   package:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
         runtime: [linux-x64, linux-arm64]
 
     steps:
+      - name: Wait for Workflow Action
+        uses: kamilchodola/wait-for-workflow-action@1.1.0
+        with:
+                GITHUB_TOKEN: ${{ secrets.REPOSITORY_DISPATCH_TOKEN }}
+                workflow_id: 'publish.yml'
+                max_wait_minutes: '10'
+                interval: '5'
+                timeout: '60'
+                org_name: 'haltroy'
+                repo_name: 'gamerun'
+                ref: '${{ github.ref }}'
       - name: Checkout repository
         uses: actions/checkout@v4
 
