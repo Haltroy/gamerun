@@ -86,8 +86,7 @@ jobs:
         run: dotnet build --no-restore ./Gamerun.Editor/Gamerun.Editor.csproj
   publish:
     name: Publish
-    if: ${{ success() }}
-    #if: github.event_name == 'push' && github.ref == 'refs/heads/main' && success()
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && success()
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -180,8 +179,7 @@ jobs:
           name: Gamerun-${{ matrix.runtime }}
           path: ./publish/gamerun-${{ matrix.runtime }}.tar.gz
   package:
-    if: ${{ success() }}
-    #if: github.event_name == 'push' && github.ref == 'refs/heads/main' && success()
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && success()
     runs-on: ubuntu-latest
     strategy:
       matrix:
