@@ -6,8 +6,9 @@ on:
   pull_request:
     branches: ["main"]
   workflow_run:
-    workflows: ['devskim']
-    types: ['completed']
+    workflows: ['DevSkim']
+    types:
+      - completed
 
 jobs:
   build:

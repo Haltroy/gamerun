@@ -6,8 +6,9 @@ on:
   pull_request:
     branches: ["main"]
   workflow_run:
-    workflows: ['build']
-    types: ['completed']
+    workflows: ['Build']
+    types:
+      - completed
 jobs:
   publish:
     runs-on: ubuntu-latest
