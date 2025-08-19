@@ -1,0 +1,219 @@
+name: Gamerun
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  lint:
+    name: DevSkim
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run DevSkim scanner
+        uses: microsoft/DevSkim-Action@v1
+
+      - name: Upload DevSkim scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: devskim-results.sarif
+  build:
+    if: ${{ success() }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4.1.0
+        with:
+          dotnet-version: 8.0.x
+      - name: Restore dependencies
+        run: dotnet restore
+      - name: Build (CLI & Daemon)
+        run: dotnet build --no-restore ./Gamerun/Gamerun.csproj
+      - name: Build (Editor)
+        run: dotnet build --no-restore ./Gamerun.Editor/Gamerun.Editor.csproj
+  publish:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && success()
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        runtime: [linux-x64, linux-musl-x64, linux-arm64, linux-musl-arm64]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4.3.1
+        with:
+          dotnet-version: 8.0.x
+      - name: Setup ARM Cross-compile
+        run: |
+          if [[ ${{ matrix.runtime }} = "linux-x64" || ${{ matrix.runtime }} = "linux-musl-x64" ]]; then
+            echo "x64 detected. No need to set these."
+            exit 0
+          fi
+          if [[ $ImageOS == "ubuntu24" ]]; then
+            cat <<EOF > deb822sources
+          Types: deb
+          URIs: https://archive.ubuntu.com/ubuntu/
+          Suites: noble
+          Components: main restricted universe
+          Architectures: amd64
+
+          Types: deb
+          URIs: https://security.ubuntu.com/ubuntu/
+          Suites: noble-security
+          Components: main restricted universe
+          Architectures: amd64
+
+          Types: deb
+          URIs: https://archive.ubuntu.com/ubuntu/
+          Suites: noble-updates
+          Components: main restricted universe
+          Architectures: amd64
+
+          Types: deb
+          URIs: https://azure.ports.ubuntu.com/ubuntu-ports/
+          Suites: noble
+          Components: main restricted multiverse universe
+          Architectures: arm64
+
+          Types: deb
+          URIs: https://azure.ports.ubuntu.com/ubuntu-ports/
+          Suites: noble-updates
+          Components: main restricted multiverse universe
+          Architectures: arm64
+          EOF
+            sudo mv deb822sources /etc/apt/sources.list.d/ubuntu.sources
+          else
+            sudo mv config/crosscomp-sources.list /etc/apt/sources.list
+          fi
+          sudo dpkg --add-architecture arm64
+      - name: Update System
+        run: |
+          sudo apt update
+          sudo apt upgrade -y
+      - name: Install libs
+        run:  sudo apt install clang llvm -y
+      - name: Install Cross-compile libs
+        run: |
+            if [[ ${{ matrix.runtime }} = "linux-x64" || ${{ matrix.runtime }} = "linux-musl-x64" ]]; then
+                echo "x64 detected. No need to install these."
+                exit 0
+            fi
+             sudo apt install zlib1g-dev:arm64 zlib1g-dev gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu -y
+      - name: Restore dependencies
+        run: dotnet restore
+      - name: Publish
+        run: |
+          if [[ ${{ matrix.runtime }} = "linux-arm64" || ${{ matrix.runtime }} = "linux-musl-arm64" ]]; then
+             ADDITONAL_LINKER_ARGS="-p:LinkerFlavor=lld -p:ObjCopyName=aarch64-linux-gnu-objcopy"
+          fi
+          dotnet publish -c Release -r ${{ matrix.runtime }} $ADDITONAL_LINKER_ARGS -o ./publish/${{ matrix.runtime }}/ ./Gamerun/Gamerun.csproj
+          dotnet publish -c Release -r ${{ matrix.runtime }} $ADDITONAL_LINKER_ARGS -o ./publish/${{ matrix.runtime }}/ ./Gamerun.Editor/Gamerun.Editor.csproj
+          tar czf ./publish/gamerun-${{ matrix.runtime }}.tar.gz ./publish/${{ matrix.runtime }}/
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Gamerun-${{ matrix.runtime }}
+          path: ./publish/gamerun-${{ matrix.runtime }}.tar.gz
+  package:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && success()
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        runtime: [linux-x64, linux-arm64]
+
+    steps:
+      - name: Wait for Workflow Action
+        uses: kamilchodola/wait-for-workflow-action@1.1.0
+        with:
+                GITHUB_TOKEN: ${{ secrets.REPOSITORY_DISPATCH_TOKEN }}
+                workflow_id: 'publish.yml'
+                max_wait_minutes: '10'
+                interval: '5'
+                timeout: '60'
+                org_name: 'haltroy'
+                repo_name: 'gamerun'
+                ref: '${{ github.ref }}'
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          name: Gamerun-${{ matrix.runtime }}
+
+      - name: Map .NET runtime to package architecture
+        id: arch
+        run: |
+          case "${{ matrix.runtime }}" in
+            linux-x64|linux-musl-x64)
+              echo "deb_arch=amd64" >> $GITHUB_OUTPUT
+              echo "rpm_arch=x86_64" >> $GITHUB_OUTPUT
+              ;;
+            linux-arm64|linux-musl-arm64)
+              echo "deb_arch=arm64" >> $GITHUB_OUTPUT
+              echo "rpm_arch=aarch64" >> $GITHUB_OUTPUT
+              ;;
+            *)
+              echo "Unknown runtime: ${{ matrix.runtime }}"
+              exit 1
+              ;;
+          esac
+
+      - name: Extract tar.gz artifacts
+        run: |
+          mkdir -p extracted/Gamerun
+          mkdir -p extracted/Gamerun.Editor
+          tar -xzf artifacts/Gamerun.tar.gz -C extracted/Gamerun
+          tar -xzf artifacts/Gamerun.Editor.tar.gz -C extracted/Gamerun.Editor
+
+      - name: Install fpm
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ruby ruby-dev gcc make rpm
+          sudo gem install --no-document fpm
+
+      - name: Prepare package layout
+        run: |
+          mkdir -p pkgroot/usr/bin
+          mkdir -p pkgroot/usr/lib/gamerun
+
+          # Copy Gamerun executable
+          cp extracted/Gamerun/Gamerun pkgroot/usr/bin/
+          chmod +x pkgroot/usr/bin/gamerun
+
+          # Copy Gamerun-editor + dlls
+          cp extracted/Gamerun.Editor/gamerun-editor pkgroot/usr/lib/gamerun/
+          cp extracted/Gamerun.Editor/*.so pkgroot/usr/lib/gamerun/
+          chmod +x pkgroot/usr/lib/gamerun/gamerun-editor
+
+          # Wrapper script
+          cat <<'EOF' > pkgroot/usr/bin/gamerun-editor
+          #!/bin/sh
+          exec /usr/lib/gamerun/gamerun-editor "$@"
+          EOF
+          chmod +x pkgroot/usr/bin/gamerun-editor
+
+      - name: Build .deb and .rpm
+        run: |
+          VERSION=1.0.0
+          ARCH=${{ steps.arch.outputs.deb_arch }}
+          PKGNAME="Gamerun-${ARCH}"
+
+          fpm -s dir -t deb -n "$PKGNAME" -v $VERSION -a ${{ steps.arch.outputs.deb_arch }} -C pkgroot .
+          fpm -s dir -t rpm -n "$PKGNAME" -v $VERSION -a ${{ steps.arch.outputs.rpm_arch }} -C pkgroot .
+
+      - name: Upload packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: packages-${{ matrix.runtime }}
+          path: ./*.{deb,rpm}
