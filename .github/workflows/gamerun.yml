@@ -40,13 +40,14 @@ jobs:
     steps:
       - uses: kachick/wait-other-jobs@v3.8.1
         timeout-minutes: 15
-        wait-list: |
-          [
-              {
-                "workflowFile": "gamerun.yml",
-                "jobName": "analyze"
-              }
-          ]
+        with:
+            wait-list: |
+            [
+                {
+                    "workflowFile": "gamerun.yml",
+                    "jobName": "analyze"
+                }
+            ]
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -63,17 +64,18 @@ jobs:
     steps:
       - uses: kachick/wait-other-jobs@v3.8.1
         timeout-minutes: 15
-        wait-list: |
-          [
-              {
-                "workflowFile": "gamerun.yml",
-                "jobName": "analyze"
-              },
-              {
-                "workflowFile": "gamerun.yml",
-                "jobName": "lint"
-              },
-          ]
+        with:
+            wait-list: |
+            [
+                {
+                    "workflowFile": "gamerun.yml",
+                    "jobName": "analyze"
+                },
+                {
+                    "workflowFile": "gamerun.yml",
+                    "jobName": "lint"
+                },
+            ]
       - uses: actions/checkout@v4
       - name: Setup .NET
         uses: actions/setup-dotnet@v4.1.0
@@ -95,21 +97,22 @@ jobs:
     steps:
       - uses: kachick/wait-other-jobs@v3.8.1
         timeout-minutes: 15
-        wait-list: |
-          [
-              {
-                "workflowFile": "gamerun.yml",
-                "jobName": "analyze"
-              },
-              {
-                "workflowFile": "gamerun.yml",
-                "jobName": "lint"
-              },
-              {
-                "workflowFile": "gamerun.yml",
-                "jobName": "build"
-              }
-          ]
+        with:
+            wait-list: |
+            [
+                {
+                    "workflowFile": "gamerun.yml",
+                    "jobName": "analyze"
+                },
+                {
+                    "workflowFile": "gamerun.yml",
+                    "jobName": "lint"
+                },
+                {
+                    "workflowFile": "gamerun.yml",
+                    "jobName": "build"
+                }
+            ]
       - uses: actions/checkout@v4
       - name: Setup .NET
         uses: actions/setup-dotnet@v4.3.1
@@ -197,25 +200,26 @@ jobs:
     steps:
       - uses: kachick/wait-other-jobs@v3.8.1
         timeout-minutes: 15
-        wait-list: |
-          [
-              {
-                "workflowFile": "gamerun.yml",
-                "jobName": "analyze"
-              },
-              {
-                "workflowFile": "gamerun.yml",
-                "jobName": "lint"
-              },
-              {
-                "workflowFile": "gamerun.yml",
-                "jobName": "build"
-              },
-              {
-                "workflowFile": "gamerun.yml",
-                "jobName": "publish"
-              }
-          ]
+        with:
+            wait-list: |
+            [
+                {
+                    "workflowFile": "gamerun.yml",
+                    "jobName": "analyze"
+                },
+                {
+                    "workflowFile": "gamerun.yml",
+                    "jobName": "lint"
+                },
+                {
+                    "workflowFile": "gamerun.yml",
+                    "jobName": "build"
+                },
+                {
+                    "workflowFile": "gamerun.yml",
+                    "jobName": "publish"
+                }
+            ]
       - name: Checkout repository
         uses: actions/checkout@v4
 
