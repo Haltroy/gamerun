@@ -17,11 +17,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4.1.0
+        uses: actions/setup-dotnet@v4.3.1
         with:
           dotnet-version: 8.0.x
-      - name: Setup DEB822 Repos
+      - name: Setup ARM Cross-compile
         run: |
+          if [[ ${{ matrix.runtime }} = "linux-x64" || ${{ matrix.runtime }} = "linux-musl-x64" ]]; then
+            echo "x64 detected. No need to set these."
+            exit 0
+          fi
           if [[ $ImageOS == "ubuntu24" ]]; then
             cat <<EOF > deb822sources
           Types: deb
@@ -58,22 +62,29 @@ jobs:
           else
             sudo mv config/crosscomp-sources.list /etc/apt/sources.list
           fi
-      - name: Add ARM64
-        run: |
           sudo dpkg --add-architecture arm64
       - name: Update System
         run: |
           sudo apt update
           sudo apt upgrade -y
-      - name: Install Dependencies
-        run: sudo apt install clang llvm zlib1g-dev:arm64 zlib1g-dev gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu -y
-      # Linux ARM64
+      - name: Install libs
+        run:  sudo apt install clang llvm -y
+      - name: Install Cross-compile libs
+        run: |
+            if [[ ${{ matrix.runtime }} = "linux-x64" || ${{ matrix.runtime }} = "linux-musl-x64" ]]; then
+                echo "x64 detected. NO need to install these."
+                exit 0
+            fi
+             zlib1g-dev:arm64 zlib1g-dev gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu -y
       - name: Restore dependencies
         run: dotnet restore
       - name: Publish
         run: |
-          dotnet publish -c Release -r ${{ matrix.runtime }} -o ./publish/${{ matrix.runtime }}/ ./Gamerun/Gamerun.csproj
-          dotnet publish -c Release -r ${{ matrix.runtime }} -o ./publish/${{ matrix.runtime }}/ ./Gamerun.Editor/Gamerun.Editor.csproj
+          if [[ ${{ matrix.runtime }} = "linux-arm64" || ${{ matrix.runtime }} = "linux-musl-arm64" ]]; then
+             ADDITONAL_LINKER_ARGS=-p:LinkerFlavor=lld -p:ObjCopyName=$OBJCOPY
+          fi
+          dotnet publish -c Release -r $ADDITONAL_LINKER_ARGS ${{ matrix.runtime }} -o ./publish/${{ matrix.runtime }}/ ./Gamerun/Gamerun.csproj
+          dotnet publish -c Release -r $ADDITONAL_LINKER_ARGS ${{ matrix.runtime }} -o ./publish/${{ matrix.runtime }}/ ./Gamerun.Editor/Gamerun.Editor.csproj
           tar czf ./publish/gamerun-${{ matrix.runtime }}.tar.gz ./publish/${{ matrix.runtime }}/
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
