@@ -302,5 +302,17 @@ namespace Gamerun.Shared.Translations {
                 return ResourceManager.GetString("GamerunEditorTitle", resourceCulture);
             }
         }
+        
+        public static string ExceptionConfigVersion1 {
+            get {
+                return ResourceManager.GetString("ExceptionConfigVersion1", resourceCulture);
+            }
+        }
+        
+        public static string ExceptionConfigVersion2 {
+            get {
+                return ResourceManager.GetString("ExceptionConfigVersion2", resourceCulture);
+            }
+        }
     }
 }

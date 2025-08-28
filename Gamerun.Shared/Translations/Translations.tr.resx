@@ -138,4 +138,10 @@
     <data name="GamerunEditorTitle" xml:space="preserve">
         <value>Gamerun Düzenleyicisi</value>
     </data>
+    <data name="ExceptionConfigVersion2" xml:space="preserve">
+        <value>Ayar \"{0}\", {2} sürümünü desteklemiyor ve {1} sürümü ve sonrak isürümleri destekliyor.</value>
+    </data>
+    <data name="ExceptionConfigVersion1" xml:space="preserve">
+        <value>Ayar \"{0}\", {1} sürümünde ama dosya {2} sürümünde. Lütfen Gamerun kurulumunuzu güncelleyin.</value>
+    </data>
 </root>

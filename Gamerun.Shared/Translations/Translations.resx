@@ -153,4 +153,10 @@
     <data name="GamerunEditorTitle" xml:space="preserve">
         <value>Gamerun Editor</value>
     </data>
+    <data name="ExceptionConfigVersion1" xml:space="preserve">
+        <value>Configuration \"{0}\" is on version {1} while the file is on version {2}. Please update your Gamerun installations.</value>
+    </data>
+    <data name="ExceptionConfigVersion2" xml:space="preserve">
+        <value>Configuration \"{0}\" does not support version {2} and support version {1} and onwards.</value>
+    </data>
 </root>

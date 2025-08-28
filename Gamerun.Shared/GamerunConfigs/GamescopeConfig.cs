@@ -7,6 +7,7 @@ namespace Gamerun.Shared;
 
 public class GamescopeConfig : GamerunConfigAbstract
 {
+    #region OVERRIDES
     public override bool IsDefaults => _outputWidth == null &&
                                        _outputHeight == null &&
                                        _internalWidth == null &&
@@ -564,6 +565,8 @@ public class GamescopeConfig : GamerunConfigAbstract
     }
 
     public override event GamerunSettingSaveDelegate? OnSave;
+    
+    #endregion OVERRIDES
 
     #region PRIVATES
 
