@@ -8,6 +8,7 @@ namespace Gamerun.Shared;
 public class GamescopeConfig : GamerunConfigAbstract
 {
     #region OVERRIDES
+
     public override bool IsDefaults => _outputWidth == null &&
                                        _outputHeight == null &&
                                        _internalWidth == null &&
@@ -273,15 +274,15 @@ public class GamescopeConfig : GamerunConfigAbstract
         Timewarp,
         VKDebugLayers,
         Steam,
-        OutputWidth == 0,
-        OutputHeight == 0,
-        InternalWidth == 0,
-        InternalHeight == 0,
-        NestedWidth == 0,
-        NestedHeight == 0,
-        XwaylandCount == 0,
-        VulkanDevice == 0,
-        HideCursorDelay == 0,
+        OutputWidth != 0,
+        OutputHeight != 0,
+        InternalWidth != 0,
+        InternalHeight != 0,
+        NestedWidth != 0,
+        NestedHeight != 0,
+        XwaylandCount != 0,
+        VulkanDevice != 0,
+        HideCursorDelay != 0,
         OutputWidth < Tools.VLEMaxSize,
         OutputHeight < Tools.VLEMaxSize,
         InternalWidth < Tools.VLEMaxSize,
@@ -291,8 +292,8 @@ public class GamescopeConfig : GamerunConfigAbstract
         XwaylandCount < Tools.VLEMaxSize,
         VulkanDevice < Tools.VLEMaxSize,
         HideCursorDelay < Tools.VLEMaxSize,
-        CursorPath.Length > 0,
-        AdditionalArgs.Length > 0,
+        !string.IsNullOrWhiteSpace(CursorPath),
+        !string.IsNullOrWhiteSpace(AdditionalArgs),
         Encoding.UTF8.GetByteCount(CursorPath) < Tools.VLEMaxSize,
         Encoding.UTF8.GetByteCount(AdditionalArgs) < Tools.VLEMaxSize
     ];
@@ -300,9 +301,7 @@ public class GamescopeConfig : GamerunConfigAbstract
     public override void WriteSettings(Stream stream)
     {
         base.WriteSettings(stream);
-        stream.WriteByte(CurrentVersion);
-        var buffer = Tools.PackBoolsToBytes(Settings);
-        stream.Write(buffer);
+        byte[] buffer;
 
         if (OutputWidth > 0)
         {
@@ -421,7 +420,7 @@ public class GamescopeConfig : GamerunConfigAbstract
             }
         }
 
-        if (string.IsNullOrWhiteSpace(CursorPath))
+        if (!string.IsNullOrWhiteSpace(CursorPath))
         {
             var length = Encoding.UTF8.GetByteCount(CursorPath);
             if (length < Tools.VLEMaxSize)
@@ -433,7 +432,7 @@ public class GamescopeConfig : GamerunConfigAbstract
             stream.Write(buffer);
         }
 
-        if (!string.IsNullOrWhiteSpace(AdditionalArgs)) return;
+        if (string.IsNullOrWhiteSpace(AdditionalArgs)) return;
 
         var additionalLength = Encoding.UTF8.GetByteCount(AdditionalArgs);
         if (additionalLength < Tools.VLEMaxSize)
@@ -565,7 +564,7 @@ public class GamescopeConfig : GamerunConfigAbstract
     }
 
     public override event GamerunSettingSaveDelegate? OnSave;
-    
+
     #endregion OVERRIDES
 
     #region PRIVATES

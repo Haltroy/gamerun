@@ -60,7 +60,6 @@ public class MangoHudConfig : GamerunConfigAbstract
 
     public override bool[] Settings =>
     [
-        true,
         Enabled,
         ConfigIsFile,
         string.IsNullOrWhiteSpace(Configuration),
@@ -113,10 +112,7 @@ public class MangoHudConfig : GamerunConfigAbstract
     public override void WriteSettings(Stream stream)
     {
         base.WriteSettings(stream);
-        stream.WriteByte(CurrentVersion);
         var length = Encoding.UTF8.GetByteCount(Configuration);
-        var buffer = Tools.PackBoolsToBytes(Settings);
-        stream.Write(buffer);
 
         if (length < Tools.VLEMaxSize)
         {
@@ -124,7 +120,7 @@ public class MangoHudConfig : GamerunConfigAbstract
         }
         else
         {
-            buffer = BitConverter.GetBytes(length);
+            var buffer = BitConverter.GetBytes(length);
             stream.Write(buffer);
         }
 

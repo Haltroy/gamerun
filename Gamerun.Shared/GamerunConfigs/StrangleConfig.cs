@@ -171,9 +171,7 @@ public class StrangleConfig : GamerunConfigAbstract
     public override void WriteSettings(Stream stream)
     {
         base.WriteSettings(stream);
-        stream.WriteByte(CurrentVersion);
-        var buffer = Tools.PackBoolsToBytes(Settings);
-        stream.Write(buffer);
+        byte[] buffer;
 
         if (AnisotropicFiltering > 0)
         {
