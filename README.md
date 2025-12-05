@@ -22,9 +22,9 @@ For script (`main` branch or the current version):
 2. On Arch Linux (and Arch-based distributions), use `makepkg -si` to install it directly or (for all distributions)
    copy the `gamerun` script to either:
     - `/bin`: `# cp gamerun /bin` (Requires privileges)
-    - `/usr/bin`: `# cp gamerun /bin` (Requires privileges)
-    - `/usr/local/bin`: `# cp gamerun /bin` (Requires privileges)
-    - `$HOME/.local/bin`: `# cp gamerun /bin` (need to add this path to PATH variable)
+    - `/usr/bin`: `# cp gamerun /usr/bin` (Requires privileges)
+    - `/usr/local/bin`: `# cp gamerun /usr/local/bin` (Requires privileges)
+    - `$HOME/.local/bin`: `$ cp gamerun $HOME/.local/bi` (need to add this path to PATH variable)
         - For BASH: add `export $PATH="$HOME/.local/bin:$PATH"` to your `$HOME/.bashrc`
         - For ZSH: add `export $PATH="$HOME/.local/bin:$PATH"` to your `$HOME/.zshrc`
         - For FISH: run `fish_add_path "$HOME/.local/bin"`
